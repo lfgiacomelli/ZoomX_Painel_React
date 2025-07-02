@@ -190,7 +190,7 @@ const Employees: React.FC = () => {
                   <SelectValue placeholder="Todos os cargos" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos os cargos</SelectItem>
+                  <SelectItem value="all">Todos os cargos</SelectItem>
                   <SelectItem value="Motociclista">Motociclista</SelectItem>
                   <SelectItem value="Supervisor">Supervisor</SelectItem>
                   <SelectItem value="Operador">Operador</SelectItem>
@@ -205,7 +205,7 @@ const Employees: React.FC = () => {
                   <SelectValue placeholder="Todos os status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos os status</SelectItem>
+                  <SelectItem value="all">Todos os status</SelectItem>
                   <SelectItem value="active">Ativo</SelectItem>
                   <SelectItem value="inactive">Inativo</SelectItem>
                 </SelectContent>

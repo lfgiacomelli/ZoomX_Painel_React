@@ -64,7 +64,7 @@ const menuItems = [
 ];
 
 export function AppSidebar() {
-  const { collapsed } = useSidebar();
+  const { state } = useSidebar();
   const location = useLocation();
   const currentPath = location.pathname;
 
@@ -82,20 +82,18 @@ export function AppSidebar() {
 
   return (
     <Sidebar
-      className={`${collapsed ? "w-16" : "w-64"} bg-[#f0f0f0] border-r border-gray-200`}
-      collapsible
+      className="bg-[#f0f0f0] border-r border-gray-200"
+      collapsible="icon"
     >
       <div className="p-4 border-b border-gray-200">
-        {!collapsed && (
-          <h1 className="text-xl font-righteous text-black">ZoomX Admin</h1>
-        )}
+        <h1 className="text-xl font-righteous text-black">ZoomX Admin</h1>
         <SidebarTrigger className="mt-2" />
       </div>
 
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="text-gray-600 font-righteous">
-            {!collapsed && "Menu Principal"}
+            Menu Principal
           </SidebarGroupLabel>
           
           <SidebarGroupContent>
@@ -108,9 +106,7 @@ export function AppSidebar() {
                       className={`flex items-center px-3 py-2 rounded-md transition-colors ${getNavCls(item.url)}`}
                     >
                       <item.icon className="w-5 h-5" />
-                      {!collapsed && (
-                        <span className="ml-3 font-righteous">{item.title}</span>
-                      )}
+                      <span className="ml-3 font-righteous">{item.title}</span>
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

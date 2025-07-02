@@ -87,7 +87,7 @@ const Users: React.FC = () => {
                   <SelectValue placeholder="Todos os status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos os status</SelectItem>
+                  <SelectItem value="all">Todos os status</SelectItem>
                   <SelectItem value="active">Ativo</SelectItem>
                   <SelectItem value="banned">Banido</SelectItem>
                   <SelectItem value="inactive">Inativo</SelectItem>

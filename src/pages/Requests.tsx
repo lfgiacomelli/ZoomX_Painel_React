@@ -50,16 +50,16 @@ const mockRequests = [
 ];
 
 const Requests: React.FC = () => {
-  const [typeFilter, setTypeFilter] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
+  const [typeFilter, setTypeFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedRequest, setSelectedRequest] = useState<any>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   
   const itemsPerPage = 10;
   const filteredRequests = mockRequests.filter(request => {
-    return (!typeFilter || request.type === typeFilter) &&
-           (!statusFilter || request.status === statusFilter);
+    return (typeFilter === 'all' || request.type === typeFilter) &&
+           (statusFilter === 'all' || request.status === statusFilter);
   });
   
   const totalPages = Math.ceil(filteredRequests.length / itemsPerPage);
@@ -131,7 +131,7 @@ const Requests: React.FC = () => {
                   <SelectValue placeholder="Todos os tipos" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos os tipos</SelectItem>
+                  <SelectItem value="all">Todos os tipos</SelectItem>
                   <SelectItem value="taxi">Moto Táxi</SelectItem>
                   <SelectItem value="delivery">Entrega</SelectItem>
                 </SelectContent>
@@ -144,7 +144,7 @@ const Requests: React.FC = () => {
                   <SelectValue placeholder="Todos os status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos os status</SelectItem>
+                  <SelectItem value="all">Todos os status</SelectItem>
                   <SelectItem value="pending">Pendente</SelectItem>
                   <SelectItem value="approved">Aprovado</SelectItem>
                   <SelectItem value="rejected">Recusado</SelectItem>
@@ -156,8 +156,8 @@ const Requests: React.FC = () => {
               <Button 
                 variant="outline" 
                 onClick={() => {
-                  setTypeFilter('');
-                  setStatusFilter('');
+                  setTypeFilter('all');
+                  setStatusFilter('all');
                 }}
               >
                 Limpar Filtros

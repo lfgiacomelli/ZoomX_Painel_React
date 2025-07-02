@@ -18,16 +18,16 @@ const mockMotorcycles = [
 ];
 
 const Motorcycles: React.FC = () => {
-  const [brandFilter, setBrandFilter] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
+  const [brandFilter, setBrandFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingMotorcycle, setEditingMotorcycle] = useState<any>(null);
   
   const itemsPerPage = 10;
   const filteredMotorcycles = mockMotorcycles.filter(motorcycle => {
-    return (!brandFilter || motorcycle.brand === brandFilter) &&
-           (!statusFilter || motorcycle.status === statusFilter);
+    return (brandFilter === 'all' || motorcycle.brand === brandFilter) &&
+           (statusFilter === 'all' || motorcycle.status === statusFilter);
   });
   
   const totalPages = Math.ceil(filteredMotorcycles.length / itemsPerPage);
@@ -168,7 +168,7 @@ const Motorcycles: React.FC = () => {
                   <SelectValue placeholder="Todas as marcas" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todas as marcas</SelectItem>
+                  <SelectItem value="all">Todas as marcas</SelectItem>
                   <SelectItem value="Honda">Honda</SelectItem>
                   <SelectItem value="Yamaha">Yamaha</SelectItem>
                   <SelectItem value="Suzuki">Suzuki</SelectItem>
@@ -183,7 +183,7 @@ const Motorcycles: React.FC = () => {
                   <SelectValue placeholder="Todos os status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos os status</SelectItem>
+                  <SelectItem value="all">Todos os status</SelectItem>
                   <SelectItem value="available">Disponível</SelectItem>
                   <SelectItem value="in_use">Em Uso</SelectItem>
                   <SelectItem value="maintenance">Manutenção</SelectItem>
@@ -194,8 +194,8 @@ const Motorcycles: React.FC = () => {
               <Button 
                 variant="outline" 
                 onClick={() => {
-                  setBrandFilter('');
-                  setStatusFilter('');
+                  setBrandFilter('all');
+                  setStatusFilter('all');
                 }}
               >
                 Limpar Filtros

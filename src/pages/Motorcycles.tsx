@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -8,72 +7,330 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Badge } from '../components/ui/badge';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import { Pagination } from '../components/ui/pagination';
+import { Loading } from '../components/ui/loading';
+import ToastMessage from '@/components/layout/ToastMessage';
 
-// Dados de exemplo
-const mockMotorcycles = [
-  { id: '1', brand: 'Honda', model: 'CG 160', year: 2023, licensePlate: 'ABC-1234', status: 'available', employeeId: null, employeeName: null, createdAt: '2024-01-15' },
-  { id: '2', brand: 'Yamaha', model: 'Factor 125', year: 2022, licensePlate: 'DEF-5678', status: 'in_use', employeeId: '1', employeeName: 'João Silva', createdAt: '2024-01-20' },
-  { id: '3', brand: 'Honda', model: 'Biz 125', year: 2021, licensePlate: 'GHI-9012', status: 'maintenance', employeeId: null, employeeName: null, createdAt: '2024-02-01' },
-  { id: '4', brand: 'Suzuki', model: 'Burgman 125', year: 2023, licensePlate: 'JKL-3456', status: 'available', employeeId: null, employeeName: null, createdAt: '2024-02-10' },
-];
+
+interface Motorcycle {
+  mot_codigo: number;
+  mot_modelo: string;
+  mot_placa: string;
+  mot_ano: number;
+  mot_cor: string;
+  fun_codigo: number | null;
+  fun_nome?: string;
+}
 
 const Motorcycles: React.FC = () => {
+  const BASE_URL = 'http://192.168.0.26:3000';
+
+  const [motorcycles, setMotorcycles] = useState<Motorcycle[]>([]);
+  const [loading, setLoading] = useState(true);
   const [brandFilter, setBrandFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingMotorcycle, setEditingMotorcycle] = useState<any>(null);
-  
-  const itemsPerPage = 10;
-  const filteredMotorcycles = mockMotorcycles.filter(motorcycle => {
-    return (brandFilter === 'all' || motorcycle.brand === brandFilter) &&
-           (statusFilter === 'all' || motorcycle.status === statusFilter);
+  const [editingMotorcycle, setEditingMotorcycle] = useState<Partial<Motorcycle> | null>(null);
+
+  const [model, setModel] = useState('');
+  const [licensePlate, setLicensePlate] = useState('');
+  const [year, setYear] = useState<number | ''>('');
+  const [color, setColor] = useState('');
+  const [employeeCode, setEmployeeCode] = useState<number | ''>('');
+
+  const [toast, setToast] = useState<{
+    visible: boolean;
+    message: string;
+    status?: "SUCCESS" | "ERROR" | "INFO" | "WARNING";
+  }>({
+    visible: false,
+    message: "",
+    status: "INFO",
   });
-  
+
+  const itemsPerPage = 10;
+
+  const logoutIfTokenExpired = async (error: any) => {
+    if (error.status === 401 || error.status === 403) {
+      setToast({
+        visible: true,
+        message: 'Sessão expirada. Faça login novamente!',
+        status: 'ERROR',
+      });
+      setTimeout(() => {
+        localStorage.clear();
+        window.location.href = '/login';
+      }, 1500);
+    }
+  };
+
+  async function fetchMotorcycles() {
+    setLoading(true);
+    try {
+      const response = await fetch(`${BASE_URL}/api/admin/motocicletas`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token') || ''}`,
+        },
+      });
+
+      if (!response.ok) {
+        let errorMessage = 'Erro ao buscar motocicletas';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch { }
+        const error: any = new Error(errorMessage);
+        error.status = response.status;
+        throw error;
+      }
+
+      const data: Motorcycle[] = await response.json();
+      setMotorcycles(data);
+
+    } catch (error: any) {
+      await logoutIfTokenExpired(error);
+      console.error('Erro ao buscar motocicletas:', error);
+      setToast({
+        visible: true,
+        message: error.message || 'Erro ao carregar motocicletas.',
+        status: 'ERROR',
+      });
+      setMotorcycles([]);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function addMotorcycle(newMotorcycle: Omit<Motorcycle, 'mot_codigo' | 'fun_nome'>) {
+    setLoading(true);
+    try {
+      const response = await fetch(`${BASE_URL}/api/admin/motocicletas/adicionar`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token') || ''}`,
+        },
+        body: JSON.stringify(newMotorcycle),
+      });
+
+      if (!response.ok) {
+        let errorMessage = 'Erro ao adicionar motocicleta';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch { }
+
+        const error: any = new Error(errorMessage);
+        error.status = response.status;
+        await logoutIfTokenExpired(error);
+        throw error;
+      }
+
+      await response.json();
+
+      setToast({
+        visible: true,
+        message: 'Motocicleta adicionada com sucesso!',
+        status: 'SUCCESS',
+      });
+
+      await fetchMotorcycles();
+
+    } catch (error: any) {
+      console.error('Erro ao adicionar motocicleta:', error);
+      setToast({
+        visible: true,
+        message: error.message || 'Erro ao adicionar motocicleta.',
+        status: 'ERROR',
+      });
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function updateMotorcycle(
+    motorcycleId: number,
+    updatedFields: Partial<Omit<Motorcycle, 'mot_codigo' | 'fun_nome'>>
+  ) {
+    setLoading(true);
+    try {
+      const response = await fetch(`${BASE_URL}/api/admin/motocicletas/editar/${motorcycleId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token') || ''}`,
+        },
+        body: JSON.stringify(updatedFields),
+      });
+
+      if (!response.ok) {
+        let errorMessage = 'Erro ao atualizar motocicleta';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch { }
+        const error: any = new Error(errorMessage);
+        error.status = response.status;
+        await logoutIfTokenExpired(error);
+        throw error;
+      }
+
+      await response.json();
+
+      setToast({
+        visible: true,
+        message: 'Motocicleta atualizada com sucesso!',
+        status: 'SUCCESS',
+      });
+
+      await fetchMotorcycles();
+
+    } catch (error: any) {
+      console.error('Erro ao atualizar motocicleta:', error);
+      setToast({
+        visible: true,
+        message: error.message || 'Erro ao atualizar motocicleta.',
+        status: 'ERROR',
+      });
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function deleteMotorcycle(motorcycleId: number) {
+    if (!confirm('Tem certeza que deseja excluir esta motocicleta? Esta ação é irreversível.')) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch(`${BASE_URL}/api/admin/motocicletas/excluir/${motorcycleId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token') || ''}`,
+        },
+      });
+
+      if (!response.ok) {
+        let errorMessage = 'Erro ao excluir motocicleta';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch { }
+        const error: any = new Error(errorMessage);
+        error.status = response.status;
+        await logoutIfTokenExpired(error);
+        throw error;
+      }
+
+      await response.json();
+
+      setToast({
+        visible: true,
+        message: 'Motocicleta excluída com sucesso!',
+        status: 'SUCCESS',
+      });
+
+      await fetchMotorcycles();
+
+    } catch (error: any) {
+      console.error('Erro ao excluir motocicleta:', error);
+      setToast({
+        visible: true,
+        message: error.message || 'Erro ao excluir motocicleta.',
+        status: 'ERROR',
+      });
+    } finally {
+      setLoading(false);
+    }
+  }
+
+
+
+  useEffect(() => {
+    fetchMotorcycles();
+  }, []);
+
+
+
+  const filteredMotorcycles = motorcycles.filter(motorcycle => {
+    const brandMatch = brandFilter === 'all' || motorcycle.mot_modelo.toLowerCase().includes(brandFilter.toLowerCase());
+
+    let statusMatch = true;
+    if (statusFilter === 'available') {
+      statusMatch = motorcycle.fun_codigo === null;
+    } else if (statusFilter === 'in_use' || statusFilter === 'maintenance') {
+      statusMatch = motorcycle.fun_codigo !== null;
+    }
+
+    return brandMatch && statusMatch;
+  });
+
   const totalPages = Math.ceil(filteredMotorcycles.length / itemsPerPage);
   const paginatedMotorcycles = filteredMotorcycles.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
-  const handleEdit = (motorcycle: any) => {
-    setEditingMotorcycle(motorcycle);
+
+  const handleNewMotorcycleClick = () => {
+    setEditingMotorcycle(null);
+    setModel('');
+    setLicensePlate('');
+    setYear('');
+    setColor('');
+    setEmployeeCode('');
     setIsModalOpen(true);
   };
 
-  const handleDelete = (motorcycleId: string) => {
-    if (confirm('Tem certeza que deseja excluir esta motocicleta?')) {
-      console.log('Excluindo motocicleta:', motorcycleId);
-    }
+  const handleEdit = (motorcycle: Motorcycle) => {
+    setEditingMotorcycle(motorcycle);
+    setModel(motorcycle.mot_modelo);
+    setLicensePlate(motorcycle.mot_placa);
+    setYear(motorcycle.mot_ano);
+    setColor(motorcycle.mot_cor);
+    setEmployeeCode(motorcycle.fun_codigo || '');
+    setIsModalOpen(true);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Salvando motocicleta:', editingMotorcycle);
+
+    const motorcycleData = {
+      mot_modelo: model,
+      mot_placa: licensePlate,
+      mot_ano: Number(year),
+      mot_cor: color,
+      fun_codigo: employeeCode === '' || employeeCode === 0 ? null : Number(employeeCode),
+    };
+
+    console.log('Dados enviados:', motorcycleData);
+
+    if (editingMotorcycle?.mot_codigo) {
+      await updateMotorcycle(editingMotorcycle.mot_codigo, motorcycleData);
+    } else {
+      await addMotorcycle(motorcycleData);
+    }
     setIsModalOpen(false);
     setEditingMotorcycle(null);
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'available':
-        return <Badge className="bg-green-100 text-green-800">Disponível</Badge>;
-      case 'in_use':
-        return <Badge className="bg-blue-100 text-blue-800">Em Uso</Badge>;
-      case 'maintenance':
-        return <Badge className="bg-yellow-100 text-yellow-800">Manutenção</Badge>;
-      default:
-        return <Badge>{status}</Badge>;
-    }
-  };
-
   return (
     <div className="space-y-6">
+      {toast.visible && (
+        <ToastMessage
+          message={toast.message}
+          status={toast.status}
+          onHide={() => setToast({ ...toast, visible: false })}
+        />
+      )}
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-righteous text-black">Motocicletas</h1>
         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
           <DialogTrigger asChild>
-            <Button className="zoomx-button" onClick={() => setEditingMotorcycle({})}>
+            <Button className="zoomx-button" onClick={handleNewMotorcycleClick}>
               <Plus className="w-4 h-4 mr-2" />
               Nova Motocicleta
             </Button>
@@ -81,7 +338,7 @@ const Motorcycles: React.FC = () => {
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
               <DialogTitle className="font-righteous">
-                {editingMotorcycle?.id ? 'Editar Motocicleta' : 'Nova Motocicleta'}
+                {editingMotorcycle?.mot_codigo ? 'Editar Motocicleta' : 'Nova Motocicleta'}
               </DialogTitle>
               <DialogDescription>
                 Preencha os dados da motocicleta abaixo.
@@ -90,56 +347,64 @@ const Motorcycles: React.FC = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium">Marca</label>
-                  <Input 
-                    className="zoomx-input" 
-                    defaultValue={editingMotorcycle?.brand}
-                    required 
+                  <label className="text-sm font-medium">Modelo</label>
+                  <Input
+                    className="zoomx-input"
+                    value={model}
+                    onChange={(e) => setModel(e.target.value)}
+                    required
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium">Modelo</label>
-                  <Input 
-                    className="zoomx-input" 
-                    defaultValue={editingMotorcycle?.model}
-                    required 
+                  <label className="text-sm font-medium">Placa</label>
+                  <Input
+                    className="zoomx-input"
+                    value={licensePlate}
+                    onChange={(e) => setLicensePlate(e.target.value)}
+                    placeholder="ABC-1234"
+                    required
                   />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium">Ano</label>
-                  <Input 
+                  <Input
                     type="number"
                     min="2000"
-                    max="2024"
-                    className="zoomx-input" 
-                    defaultValue={editingMotorcycle?.year}
-                    required 
+                    max={new Date().getFullYear()}
+                    className="zoomx-input"
+                    value={year}
+                    onChange={(e) => setYear(Number(e.target.value))}
+                    required
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium">Placa</label>
-                  <Input 
-                    className="zoomx-input" 
-                    defaultValue={editingMotorcycle?.licensePlate}
-                    placeholder="ABC-1234"
-                    required 
+                  <label className="text-sm font-medium">Cor</label>
+                  <Input
+                    className="zoomx-input"
+                    value={color}
+                    onChange={(e) => setColor(e.target.value)}
+                    required
                   />
                 </div>
               </div>
               <div>
-                <label className="text-sm font-medium">Status</label>
-                <Select defaultValue={editingMotorcycle?.status || 'available'}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione o status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="available">Disponível</SelectItem>
-                    <SelectItem value="in_use">Em Uso</SelectItem>
-                    <SelectItem value="maintenance">Manutenção</SelectItem>
-                  </SelectContent>
-                </Select>
+                <label className="text-sm font-medium">Funcionário (Código)</label>
+                <Input
+                  type="number"
+                  className="zoomx-input"
+                  value={employeeCode}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setEmployeeCode(val === '' ? '' : Number(val));
+                  }}
+                  placeholder="Deixe em branco se disponível"
+                />
+
+                <span className="text-xs text-gray-500">
+                  Defina o código do funcionário se a motocicleta estiver em uso.
+                </span>
               </div>
               <div className="flex justify-end space-x-2">
                 <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
@@ -154,7 +419,8 @@ const Motorcycles: React.FC = () => {
         </Dialog>
       </div>
 
-      {/* Filtros */}
+      ---
+
       <Card className="zoomx-card">
         <CardHeader>
           <CardTitle className="font-righteous">Filtros</CardTitle>
@@ -162,19 +428,13 @@ const Motorcycles: React.FC = () => {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="text-sm font-medium">Marca</label>
-              <Select value={brandFilter} onValueChange={setBrandFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Todas as marcas" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todas as marcas</SelectItem>
-                  <SelectItem value="Honda">Honda</SelectItem>
-                  <SelectItem value="Yamaha">Yamaha</SelectItem>
-                  <SelectItem value="Suzuki">Suzuki</SelectItem>
-                  <SelectItem value="Kawasaki">Kawasaki</SelectItem>
-                </SelectContent>
-              </Select>
+              <label className="text-sm font-medium">Modelo</label>
+              <Input
+                placeholder="Pesquisar por modelo..."
+                value={brandFilter}
+                onChange={(e) => setBrandFilter(e.target.value)}
+                className="zoomx-input"
+              />
             </div>
             <div>
               <label className="text-sm font-medium">Status</label>
@@ -186,16 +446,16 @@ const Motorcycles: React.FC = () => {
                   <SelectItem value="all">Todos os status</SelectItem>
                   <SelectItem value="available">Disponível</SelectItem>
                   <SelectItem value="in_use">Em Uso</SelectItem>
-                  <SelectItem value="maintenance">Manutenção</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="flex items-end">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => {
                   setBrandFilter('all');
                   setStatusFilter('all');
+                  setCurrentPage(1);
                 }}
               >
                 Limpar Filtros
@@ -205,7 +465,8 @@ const Motorcycles: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Tabela de Motocicletas */}
+      ---
+
       <Card className="zoomx-card">
         <CardHeader>
           <CardTitle className="font-righteous">Lista de Motocicletas</CardTitle>
@@ -214,60 +475,68 @@ const Motorcycles: React.FC = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="text-left py-3 px-4 font-righteous">Marca</th>
-                  <th className="text-left py-3 px-4 font-righteous">Modelo</th>
-                  <th className="text-left py-3 px-4 font-righteous">Ano</th>
-                  <th className="text-left py-3 px-4 font-righteous">Placa</th>
-                  <th className="text-left py-3 px-4 font-righteous">Status</th>
-                  <th className="text-left py-3 px-4 font-righteous">Funcionário</th>
-                  <th className="text-center py-3 px-4 font-righteous">Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {paginatedMotorcycles.map((motorcycle) => (
-                  <tr key={motorcycle.id} className="border-b border-gray-100 hover:bg-gray-50">
-                    <td className="py-3 px-4 font-medium">{motorcycle.brand}</td>
-                    <td className="py-3 px-4">{motorcycle.model}</td>
-                    <td className="py-3 px-4">{motorcycle.year}</td>
-                    <td className="py-3 px-4 font-mono">{motorcycle.licensePlate}</td>
-                    <td className="py-3 px-4">{getStatusBadge(motorcycle.status)}</td>
-                    <td className="py-3 px-4 text-gray-600">
-                      {motorcycle.employeeName || '-'}
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="flex justify-center space-x-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleEdit(motorcycle)}
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleDelete(motorcycle.id)}
-                          className="text-red-600 hover:text-red-700"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-          />
+
+          {loading ? (
+            <Loading />
+          ) : (
+            <>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-gray-200">
+                      <th className="text-left py-3 px-4 font-righteous">Modelo</th>
+                      <th className="text-left py-3 px-4 font-righteous">Placa</th>
+                      <th className="text-left py-3 px-4 font-righteous">Ano</th>
+                      <th className="text-left py-3 px-4 font-righteous">Cor</th>
+                      <th className="text-left py-3 px-4 font-righteous">Dono</th>
+                      <th className="text-center py-3 px-4 font-righteous">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {paginatedMotorcycles.map((motorcycle) => (
+                      <tr key={motorcycle.mot_codigo} className="border-b border-gray-100 hover:bg-gray-50">
+                        <td className="py-3 px-4 font-medium">{motorcycle.mot_modelo}</td>
+                        <td className="py-3 px-4">{motorcycle.mot_placa}</td>
+                        <td className="py-3 px-4">{motorcycle.mot_ano}</td>
+                        <td className="py-3 px-4">{motorcycle.mot_cor}</td>
+                        <td className="py-3 px-4">{motorcycle.fun_nome}</td>
+                        <td className="py-3 px-4">
+                          <div className="flex justify-center space-x-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleEdit(motorcycle)}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => deleteMotorcycle(motorcycle.mot_codigo)}
+                              className="text-red-600 hover:text-red-700"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            </>
+          )}
+          {
+            filteredMotorcycles.length === 0 && !loading && (
+              <div className="text-center text-gray-500 py-4">Nenhuma motocicleta encontrada.</div>
+            )
+          }
         </CardContent>
       </Card>
     </div>

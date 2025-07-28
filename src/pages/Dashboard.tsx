@@ -17,6 +17,7 @@ interface SolicitacaoPendente {
   sol_origem: string;
   sol_destino: string;
   sol_valor: string;
+  sol_formapagamento: string;
   usu_nome: string;
 }
 
@@ -297,7 +298,7 @@ const Dashboard: React.FC = () => {
           </CardHeader>
           <CardContent>
             {loadingContador ? (
-              <div className="text-2xl font-bold text-black">Carregando...</div>
+              <div className="text-2xl font-bold text-black">Atualizando...</div>
             ) : (
               <div className="text-2xl font-bold text-black">
                 {totalCorridasFinalizadas !== null ? totalCorridasFinalizadas : 'N/A'}
@@ -319,7 +320,7 @@ const Dashboard: React.FC = () => {
           </CardHeader>
           <CardContent>
             {loadingContador ? (
-              <div className="text-2xl font-bold text-black">Carregando...</div>
+              <div className="text-2xl font-bold text-black">Atualizando...</div>
             ) : (
               <div className="text-2xl font-bold text-black">
                 {totalAvaliacoes !== null ? totalAvaliacoes : 'N/A'}
@@ -342,7 +343,7 @@ const Dashboard: React.FC = () => {
           <CardContent>
             <div className="text-2xl font-bold text-black">
               {loadingContador ? (
-                <div className="text-2xl font-bold text-black">Carregando...</div>
+                <div className="text-2xl font-bold text-black">Atualizando...</div>
               ) : (
                 <div className="text-2xl font-bold text-black">
                   {faturamento ? `R$ ${parseFloat(faturamento.faturamento_diario).toFixed(2)}` : 'N/A'}
@@ -389,34 +390,39 @@ const Dashboard: React.FC = () => {
         </CardHeader>
         <CardContent>
           {loadingSolicitacoes ? (
-            <p>Carregando solicitações...</p>
+            <p>Atualizando solicitações...</p>
           ) : solicitacoesPendentes.length === 0 ? (
             <p>Nenhuma solicitação pendente.</p>
           ) : (
-            <ul className="space-y-3 max-h-64 overflow-y-auto">
-              {solicitacoesPendentes.map((sol) => (
-                <li
-                  key={sol.sol_codigo}
-                  className="border border-gray-200 rounded p-3 flex justify-between items-center hover:shadow"
-                >
-                  <div className="flex flex-col space-y-1 max-w-[70%]">
-                    <p>
-                      <strong>Origem: </strong> {sol.sol_origem} | <strong> Destino:</strong> {sol.sol_destino} | <strong>Valor:</strong> R$ {parseFloat(sol.sol_valor).toFixed(2)}
-                    </p>
-                    <p>
-                      <strong>Usuário:</strong> {sol.usu_nome}
-                    </p>
-                  </div>
-                  <button
-                    onClick={goToSolicitacoes}
-                    className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition"
-                    aria-label={`Ver detalhes da solicitação ${sol.sol_codigo}`}
+            <>
+              <Box sx={{ width: '100%' }}>
+                <LinearProgress color='warning' />
+              </Box>
+              <ul className="space-y-3 max-h-64 overflow-y-auto">
+                {solicitacoesPendentes.map((sol) => (
+                  <li
+                    key={sol.sol_codigo}
+                    className="border border-gray-200 rounded p-3 flex justify-between items-center hover:shadow"
                   >
-                    Ver Solicitações
-                  </button>
-                </li>
-              ))}
-            </ul>
+                    <div className="flex flex-col space-y-1 max-w-[70%]">
+                      <p>
+                        <strong>Origem: </strong> {sol.sol_origem} | <strong> Destino:</strong> {sol.sol_destino} | <strong>Valor:</strong> R$ {parseFloat(sol.sol_valor).toFixed(2)} | <strong>Forma de pagamento:</strong> {sol.sol_formapagamento.toLocaleLowerCase() === "pix" ? "PIX" : sol.sol_formapagamento}
+                      </p>
+                      <p>
+                        <strong>Usuário:</strong> {sol.usu_nome}
+                      </p>
+                    </div>
+                    <button
+                      onClick={goToSolicitacoes}
+                      className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition"
+                      aria-label={`Ver detalhes da solicitação ${sol.sol_codigo}`}
+                    >
+                      Ver Solicitações
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </>
           )}
         </CardContent>
       </Card>
@@ -432,7 +438,7 @@ const Dashboard: React.FC = () => {
 
 
           {loadingViagens ? (
-            <p>Carregando viagens...</p>
+            <p>Atualizando viagens...</p>
           ) : viagensPendentes.length === 0 ? (
             <p>Nenhuma viagem em andamento.</p>
           ) : (
@@ -455,7 +461,7 @@ const Dashboard: React.FC = () => {
                       </p>
                     )}
                   </li>
-              ))}
+                ))}
                 <div className="mt-4">
                   <Button
                     onClick={handleFinalizarTodas}

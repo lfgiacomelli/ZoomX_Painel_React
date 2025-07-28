@@ -209,6 +209,7 @@ const Requests: React.FC = () => {
       });
       setIsApproveModalOpen(false);
       fetchRequestsData();
+      window.location.reload();
     } catch (error: any) {
       console.error('Erro ao aprovar solicitação:', error);
       setToast({

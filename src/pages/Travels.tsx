@@ -122,14 +122,15 @@ const Travels: React.FC = () => {
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
-    async function handleFinalizar(travelId: number) {
+    async function handleFinalizar(id: number) {
         try {
 
-            const response = await fetch(`${BASE_URL}/api/admin/viagens/finalizar/${travelId}`, {
+            const response = await fetch(`${BASE_URL}/api/admin/viagens/finalizar/${id}`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                },
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token') || ''}`,
+                    }
             });
             fetchTravelsData();
 
@@ -146,10 +147,10 @@ const Travels: React.FC = () => {
                 status: 'SUCCESS',
             })
         } catch (error) {
-            console.error('Erro ao finalizar todas as viagens:', error);
+            console.error('Erro ao finalizar a viagem:', error);
             setToast({
                 visible: true,
-                message: 'Erro ao finalizar todas as viagens. Tente novamente.',
+                message: 'Erro ao finalizar a viagem. Tente novamente.',
                 status: 'ERROR',
             });
         }
@@ -160,6 +161,7 @@ const Travels: React.FC = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
                 },
             });
 

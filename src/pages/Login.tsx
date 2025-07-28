@@ -13,6 +13,7 @@ import { Button } from '../components/ui/button';
 import { Label } from '../components/ui/label';
 import { Alert, AlertDescription } from '../components/ui/alert';
 import { XCircle, Eye, EyeOff, Loader2 } from 'lucide-react';
+import ToastMessage from '@/components/layout/ToastMessage';
 
 const LoginPage: React.FC = () => {
   const { login } = useAuth();
@@ -24,6 +25,16 @@ const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+
+  const [toast, setToast] = useState<{
+    visible: boolean;
+    message: string;
+    status?: "SUCCESS" | "ERROR" | "INFO" | "WARNING";
+  }>({
+    visible: false,
+    message: "",
+    status: "INFO",
+  });
 
   useEffect(() => {
     setIsMounted(true);
@@ -60,7 +71,6 @@ const LoginPage: React.FC = () => {
               Authorization: `Bearer ${data.token}`,
             },
           });
-          console.log('Diárias geradas com sucesso');
         } catch (gerarError) {
           console.error('Erro ao gerar diárias:', gerarError);
         }
@@ -69,6 +79,16 @@ const LoginPage: React.FC = () => {
       }
     } catch (err) {
       console.error('Erro de conexão:', err);
+      setToast({
+        visible: true,
+        message: 'Erro ao fazer login. Verifique suas credenciais e tente novamente.',
+        status: 'ERROR',
+      });
+      setToast({
+        visible: true,
+        message: 'Erro de conexão.',
+        status: 'ERROR',
+      })
       setError('Não foi possível conectar ao servidor. Verifique sua conexão.');
     } finally {
       setLoading(false);
@@ -77,6 +97,13 @@ const LoginPage: React.FC = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 px-4">
+      {toast.visible && (
+        <ToastMessage
+          message={toast.message}
+          status={toast.status}
+          onHide={() => setToast({ ...toast, visible: false })}
+        />
+      )}
       <Card className={`w-full max-w-md shadow-lg border-0 transition-all duration-500 ease-out ${isMounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
         <CardHeader className="text-center space-y-2">
           <div className="mx-auto flex items-center justify-center h-12 w-12 bg-blue-100 rounded-full">

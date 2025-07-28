@@ -6,18 +6,9 @@ import {
   CardHeader,
   CardTitle,
 } from '../components/ui/card';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-} from 'recharts';
+import Box from '@mui/material/Box';
+import LinearProgress from '@mui/material/LinearProgress';
+
 import { Button } from '@/components/ui/button';
 import ToastMessage from '@/components/layout/ToastMessage';
 
@@ -95,7 +86,7 @@ const Dashboard: React.FC = () => {
         if (!res.ok) throw new Error('Erro ao buscar solicitações');
         const data: SolicitacaoPendente[] = await res.json();
         setSolicitacoesPendentes(data);
-        if(data.length > 0) {
+        if (data.length > 0) {
           setToast({
             visible: true,
             message: `Você tem ${data.length} solicitações pendentes.`,
@@ -438,39 +429,44 @@ const Dashboard: React.FC = () => {
           <CardDescription>Viagens que estão atualmente em andamento</CardDescription>
         </CardHeader>
         <CardContent>
+
+
           {loadingViagens ? (
             <p>Carregando viagens...</p>
           ) : viagensPendentes.length === 0 ? (
             <p>Nenhuma viagem em andamento.</p>
           ) : (
-            <ul className="space-y-3 max-h-64 overflow-y-auto">
-              {viagensPendentes.map((via) => (
-                <li
-                  key={via.via_codigo}
-                  className="border border-gray-200 rounded p-3 hover:shadow"
-                >
-                  <p>
-                    <strong>Origem:</strong> {via.via_origem} | <strong>Destino:</strong> {via.via_destino} | <strong>Valor:</strong> R$ {parseFloat(via.via_valor).toFixed(2)} | <strong>Mototáxista:</strong> {via.funcionario_nome} | <strong>Usuário:</strong> {via.usuario_nome}
-                  </p>
-
-                  {via.via_observacoes && (
+            <><Box sx={{ width: '100%' }}>
+              <LinearProgress color='warning' />
+            </Box>
+              <ul className="space-y-3 max-h-64 overflow-y-auto">
+                {viagensPendentes.map((via) => (
+                  <li
+                    key={via.via_codigo}
+                    className="border border-gray-200 rounded p-3 hover:shadow"
+                  >
                     <p>
-                      <strong>Observações:</strong> {via.via_observacoes}
+                      <strong>Origem:</strong> {via.via_origem} | <strong>Destino:</strong> {via.via_destino} | <strong>Valor:</strong> R$ {parseFloat(via.via_valor).toFixed(2)} | <strong>Mototáxista:</strong> {via.funcionario_nome} | <strong>Usuário:</strong> {via.usuario_nome}
                     </p>
-                  )}
-                </li>
 
+                    {via.via_observacoes && (
+                      <p>
+                        <strong>Observações:</strong> {via.via_observacoes}
+                      </p>
+                    )}
+                  </li>
               ))}
-              <div className="mt-4">
-                <Button
-                  onClick={handleFinalizarTodas}
-                  className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition"
-                  aria-label="Ver lista de solicitações"
-                >
-                  Finalizar todas
-                </Button>
-              </div>
-            </ul>
+                <div className="mt-4">
+                  <Button
+                    onClick={handleFinalizarTodas}
+                    className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition"
+                    aria-label="Ver lista de solicitações"
+                  >
+                    Finalizar todas
+                  </Button>
+                </div>
+              </ul>
+            </>
           )}
         </CardContent>
       </Card>

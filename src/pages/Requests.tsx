@@ -462,8 +462,18 @@ const Requests: React.FC = () => {
               </div>
               <div>
                 <label className="text-sm font-medium">Forma de Pagamento</label>
-                <p className="text-sm text-gray-600">{selectedRequest.sol_formapagamento}</p>
+                <p
+                  className={`text-sm ${selectedRequest.sol_formapagamento.toLocaleLowerCase() === "pix"
+                      ? "text-green-600 font-medium"
+                      : "text-gray-600"
+                    }`}
+                >
+                  {selectedRequest.sol_formapagamento.toLocaleLowerCase() === "pix"
+                    ? "PIX (pago pelo app via QRCode)"
+                    : selectedRequest.sol_formapagamento}
+                </p>
               </div>
+
               <div>
                 <label className="text-sm font-medium">Distância</label>
                 <p className="text-sm text-gray-600">{selectedRequest.sol_distancia} km</p>

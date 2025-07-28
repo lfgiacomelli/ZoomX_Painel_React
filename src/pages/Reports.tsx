@@ -93,7 +93,7 @@ interface RelatorioData {
   rotasPopulares: RotasPopulares[];
 }
 
-const BASE_URL = 'http://192.168.0.26:3000';
+const BASE_URL = 'https://backend-turma-a-2025.onrender.com';
 const API_URL = '/api/admin/relatorios';
 
 const Reports: React.FC = () => {

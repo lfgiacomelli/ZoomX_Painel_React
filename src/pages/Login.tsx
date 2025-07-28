@@ -42,7 +42,7 @@ const LoginPage: React.FC = () => {
     setLoading(true);
 
     try {
-      const res = await fetch('http://192.168.0.26:3000/api/admin/login/', {
+      const res = await fetch('https://backend-turma-a-2025.onrender.com/api/admin/login/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ fun_email: email, fun_senha: senha }),

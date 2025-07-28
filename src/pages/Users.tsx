@@ -10,7 +10,7 @@ import { Loading } from '../components/ui/loading';
 import ToastMessage from '@/components/layout/ToastMessage';
 
 const Users: React.FC = () => {
-  const BASE_URL = 'http://192.168.0.26:3000';
+  const BASE_URL = 'https://backend-turma-a-2025.onrender.com';
 
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);

@@ -47,7 +47,7 @@ interface Funcionario {
 
 const Requests: React.FC = () => {
   const { funcionario } = useAuth();
-  const BASE_URL = 'http://192.168.0.26:3000';
+  const BASE_URL = 'https://backend-turma-a-2025.onrender.com';
 
   const [requests, setRequests] = useState<Request[]>([]);
   const [loading, setLoading] = useState(true);
@@ -79,7 +79,6 @@ const Requests: React.FC = () => {
     message: "",
     status: "INFO",
   });
-
 
   async function fetchRequestsData() {
     setLoading(true);

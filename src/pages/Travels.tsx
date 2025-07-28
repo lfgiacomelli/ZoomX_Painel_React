@@ -47,7 +47,7 @@ interface Travel {
 }
 
 const Travels: React.FC = () => {
-    const BASE_URL = 'http://192.168.0.26:3000';
+    const BASE_URL = 'https://backend-turma-a-2025.onrender.com';
 
     const [travels, setTravels] = useState<Travel[]>([]);
     const [loading, setLoading] = useState(true);

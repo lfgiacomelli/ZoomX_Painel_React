@@ -36,7 +36,7 @@ export default function Email() {
         }));
     };
 
-    const BASE_URL = 'http://192.168.0.26:3000';
+    const BASE_URL = 'https://backend-turma-a-2025.onrender.com';
 
     const handleSubmit = async (e) => {
         e.preventDefault();

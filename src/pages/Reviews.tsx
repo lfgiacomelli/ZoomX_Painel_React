@@ -35,7 +35,7 @@ interface Review {
 }
 
 const Reviews: React.FC = () => {
-  const BASE_URL = 'http://192.168.0.26:3000';
+  const BASE_URL = 'https://backend-turma-a-2025.onrender.com';
 
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);

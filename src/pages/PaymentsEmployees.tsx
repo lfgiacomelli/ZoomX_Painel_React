@@ -52,7 +52,7 @@ export default function PaymentsEmployees() {
   async function handlePayments() {
     setLoadingDiarias(true);
     try {
-      const response = await fetch('http://192.168.0.26:3000/api/admin/pagamentos/gerar-diarias', {
+      const response = await fetch('https://backend-turma-a-2025.onrender.com/api/admin/pagamentos/gerar-diarias', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

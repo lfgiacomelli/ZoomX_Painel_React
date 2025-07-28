@@ -13,7 +13,7 @@ import emptyAnuncios from '../assets/empty.png'
 import ToastMessage from '@/components/layout/ToastMessage';
 
 const Announcements: React.FC = () => {
-  const BASE_URL = 'http://192.168.0.26:3000';
+  const BASE_URL = 'https://backend-turma-a-2025.onrender.com';
   const [isLoading, setIsLoading] = useState(true);
   const [anuncios, setAnuncios] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(1);

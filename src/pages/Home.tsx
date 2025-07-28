@@ -45,7 +45,6 @@ export default function Home() {
   ];
 
   const handleAccessPanel = () => navigate('/login');
-  const handleDemoRequest = () => console.log("Demo requested");
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#f8f8f8] to-[#eaeaea] text-gray-900 font-['Righteous'] overflow-hidden">

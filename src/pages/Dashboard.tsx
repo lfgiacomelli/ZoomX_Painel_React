@@ -11,6 +11,7 @@ import LinearProgress from '@mui/material/LinearProgress';
 
 import { Button } from '@/components/ui/button';
 import ToastMessage from '@/components/layout/ToastMessage';
+import { useNavigate } from 'react-router-dom';
 
 interface SolicitacaoPendente {
   sol_codigo: number;
@@ -47,6 +48,7 @@ interface Review {
 }
 
 const Dashboard: React.FC = () => {
+  const navigate = useNavigate();
   const [solicitacoesPendentes, setSolicitacoesPendentes] = useState<SolicitacaoPendente[]>([]);
   const [viagensPendentes, setViagensPendentes] = useState<ViagemPendente[]>([]);
   const [totalCorridasFinalizadas, setTotalCorridasFinalizadas] = useState<number | null>(null);
@@ -234,7 +236,7 @@ const Dashboard: React.FC = () => {
   }, []);
 
   const goToSolicitacoes = () => {
-    window.location.href = '/solicitacoes';
+    navigate('/solicitacoes');
   };
 
   async function handleFinalizarTodas() {
@@ -306,7 +308,7 @@ const Dashboard: React.FC = () => {
             )}
             <Button
               className="zoomx-button mt-4"
-              onClick={() => window.location.href = '/viagens'}
+              onClick={() => navigate('/viagens')}
               aria-label="Ver viagens"
             >
               Ver viagens
@@ -328,7 +330,7 @@ const Dashboard: React.FC = () => {
             )}
             <Button
               className="zoomx-button mt-4"
-              onClick={() => window.location.href = '/avaliacoes'}
+              onClick={() => navigate('/avaliacoes')}
               aria-label="Ver avaliações"
             >
               Ver avaliações
@@ -352,7 +354,7 @@ const Dashboard: React.FC = () => {
               )}
               <Button
                 className="zoomx-button mt-4"
-                onClick={() => window.location.href = '/relatorios'}
+                onClick={() => navigate('/relatorios')}
                 aria-label="Ver relatório"
               >
                 Ver relatório
@@ -371,7 +373,7 @@ const Dashboard: React.FC = () => {
             </div>
             <Button
               className="zoomx-button mt-4"
-              onClick={() => window.location.href = '/funcionarios'}
+              onClick={() => navigate('/funcionarios')}
               aria-label="Ver lista de mototáxistas ativos"
             >
               Ver Mototáxistas

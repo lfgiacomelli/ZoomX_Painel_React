@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export default function HomeHeader() {
+  const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
@@ -35,13 +36,13 @@ export default function HomeHeader() {
           <div className="flex items-center">
             <div className="hidden md:flex items-center space-x-4">
               <a 
-                href="/login" 
+                onClick={() => navigate('/login')} 
                 className="text-gray-700 hover:text-blue-600 text-sm font-medium transition-colors"
               >
                 Entrar
               </a>
-              
-              <a href="/e-mail">
+
+              <a onClick={() => navigate('/email')}>
                 <button
                   type="button"
                   className="relative inline-flex items-center rounded-md bg-gradient-to-r from-blue-600 to-blue-500 px-4 py-2 text-sm font-medium text-white shadow-md

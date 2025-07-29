@@ -35,8 +35,8 @@ export default function HomeHeader() {
 
           <div className="flex items-center">
             <div className="hidden md:flex items-center space-x-4">
-              <a 
-                onClick={() => navigate('/login')} 
+              <a
+                onClick={() => navigate('/login')}
                 className="text-gray-700 hover:text-blue-600 text-sm font-medium transition-colors"
               >
                 Entrar
@@ -80,16 +80,10 @@ export default function HomeHeader() {
         <div className="px-2 pt-2 pb-4 space-y-1 sm:px-3 bg-white border-t">
           <div className="pt-4 border-t border-gray-200">
             <a
-              href="/login"
+              onClick={() => navigate('/login')}
               className="block w-full px-4 py-2 text-center rounded-md text-gray-700 hover:text-blue-600 hover:bg-blue-50 font-medium"
             >
               Entrar
-            </a>
-            <a
-              href="/register"
-              className="block w-full mt-2 px-4 py-2 text-center rounded-md bg-blue-600 text-white font-medium hover:bg-blue-700"
-            >
-              Criar conta
             </a>
           </div>
         </div>

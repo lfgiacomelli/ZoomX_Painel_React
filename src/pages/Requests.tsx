@@ -390,7 +390,7 @@ const Requests: React.FC = () => {
                             <Button size="sm" variant="outline" onClick={() => handleViewDetails(request)}>
                               Detalhes
                             </Button>
-                            {request.sol_status === 'Pendente' && (
+                            {request.sol_status.toLowerCase() === 'pendente' && (
                               <>
                                 <Button
                                   size="sm"

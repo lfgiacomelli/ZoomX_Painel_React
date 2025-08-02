@@ -4,12 +4,11 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
-import { Badge } from '../components/ui/badge';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import { Pagination } from '../components/ui/pagination';
 import { Loading } from '../components/ui/loading';
 import ToastMessage from '@/components/layout/ToastMessage';
-
+import EmployeesWithoutMotorcycles from '@/components/layout/EmployeesWithoutBike';
 
 interface Motorcycle {
   mot_codigo: number;
@@ -399,12 +398,8 @@ const Motorcycles: React.FC = () => {
                     const val = e.target.value;
                     setEmployeeCode(val === '' ? '' : Number(val));
                   }}
-                  placeholder="Deixe em branco se disponível"
+                  placeholder="Anote o código do funcionário e insira aqui"
                 />
-
-                <span className="text-xs text-gray-500">
-                  Defina o código do funcionário se a motocicleta estiver em uso.
-                </span>
               </div>
               <div className="flex justify-end space-x-2">
                 <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
@@ -539,6 +534,7 @@ const Motorcycles: React.FC = () => {
           }
         </CardContent>
       </Card>
+      <EmployeesWithoutMotorcycles />
     </div>
   );
 };

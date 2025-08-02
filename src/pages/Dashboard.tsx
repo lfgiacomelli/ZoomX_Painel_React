@@ -13,6 +13,9 @@ import { Button } from '@/components/ui/button';
 import ToastMessage from '@/components/layout/ToastMessage';
 import { useNavigate } from 'react-router-dom';
 
+import ShowPaymentsIfExists from '@/components/layout/ShowPaymentsIfExists';
+import EmployeesWithoutMotorcycles from '@/components/layout/EmployeesWithoutBike';
+
 interface SolicitacaoPendente {
   sol_codigo: number;
   sol_origem: string;
@@ -478,6 +481,8 @@ const Dashboard: React.FC = () => {
           )}
         </CardContent>
       </Card>
+      <ShowPaymentsIfExists />
+      <EmployeesWithoutMotorcycles />
     </div>
   );
 };

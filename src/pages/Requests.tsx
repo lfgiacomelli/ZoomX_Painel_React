@@ -105,7 +105,6 @@ const Requests: React.FC = () => {
       setLoading(false);
     }
   }
-
   async function fetchFuncionarios() {
     setLoadingFuncionarios(true);
     try {
@@ -139,8 +138,19 @@ const Requests: React.FC = () => {
   useEffect(() => {
     fetchRequestsData();
     fetchFuncionarios();
-  }, []);
 
+    const intervalId = setInterval(() => {
+      fetchRequestsData().then(() => {
+        setToast({
+          visible: true,
+          message: "Solicitações atualizadas com sucesso!",
+          status: "SUCCESS",
+        });
+      });
+    }, 12000);
+
+    return () => clearInterval(intervalId);
+  }, []);
   const filteredRequests = requests.filter((request) => {
     const matchesType =
       typeFilter === 'all' ||
@@ -283,7 +293,7 @@ const Requests: React.FC = () => {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
         <Loading />
-        <h2 className="text-lg font-medium text-gray-600">Carregando solicitações...</h2>
+        <h2 className="text-lg font-medium text-gray-600">Atualizando solicitações...</h2>
       </div>
     )
   }

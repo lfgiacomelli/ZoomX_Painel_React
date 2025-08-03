@@ -7,58 +7,93 @@ type ToastMessageProps = {
   status?: "SUCCESS" | "ERROR" | "INFO" | "WARNING";
 };
 
+const statusStyles = {
+  SUCCESS: {
+    bg: "bg-white",
+    border: "border-l-4 border-emerald-500",
+    icon: <CheckCircle className="w-5 h-5 text-emerald-500" />,
+    textColor: "text-gray-800",
+  },
+  ERROR: {
+    bg: "bg-white",
+    border: "border-l-4 border-rose-500",
+    icon: <XCircle className="w-5 h-5 text-rose-500" />,
+    textColor: "text-gray-800",
+  },
+  WARNING: {
+    bg: "bg-white",
+    border: "border-l-4 border-amber-500",
+    icon: <AlertTriangle className="w-5 h-5 text-amber-500" />,
+    textColor: "text-gray-800",
+  },
+  INFO: {
+    bg: "bg-white",
+    border: "border-l-4 border-slate-500",
+    icon: <Info className="w-5 h-5 text-slate-500" />,
+    textColor: "text-gray-800",
+  },
+};
+
 export default function ToastMessage({
   message,
   onHide,
   status = "INFO",
 }: ToastMessageProps) {
   const [visible, setVisible] = useState(true);
+  const [isExiting, setIsExiting] = useState(false);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      setVisible(false);
-      if (onHide) onHide();
-    }, 3500);
+      setIsExiting(true);
+      setTimeout(() => {
+        setVisible(false);
+        if (onHide) onHide();
+      }, 300);
+    }, 2700);
 
     return () => clearTimeout(timeout);
   }, [onHide]);
 
   if (!visible) return null;
 
-  const statusStyles = {
-    SUCCESS: {
-      bg: "bg-green-600",
-      icon: <CheckCircle className="w-5 h-5 text-white mr-2" />,
-    },
-    ERROR: {
-      bg: "bg-red-600",
-      icon: <XCircle className="w-5 h-5 text-white mr-2" />,
-    },
-    WARNING: {
-      bg: "bg-yellow-500 text-black",
-      icon: <AlertTriangle className="w-5 h-5 text-black mr-2" />,
-    },
-    INFO: {
-      bg: "bg-blue-600",
-      icon: <Info className="w-5 h-5 text-white mr-2" />,
-    },
-  };
-
-  const { bg, icon } = statusStyles[status];
+  const { bg, border, icon, textColor } = statusStyles[status];
 
   return (
     <div
       className={`
         fixed bottom-6 right-6
-        flex items-center max-w-sm w-full
-        px-4 py-3 rounded-xl shadow-2xl
-        ${bg} text-white z-[9999]
-        animate-slideUpFade
+        flex items-start
+        px-4 py-3 rounded-sm shadow-lg
+        ${bg} ${border} ${textColor}
+        z-[9999]
+        transform transition-all duration-300
+        ${isExiting ? "translate-x-full opacity-0" : "translate-x-0 opacity-100"}
       `}
       role="alert"
+      aria-live="assertive"
+      aria-atomic="true"
     >
-      {icon}
-      <span className="font-medium text-center">{message}</span>
+      <div className="flex-shrink-0 pt-0.5 mr-3">
+        {icon}
+      </div>
+      <div className="flex-1">
+        <p className="text-sm font-medium leading-tight">{message}</p>
+      </div>
+      <button
+        onClick={() => {
+          setIsExiting(true);
+          setTimeout(() => {
+            setVisible(false);
+            if (onHide) onHide();
+          }, 300);
+        }}
+        className="ml-4 text-gray-400 hover:text-gray-500 focus:outline-none"
+        aria-label="Dismiss"
+      >
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
     </div>
   );
 }

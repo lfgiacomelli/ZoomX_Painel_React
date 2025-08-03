@@ -15,6 +15,7 @@ import { useNavigate } from 'react-router-dom';
 
 import ShowPaymentsIfExists from '@/components/layout/ShowPaymentsIfExists';
 import EmployeesWithoutMotorcycles from '@/components/layout/EmployeesWithoutBike';
+import DocumentAlert from '@/components/layout/DocumentAlert';
 
 interface SolicitacaoPendente {
   sol_codigo: number;
@@ -387,6 +388,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       ---
+      <DocumentAlert />
 
       <Card className="zoomx-card">
         <CardHeader>

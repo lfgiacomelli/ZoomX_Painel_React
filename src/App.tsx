@@ -21,6 +21,7 @@ import LoginPage from './pages/Login';
 import Home from "./pages/Home";
 import Email from "./pages/E-mail";
 import PaymentsEmployees from  "./pages/PaymentsEmployees";
+import EmployeeTrips from "./pages/EmployeeTrips";
 import { PrivateRoute } from './routes/PrivateRoutes';
 
 
@@ -44,6 +45,7 @@ const App = () => (
               <Route path="/usuarios" element={<Layout><Users /></Layout>} />
               <Route path="/solicitacoes" element={<Layout><Requests /></Layout>} />
               <Route path="/diarias" element={<Layout><PaymentsEmployees /></Layout>} />
+              <Route path="/viagensFuncionario/:funCodigo" element={<Layout><EmployeeTrips /></Layout>} />
               <Route path="/motocicletas" element={<Layout><Motorcycles /></Layout>} />
               <Route path="/relatorios" element={<Layout><Reports /></Layout>} />
               <Route path="/anuncios" element={<Layout><Announcements /></Layout>} />

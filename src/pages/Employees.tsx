@@ -5,11 +5,13 @@ import { Input } from '../components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
 import { Badge } from '../components/ui/badge';
-import { Plus, Edit, Trash2, ToggleLeft, ToggleRight, Check, X } from 'lucide-react';
+import { Plus, Edit, Trash2, ToggleLeft, ToggleRight, Check, X, EllipsisVertical } from 'lucide-react';
 import { Loading } from '../components/ui/loading';
 import { Pagination } from '../components/ui/pagination';
 import { ApiService } from '../services/api';
 import ToastMessage from '@/components/layout/ToastMessage';
+import { ActionMenu } from '@/components/layout/ActionMenu';
+
 
 const Employees: React.FC = () => {
   const [toast, setToast] = useState<{
@@ -65,7 +67,7 @@ const Employees: React.FC = () => {
         setTimeout(() => {
           window.location.href = '/login';
         }, 2000);
-        return data; 
+        return data;
       }
 
       try {
@@ -75,7 +77,6 @@ const Employees: React.FC = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        console.log('Diárias geradas com sucesso');
       } catch (gerarError) {
         console.error('Erro ao gerar diárias:', gerarError);
         setToast({
@@ -635,8 +636,9 @@ const Employees: React.FC = () => {
                       <th className="text-left py-3 px-4 font-righteous">Cargo</th>
                       <th className="text-left py-3 px-4 font-righteous">Status</th>
                       <th className="text-center py-3 px-4 font-righteous">Ações</th>
-                      <th className="text-left py-3 px-4 font-righteous text-center">Pagamento Diário</th>
-                      <th className="text-center py-3 px-4 font-righteous">Ações Pagamento</th>
+                      <th className="text-left py-3 px-4 font-righteous text-center">Status da diária</th>
+                      <th className="text-center py-3 px-4 font-righteous">Controle Pagamentos</th>
+                      <th className="text-center py-3 px-4 font-righteous">Outros</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -722,6 +724,15 @@ const Employees: React.FC = () => {
                             {employee.pag_status === 'pago' ? 'Pago' : 'Marcar Pago'}
                           </Button>
 
+                        </td>
+                        <td className="py-3 px-4 text-center">
+                          <ActionMenu
+                            funCodigo={employee.fun_codigo}
+                            funDocumento={employee.fun_documento}
+                            onFotoAtualizada={() => {
+                              fetchFuncionarios().then(data => setEmployees(data));
+                            }}
+                          />
                         </td>
                       </tr>
                     ))}

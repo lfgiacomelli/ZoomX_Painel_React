@@ -22,6 +22,7 @@ import Home from "./pages/Home";
 import Email from "./pages/E-mail";
 import PaymentsEmployees from  "./pages/PaymentsEmployees";
 import EmployeeTrips from "./pages/EmployeeTrips";
+import Documentos from "./pages/Documents";
 import { PrivateRoute } from './routes/PrivateRoutes';
 
 
@@ -51,6 +52,7 @@ const App = () => (
               <Route path="/anuncios" element={<Layout><Announcements /></Layout>} />
               <Route path="/viagens" element={<Layout><Travels /></Layout>} />
               <Route path="/avaliacoes" element={<Layout><Reviews /></Layout>} />
+              <Route path="/documentos" element={<Layout><Documentos /></Layout>} />
               <Route path="/conta" element={<Layout><Account /></Layout>} />
               <Route path="*" element={<Layout><NotFound /></Layout>} />
             </Route>

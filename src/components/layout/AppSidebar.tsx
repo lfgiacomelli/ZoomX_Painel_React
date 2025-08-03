@@ -26,7 +26,7 @@ import {
 } from '../ui/sidebar';
 import { useAuth } from '@/contexts/useAuth';
 
-const menuItems = [
+const baseMenuItems = [
   { title: 'Dashboard', url: '/', icon: BarChart },
   { title: 'Solicitações', url: '/solicitacoes', icon: File },
   { title: 'Viagens', url: '/viagens', icon: LocateIcon },
@@ -40,6 +40,7 @@ const menuItems = [
   { title: 'Conta', url: '/conta', icon: User },
 ];
 
+
 interface WeatherData {
   temp: number;
   icon: string;
@@ -50,7 +51,17 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const location = useLocation();
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout, funcionario } = useAuth();
+
+  const cargo = funcionario?.cargo;
+
+  const menuItems = [
+    ...baseMenuItems,
+    ...(funcionario?.cargo === 'Gerente' || funcionario?.cargo === 'Administrador'
+      ? [{ title: 'Documentos', url: '/documentos', icon: File }]
+      : []),
+  ];
+
 
   const [weather, setWeather] = useState<WeatherData | null>(null);
 

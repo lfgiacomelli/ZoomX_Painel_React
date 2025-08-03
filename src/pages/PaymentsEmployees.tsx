@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { CheckCircle, XCircle, Clock, Info, Plus } from 'lucide-react';
 import ToastMessage from '@/components/layout/ToastMessage';
 import { Skeleton } from '@/components/ui/skeleton';
+import { set } from 'date-fns';
 
 interface PaymentsEmployeesProps {
   pag_codigo: number;
@@ -13,6 +14,7 @@ interface PaymentsEmployeesProps {
 }
 
 export default function PaymentsEmployees() {
+  const [totalValue, setTotalValue] = useState(0);
   const [payments, setPayments] = useState<PaymentsEmployeesProps[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingDiarias, setLoadingDiarias] = useState(false);
@@ -84,11 +86,18 @@ export default function PaymentsEmployees() {
     );
   };
 
-  const filteredPayments = filterToday ? payments.filter((p) => isToday(p.pag_data)) : payments;
+  const filteredPayments = filterToday
+    ? payments.filter((p) => isToday(p.pag_data))
+    : payments;
 
-  const renderStatus = (status: string) => {
+  const renderStatus = (payment: PaymentsEmployeesProps) => {
     const baseClass = 'flex items-center gap-1 text-sm font-medium';
-    switch (status.toUpperCase()) {
+    const status = payment.pag_status.toUpperCase();
+
+    const effectiveStatus =
+      status === 'PENDENTE' && !isToday(payment.pag_data) ? 'CANCELADO' : status;
+
+    switch (effectiveStatus) {
       case 'PAGO':
         return <span className={`${baseClass} text-green-600`}><CheckCircle size={16} /> Pago</span>;
       case 'PENDENTE':
@@ -100,7 +109,8 @@ export default function PaymentsEmployees() {
     }
   };
 
-  const formatCurrency = (value: number) => value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const formatCurrency = (value: number) =>
+    value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
   const formatDate = (dateStr: string) => {
     const [year, month, day] = dateStr.split('T')[0].split('-');
@@ -109,17 +119,28 @@ export default function PaymentsEmployees() {
 
   return (
     <section className="p-6">
-      {toast.visible && <ToastMessage message={toast.message} status={toast.status} onHide={() => setToast({ ...toast, visible: false })} />}
+      {toast.visible && (
+        <ToastMessage
+          message={toast.message}
+          status={toast.status}
+          onHide={() => setToast({ ...toast, visible: false })}
+        />
+      )}
 
       <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-semibold text-gray-800">Diárias dos Funcionários</h1>
-          <p className="text-sm text-gray-500 mt-1">Pagamentos realizados ou pendentes</p>
+          <p className="text-sm text-gray-500 mt-1">Gerencie os pagamentos pendentes, pagos e crie novas diárias.</p>
         </div>
 
         <div className="flex items-center gap-4">
           <label className="flex items-center gap-2 cursor-pointer select-none text-gray-700 font-medium text-sm">
-            <input type="checkbox" checked={filterToday} onChange={() => setFilterToday(!filterToday)} className="w-4 h-4" />
+            <input
+              type="checkbox"
+              checked={filterToday}
+              onChange={() => setFilterToday(!filterToday)}
+              className="w-4 h-4"
+            />
             Ver hoje
           </label>
 
@@ -147,39 +168,42 @@ export default function PaymentsEmployees() {
             </tr>
           </thead>
           <tbody>
-            {loading
-              ? Array.from({ length: 5 }).map((_, idx) => (
-                  <tr key={idx} className="border-t">
-                    {Array(6).fill(0).map((_, colIdx) => (
+            {loading ? (
+              Array.from({ length: 5 }).map((_, idx) => (
+                <tr key={idx} className="border-t">
+                  {Array(6)
+                    .fill(0)
+                    .map((_, colIdx) => (
                       <td key={colIdx} className="px-6 py-4">
                         <Skeleton className="h-4 w-full max-w-[120px]" />
                       </td>
                     ))}
-                  </tr>
-                ))
-              : filteredPayments.length > 0 ? (
-                  filteredPayments.map((payment) => (
-                    <tr key={payment.pag_codigo} className="border-t hover:bg-gray-50 transition">
-                      <td className="px-6 py-4 text-gray-700">{payment.pag_codigo}</td>
-                      <td className="px-6 py-4 text-gray-900 font-medium">{payment.fun_nome}</td>
-                      <td className="px-6 py-4">{formatCurrency(payment.pag_valor)}</td>
-                      <td className="px-6 py-4 text-gray-700 text-center">
-                        {payment.pag_forma_pagament.toLowerCase() === 'pix' ? (
-                          <span className="text-green-600 font-medium">PIX</span>
-                        ) : (
-                          payment.pag_forma_pagament || 'Não especificado')}
-                      </td>
-                      <td className="px-6 py-4">{formatDate(payment.pag_data)}</td>
-                      <td className="px-6 py-4">{renderStatus(payment.pag_status)}</td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
-                      Nenhum pagamento encontrado.
-                    </td>
-                  </tr>
-                )}
+                </tr>
+              ))
+            ) : filteredPayments.length > 0 ? (
+              filteredPayments.map((payment) => (
+                <tr key={payment.pag_codigo} className="border-t hover:bg-gray-50 transition">
+                  <td className="px-6 py-4 text-gray-700">{payment.pag_codigo}</td>
+                  <td className="px-6 py-4 text-gray-900 font-medium">{payment.fun_nome}</td>
+                  <td className="px-6 py-4">{formatCurrency(payment.pag_valor)}</td>
+                  <td className="px-6 py-4 text-gray-700 text-center">
+                    {payment.pag_forma_pagament.toLowerCase() === 'pix' ? (
+                      <span className="text-green-600 font-medium">PIX</span>
+                    ) : (
+                      payment.pag_forma_pagament || 'Não especificado'
+                    )}
+                  </td>
+                  <td className="px-6 py-4">{formatDate(payment.pag_data)}</td>
+                  <td className="px-6 py-4">{renderStatus(payment)}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                  Nenhum pagamento encontrado.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

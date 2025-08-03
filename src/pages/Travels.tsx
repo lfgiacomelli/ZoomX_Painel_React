@@ -316,7 +316,7 @@ const Travels: React.FC = () => {
                                             <th className="px-4 py-2 font-righteous">F. Pagamento</th>
                                             <th className="px-4 py-2 font-righteous">Status</th>
                                             <th className="px-4 py-2 font-righteous">Serviço</th>
-                                            <th className="px-4 py-2 font-righteous">Motorista</th>
+                                            <th className="px-4 py-2 font-righteous">Mototaxista</th>
                                             <th className="px-4 py-2 font-righteous">Atendente</th>
                                             <th className="px-4 py-2 font-righteous">Usuário</th>
                                             <th className="px-4 py-2 font-righteous">Data</th>

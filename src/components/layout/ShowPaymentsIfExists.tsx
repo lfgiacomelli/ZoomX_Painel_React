@@ -9,6 +9,7 @@ import {
 import { Button } from "../ui/button";
 import { Box, LinearProgress } from "@mui/material";
 import ToastMessage from "./ToastMessage";
+import { set } from "date-fns";
 
 export default function DailyPaymentsCard() {
     const [haPagamentos, setHaPagamentos] = useState(null);
@@ -59,6 +60,7 @@ export default function DailyPaymentsCard() {
 
     async function handleGerarDiarias() {
         try {
+            setLoading(true);
             const response = await fetch(`${BASE_URL}/api/admin/pagamentos/gerar-diarias`, {
                 method: 'POST',
                 headers: {
@@ -86,6 +88,9 @@ export default function DailyPaymentsCard() {
                 message: error instanceof Error ? error.message : 'Erro inesperado. Tente novamente mais tarde.',
                 status: 'ERROR',
             });
+        } finally {
+            setLoading(false);
+            fetchData();
         }
     }
 
@@ -116,11 +121,11 @@ export default function DailyPaymentsCard() {
                         <div className="flex items-center gap-4 mb-4">
                             <div className="text-yellow-500 text-3xl">⚠️</div>
                             <h2 className="text-xl font-semibold text-yellow-800">
-                                Nenhum pagamento gerado hoje
+                                Nenhuma diária foi gerada para hoje.
                             </h2>
                         </div>
                         <p className="text-yellow-700 mb-6">
-                            Lembre-se de gerar as diárias dos funcionários para que os pagamentos possam ser processados corretamente.
+                            Lembre-se de gerar as diárias dos funcionários e atualizar os pagamentos para que possam ser processados corretamente.
                         </p>
                         <Button
                             onClick={handleGerarDiarias}

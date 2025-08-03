@@ -36,6 +36,7 @@ const Motorcycles: React.FC = () => {
   const [year, setYear] = useState<number | ''>('');
   const [color, setColor] = useState('');
   const [employeeCode, setEmployeeCode] = useState<number | ''>('');
+  const [refreshEmployees, setRefreshEmployees] = useState(0);
 
   const [toast, setToast] = useState<{
     visible: boolean;
@@ -135,6 +136,8 @@ const Motorcycles: React.FC = () => {
       });
 
       await fetchMotorcycles();
+
+      setRefreshEmployees(prev => prev + 1);
 
     } catch (error: any) {
       console.error('Erro ao adicionar motocicleta:', error);
@@ -415,7 +418,7 @@ const Motorcycles: React.FC = () => {
       </div>
 
       ---
-
+      <EmployeesWithoutMotorcycles key={refreshEmployees} />
       <Card className="zoomx-card">
         <CardHeader>
           <CardTitle className="font-righteous">Filtros</CardTitle>
@@ -534,7 +537,6 @@ const Motorcycles: React.FC = () => {
           }
         </CardContent>
       </Card>
-      <EmployeesWithoutMotorcycles />
     </div>
   );
 };

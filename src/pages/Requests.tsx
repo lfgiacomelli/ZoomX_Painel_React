@@ -525,9 +525,6 @@ const Requests: React.FC = () => {
               </p>
               <div>
                 <label className="block mb-1 font-medium">Selecionar Funcionário</label>
-                <p className="text-xs text-muted-foreground mb-2">
-                  * Apenas funcionários que <strong>não possuem pagamento pendente hoje</strong>, <strong>não estão em viagem</strong> e <strong>possuem motocicleta cadastrada</strong> estão disponíveis na lista.
-                </p>
                 {loadingFuncionarios ? (
                   <p>Carregando funcionários...</p>
                 ) : (

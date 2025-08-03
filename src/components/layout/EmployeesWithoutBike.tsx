@@ -6,16 +6,18 @@ import {
     CardHeader,
     CardTitle,
 } from '../ui/card';
-import { Button } from "../ui/button";
 import { Box, LinearProgress } from "@mui/material";
 import ToastMessage from "./ToastMessage";
-import { useNavigate } from "react-router-dom";
+
+type EmployeeWithoutMotorcycle = {
+    fun_codigo: number;
+    fun_nome: string;
+};
 
 export default function EmployeesWithoutMotorcycles() {
-    const navigate = useNavigate();
 
     const [loading, setLoading] = useState(true);
-    const [employeesWithoutMotorcycles, setEmployeesWithoutMotorcycles] = useState([]);
+    const [employeesWithoutMotorcycles, setEmployeesWithoutMotorcycles] = useState<EmployeeWithoutMotorcycle[]>([]);
     const [toast, setToast] = useState<{
         visible: boolean;
         message: string;
@@ -60,10 +62,6 @@ export default function EmployeesWithoutMotorcycles() {
         }
     }
 
-    const handleNavigateToEmployees = () => {
-        navigate('/funcionarios');
-    };
-
     if (employeesWithoutMotorcycles.length === 0) {
         return null; 
     }
@@ -75,7 +73,7 @@ export default function EmployeesWithoutMotorcycles() {
             <Card className="zoomx-card w-full mt-10">
                 <CardHeader>
                     <CardTitle className="font-righteous">Mototaxistas sem Motocicleta</CardTitle>
-                    <CardDescription>Confira a lista de mototaxistas sem motocicletas cadastradas.</CardDescription>
+                    <CardDescription>Confira a lista de mototaxistas sem motocicletas cadastradas. Eles não ficarão disponíveis para novas solicitações até regularizarem a situação.</CardDescription>
                 </CardHeader>
 
                 <CardContent>

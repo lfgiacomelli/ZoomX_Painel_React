@@ -8,5 +8,5 @@ export const PrivateRoute = () => {
     return <div className="min-h-screen flex items-center justify-center text-gray-600 text-lg">Carregando...</div>;
   }
 
-  return isAuthenticated ? <Outlet /> : <Navigate to="/home" />;
+  return isAuthenticated ? <Outlet /> : <Navigate to="/home" replace />;
 };

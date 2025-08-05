@@ -21,6 +21,8 @@ import { Loading } from '../components/ui/loading';
 
 import { useAuth } from '@/contexts/useAuth';
 import ToastMessage from '@/components/layout/ToastMessage';
+import { handleAuthError } from '@/utils/handleAuthError';
+import { useNavigate } from 'react-router-dom';
 
 interface Request {
   sol_codigo: number;
@@ -70,6 +72,7 @@ const Requests: React.FC = () => {
   const [selectedFuncionarioCodigo, setSelectedFuncionarioCodigo] = useState<number | null>(null);
   const [loadingApprove, setLoadingApprove] = useState(false);
 
+  const navigate = useNavigate();
   const [toast, setToast] = useState<{
     visible: boolean;
     message: string;
@@ -91,6 +94,8 @@ const Requests: React.FC = () => {
           }
         }
       );
+      if (handleAuthError(response, setToast, navigate)) return;
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Erro ao buscar solicitações');
@@ -116,6 +121,8 @@ const Requests: React.FC = () => {
           }
         }
       );
+      if (handleAuthError(response, setToast, navigate)) return;
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Erro ao buscar funcionários');
@@ -143,7 +150,7 @@ const Requests: React.FC = () => {
       fetchRequestsData().then(() => {
         setToast({
           visible: true,
-          message: "Solicitações atualizadas com sucesso!",
+          message: "Solicitações atualizadas automaticamente!",
           status: "SUCCESS",
         });
       });

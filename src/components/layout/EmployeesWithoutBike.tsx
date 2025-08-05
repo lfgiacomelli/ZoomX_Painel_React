@@ -10,6 +10,8 @@ import { LinearProgress } from "@mui/material";
 import ToastMessage from "./ToastMessage";
 
 import { TriangleAlert } from 'lucide-react'
+import { handleAuthError } from "@/utils/handleAuthError";
+import { useNavigate } from "react-router-dom";
 
 type EmployeeWithoutMotorcycle = {
     fun_codigo: number;
@@ -17,6 +19,7 @@ type EmployeeWithoutMotorcycle = {
 };
 
 export default function EmployeesWithoutMotorcycles() {
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [employeesWithoutMotorcycles, setEmployeesWithoutMotorcycles] = useState<EmployeeWithoutMotorcycle[]>([]);
     const [toast, setToast] = useState<{
@@ -44,6 +47,7 @@ export default function EmployeesWithoutMotorcycles() {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`,
                 },
             });
+            if (handleAuthError(response, setToast, navigate)) return;
 
             if (!response.ok) {
                 const errorData = await response.json();

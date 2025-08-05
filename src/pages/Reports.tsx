@@ -34,6 +34,8 @@ import {
 } from 'recharts';
 import { Loading } from '@/components/ui/loading';
 import ToastMessage from '@/components/layout/ToastMessage';
+import { handleAuthError } from '@/utils/handleAuthError';
+import { useNavigate } from 'react-router-dom';
 
 interface UsuarioAtivo {
   usu_nome: string;
@@ -100,6 +102,7 @@ const Reports: React.FC = () => {
   const [period, setPeriod] = useState('month');
   const [reportType, setReportType] = useState('general');
 
+  const navigate = useNavigate();
   const [data, setData] = useState<RelatorioData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -126,6 +129,8 @@ const Reports: React.FC = () => {
             }
           }
         );
+        if (handleAuthError(res, setToast, navigate)) return;
+
         if (!res.ok) throw new Error('Erro ao buscar relatório');
         const json = await res.json();
 

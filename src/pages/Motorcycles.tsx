@@ -9,6 +9,8 @@ import { Pagination } from '../components/ui/pagination';
 import { Loading } from '../components/ui/loading';
 import ToastMessage from '@/components/layout/ToastMessage';
 import EmployeesWithoutMotorcycles from '@/components/layout/EmployeesWithoutBike';
+import { handleAuthError } from '@/utils/handleAuthError';
+import { useNavigate } from 'react-router-dom';
 
 interface Motorcycle {
   mot_codigo: number;
@@ -37,6 +39,7 @@ const Motorcycles: React.FC = () => {
   const [color, setColor] = useState('');
   const [employeeCode, setEmployeeCode] = useState<number | ''>('');
   const [refreshEmployees, setRefreshEmployees] = useState(0);
+  const navigate = useNavigate();
 
   const [toast, setToast] = useState<{
     visible: boolean;
@@ -50,20 +53,6 @@ const Motorcycles: React.FC = () => {
 
   const itemsPerPage = 10;
 
-  const logoutIfTokenExpired = async (error: any) => {
-    if (error.status === 401 || error.status === 403) {
-      setToast({
-        visible: true,
-        message: 'Sessão expirada. Faça login novamente!',
-        status: 'ERROR',
-      });
-      setTimeout(() => {
-        localStorage.clear();
-        window.location.href = '/login';
-      }, 1500);
-    }
-  };
-
   async function fetchMotorcycles() {
     setLoading(true);
     try {
@@ -73,6 +62,7 @@ const Motorcycles: React.FC = () => {
           'Authorization': `Bearer ${localStorage.getItem('token') || ''}`,
         },
       });
+      if (handleAuthError(response, setToast, navigate)) return;
 
       if (!response.ok) {
         let errorMessage = 'Erro ao buscar motocicletas';
@@ -89,7 +79,6 @@ const Motorcycles: React.FC = () => {
       setMotorcycles(data);
 
     } catch (error: any) {
-      await logoutIfTokenExpired(error);
       console.error('Erro ao buscar motocicletas:', error);
       setToast({
         visible: true,
@@ -123,7 +112,6 @@ const Motorcycles: React.FC = () => {
 
         const error: any = new Error(errorMessage);
         error.status = response.status;
-        await logoutIfTokenExpired(error);
         throw error;
       }
 
@@ -174,7 +162,6 @@ const Motorcycles: React.FC = () => {
         } catch { }
         const error: any = new Error(errorMessage);
         error.status = response.status;
-        await logoutIfTokenExpired(error);
         throw error;
       }
 
@@ -223,7 +210,6 @@ const Motorcycles: React.FC = () => {
         } catch { }
         const error: any = new Error(errorMessage);
         error.status = response.status;
-        await logoutIfTokenExpired(error);
         throw error;
       }
 

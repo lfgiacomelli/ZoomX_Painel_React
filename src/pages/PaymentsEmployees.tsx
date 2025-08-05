@@ -3,6 +3,8 @@ import { CheckCircle, XCircle, Clock, Info, Plus } from 'lucide-react';
 import ToastMessage from '@/components/layout/ToastMessage';
 import { Skeleton } from '@/components/ui/skeleton';
 import { set } from 'date-fns';
+import { handleAuthError } from '@/utils/handleAuthError';
+import { useNavigate } from 'react-router-dom';
 
 interface PaymentsEmployeesProps {
   pag_codigo: number;
@@ -14,6 +16,7 @@ interface PaymentsEmployeesProps {
 }
 
 export default function PaymentsEmployees() {
+  const navigate = useNavigate();
   const [totalValue, setTotalValue] = useState(0);
   const [payments, setPayments] = useState<PaymentsEmployeesProps[]>([]);
   const [loading, setLoading] = useState(true);
@@ -39,6 +42,7 @@ export default function PaymentsEmployees() {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       });
+      if (handleAuthError(response, setToast, navigate)) return;
       const data = await response.json();
       setPayments(data);
     } catch (error) {
@@ -68,6 +72,8 @@ export default function PaymentsEmployees() {
         setToast({ visible: true, message: '✅ Diárias geradas com sucesso!', status: 'SUCCESS' });
         fetchPayments();
       }
+      if (handleAuthError(response, setToast, navigate)) return;
+
     } catch (error: any) {
       console.error('Erro ao gerar diárias:', error);
       setToast({ visible: true, message: error?.message || 'Erro inesperado. Tente novamente mais tarde.', status: 'ERROR' });

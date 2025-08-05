@@ -8,6 +8,8 @@ import { Trash2 } from 'lucide-react';
 import { Pagination } from '../components/ui/pagination';
 import { Loading } from '../components/ui/loading';
 import ToastMessage from '@/components/layout/ToastMessage';
+import { useNavigate } from 'react-router-dom';
+import { handleAuthError } from '@/utils/handleAuthError';
 
 const Users: React.FC = () => {
   const BASE_URL = 'https://backend-turma-a-2025.onrender.com';
@@ -17,6 +19,7 @@ const Users: React.FC = () => {
   const [nameFilter, setNameFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const navigate = useNavigate();
 
   const [toast, setToast] = useState<{
     visible: boolean;
@@ -41,6 +44,8 @@ const Users: React.FC = () => {
           }
         }
       );
+      if (handleAuthError(response, setToast, navigate)) return;
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Erro ao buscar usuários');
@@ -87,6 +92,7 @@ const Users: React.FC = () => {
             'Authorization': `Bearer ${localStorage.getItem('token') || ''}`,
           },
         });
+
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(errorData.message || `Erro ao ${action} usuário`);
@@ -129,11 +135,12 @@ const Users: React.FC = () => {
             'Authorization': `Bearer ${localStorage.getItem('token') || ''}`,
           },
         });
+
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(errorData.message || 'Erro ao excluir usuário');
         }
-        await response.json(); 
+        await response.json();
 
         setUsers(prevUsers => prevUsers.filter(user => user.usu_codigo !== userId));
         setToast({
@@ -241,7 +248,7 @@ const Users: React.FC = () => {
                       <th className="text-left py-3 px-4 font-righteous">Email</th>
                       <th className="text-left py-3 px-4 font-righteous">Telefone</th>
                       <th className="text-left py-3 px-4 font-righteous">Status</th>
-                      <th className="text-left py-3 px-4 font-righteous">Ações</th> 
+                      <th className="text-left py-3 px-4 font-righteous">Ações</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -252,7 +259,7 @@ const Users: React.FC = () => {
                         <td className="py-3 px-4 text-gray-600">{user.usu_telefone}</td>
                         <td className="py-3 px-4">{getStatusBadge(user.usu_ativo)}</td>
                         <td className="py-3 px-4">
-                          <div className="flex justify-start space-x-2"> 
+                          <div className="flex justify-start space-x-2">
                             <Button
                               size="sm"
                               variant="outline"

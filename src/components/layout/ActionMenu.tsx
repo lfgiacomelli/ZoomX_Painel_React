@@ -14,6 +14,7 @@ import example from '@/assets/example_cnh.png';
 import ToastMessage from "./ToastMessage";
 
 import { useNavigate } from "react-router-dom";
+import { handleAuthError } from "@/utils/handleAuthError";
 
 
 type ActionMenuProps = {
@@ -154,7 +155,7 @@ export function ActionMenu({ funCodigo, funDocumento, onFotoAtualizada }: Action
           },
         }
       );
-
+      if (handleAuthError(response, setToast, navigate)) return;
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.message || "Falha no upload");

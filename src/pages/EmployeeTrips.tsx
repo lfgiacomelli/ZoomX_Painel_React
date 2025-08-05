@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import {
@@ -21,6 +21,8 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, MapPin, Calendar, DollarSign, CreditCard, Bike } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
+import { handleAuthError } from "@/utils/handleAuthError";
+import ToastMessage from "@/components/layout/ToastMessage";
 
 type Trip = {
     via_codigo: number;
@@ -49,7 +51,16 @@ export default function EmployeeTrips() {
     const [trips, setTrips] = useState<Trip[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-
+    const navigate = useNavigate();
+    const [toast, setToast] = useState<{
+        visible: boolean;
+        message: string;
+        status?: "SUCCESS" | "ERROR" | "INFO" | "WARNING";
+    }>({
+        visible: false,
+        message: "",
+        status: "INFO",
+    });
     useEffect(() => {
         if (!funCodigo) return;
 
@@ -67,6 +78,8 @@ export default function EmployeeTrips() {
                         },
                     }
                 );
+                if (handleAuthError(response, setToast, navigate)) return;
+
 
                 if (!response.ok) throw new Error("Erro ao carregar viagens");
 
@@ -132,6 +145,13 @@ export default function EmployeeTrips() {
 
     return (
         <div className="space-y-6">
+            {toast.visible && (
+                <ToastMessage
+                    message={toast.message}
+                    status={toast.status}
+                    onHide={() => setToast({ ...toast, visible: false })}
+                />
+            )}
             <div className="space-y-1">
                 <h1 className="text-2xl font-semibold tracking-tight">Histórico de viagens de {fun_nome}</h1>
                 <p className="text-sm text-muted-foreground">

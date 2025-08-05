@@ -16,6 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import ShowPaymentsIfExists from '@/components/layout/ShowPaymentsIfExists';
 import EmployeesWithoutMotorcycles from '@/components/layout/EmployeesWithoutBike';
 import DocumentAlert from '@/components/layout/DocumentAlert';
+import { handleAuthError } from '@/utils/handleAuthError';
 
 interface SolicitacaoPendente {
   sol_codigo: number;
@@ -76,7 +77,6 @@ const Dashboard: React.FC = () => {
 
 
   const BASE_URL = 'https://backend-turma-a-2025.onrender.com';
-
   useEffect(() => {
     const fetchSolicitacoes = async () => {
       setLoadingSolicitacoes(true);
@@ -90,6 +90,9 @@ const Dashboard: React.FC = () => {
             }
           }
         );
+        if (handleAuthError(res, setToast, navigate)) return;
+
+
         if (!res.ok) throw new Error('Erro ao buscar solicitações');
         const data: SolicitacaoPendente[] = await res.json();
         setSolicitacoesPendentes(data);
@@ -118,6 +121,8 @@ const Dashboard: React.FC = () => {
             }
           }
         );
+        if (handleAuthError(res, setToast, navigate)) return;
+
         if (!res.ok) throw new Error('Erro ao buscar viagens');
         const data: ViagemPendente[] = await res.json();
         setViagensPendentes(data);
@@ -139,6 +144,8 @@ const Dashboard: React.FC = () => {
             }
           }
         );
+        if (handleAuthError(response, setToast, navigate)) return;
+
         if (!response.ok) throw new Error('Erro ao buscar contador de viagens finalizadas');
         const data: ContadorData = await response.json();
         setTotalCorridasFinalizadas(data.total);
@@ -159,6 +166,8 @@ const Dashboard: React.FC = () => {
             }
           }
         );
+        if (handleAuthError(response, setToast, navigate)) return;
+
         if (!response.ok) throw new Error('Erro ao buscar faturamento');
         const data = await response.json();
         setFaturamento(data);
@@ -179,6 +188,8 @@ const Dashboard: React.FC = () => {
             }
           }
         );
+        if (handleAuthError(response, setToast, navigate)) return;
+
         if (!response.ok) throw new Error('Erro ao buscar funcionários ativos');
         const data = await response.json();
         setFuncionariosAtivos(data);
@@ -197,6 +208,7 @@ const Dashboard: React.FC = () => {
             'Authorization': `Bearer ${localStorage.getItem('token') || ''}`,
           },
         });
+        if (handleAuthError(response, setToast, navigate)) return;
 
         if (!response.ok) {
           const errorData = await response.json();
@@ -299,19 +311,19 @@ const Dashboard: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="zoomx-card">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-center space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total de Corridas Finalizadas</CardTitle>
           </CardHeader>
           <CardContent>
             {loadingContador ? (
-              <div className="text-2xl font-bold text-black">Atualizando...</div>
+              <div className="text-2xl font-bold text-black text-center">Atualizando...</div>
             ) : (
-              <div className="text-2xl font-bold text-black">
+              <div className="text-2xl font-bold text-black text-center">
                 {totalCorridasFinalizadas !== null ? totalCorridasFinalizadas : 'N/A'}
               </div>
             )}
             <Button
-              className="zoomx-button mt-4"
+              className="zoomx-button mt-4 w-full"
               onClick={() => navigate('/viagens')}
               aria-label="Ver viagens"
             >
@@ -321,19 +333,19 @@ const Dashboard: React.FC = () => {
         </Card>
 
         <Card className="zoomx-card">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total de Avaliações</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-center space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-center">Total de Avaliações</CardTitle>
           </CardHeader>
           <CardContent>
             {loadingContador ? (
-              <div className="text-2xl font-bold text-black">Atualizando...</div>
+              <div className="text-2xl font-bold text-black text-center">Atualizando...</div>
             ) : (
-              <div className="text-2xl font-bold text-black">
+              <div className="text-2xl font-bold text-black text-center">
                 {totalAvaliacoes !== null ? totalAvaliacoes : 'N/A'}
               </div>
             )}
             <Button
-              className="zoomx-button mt-4"
+              className="zoomx-button mt-4 w-full"
               onClick={() => navigate('/avaliacoes')}
               aria-label="Ver avaliações"
             >
@@ -343,21 +355,21 @@ const Dashboard: React.FC = () => {
         </Card>
 
         <Card className="zoomx-card">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Faturamento do dia</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-center space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-center">Faturamento do dia</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-black">
+            <div className="text-2xl font-bold text-black text-center">
               {loadingContador ? (
-                <div className="text-2xl font-bold text-black">Atualizando...</div>
+                <div className="text-2xl font-bold text-black text-center">Atualizando...</div>
               ) : (
-                <div className="text-2xl font-bold text-black">
+                <div className="text-2xl font-bold text-black text-center">
                   {faturamento ? `R$ ${parseFloat(faturamento.faturamento_diario).toFixed(2)}` : 'N/A'}
 
                 </div>
               )}
               <Button
-                className="zoomx-button mt-4"
+                className="zoomx-button mt-4 w-full"
                 onClick={() => navigate('/relatorios')}
                 aria-label="Ver relatório"
               >
@@ -368,15 +380,15 @@ const Dashboard: React.FC = () => {
         </Card>
 
         <Card className="zoomx-card">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Mototáxistas ativos</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-center space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Mototáxistas disponíveis</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-black">
+            <div className="text-2xl font-bold text-black text-center">
               {funcionariosAtivos.length}
             </div>
             <Button
-              className="zoomx-button mt-4"
+              className="zoomx-button mt-4 w-full"
               onClick={() => navigate('/funcionarios')}
               aria-label="Ver lista de mototáxistas ativos"
             >

@@ -8,11 +8,14 @@ import { Badge } from '../components/ui/badge';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import { Pagination } from '../components/ui/pagination';
 import { Loading } from '@/components/ui/loading';
+import { useNavigate } from 'react-router-dom';
 
 import emptyAnuncios from '../assets/empty.png'
 import ToastMessage from '@/components/layout/ToastMessage';
+import { handleAuthError } from '@/utils/handleAuthError';
 
 const Announcements: React.FC = () => {
+  const navigate = useNavigate();
   const BASE_URL = 'https://backend-turma-a-2025.onrender.com';
   const [isLoading, setIsLoading] = useState(true);
   const [anuncios, setAnuncios] = useState<any[]>([]);
@@ -49,6 +52,8 @@ const Announcements: React.FC = () => {
           }
         }
       );
+      if (handleAuthError(response, setToast, navigate)) return;
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }

@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/useAuth";
+import { handleAuthError } from "@/utils/handleAuthError";
+import { useNavigate } from "react-router-dom";
+import ToastMessage from "@/components/layout/ToastMessage";
 
 type DocumentoFuncionario = {
   fun_codigo: number;
@@ -10,6 +13,16 @@ type DocumentoFuncionario = {
 const BASE_URL = "https://backend-turma-a-2025.onrender.com";
 
 export default function Documents() {
+  const navigate = useNavigate();
+  const [toast, setToast] = useState<{
+    visible: boolean;
+    message: string;
+    status?: "SUCCESS" | "ERROR" | "INFO" | "WARNING";
+  }>({
+    visible: false,
+    message: "",
+    status: "INFO",
+  });
   const { funcionario } = useAuth();
   const [documents, setDocuments] = useState<DocumentoFuncionario[]>([]);
   const [loading, setLoading] = useState(true);
@@ -41,6 +54,8 @@ export default function Documents() {
             },
           }
         );
+        if (handleAuthError(response, setToast, navigate)) return;
+
         const data = await response.json();
         setDocuments(data);
       } catch (error) {
@@ -69,6 +84,13 @@ export default function Documents() {
 
   return (
     <div className="px-4 py-6">
+      {toast.visible && (
+        <ToastMessage
+          message={toast.message}
+          status={toast.status}
+          onHide={() => setToast({ ...toast, visible: false })}
+        />
+      )}
       <h1 className="text-2xl font-semibold mb-2">Documentos</h1>
       <p className="mb-4 text-gray-600">
         Esta página é destinada à gestão de documentos dos mototaxistas.

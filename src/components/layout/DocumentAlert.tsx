@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Loading } from "@/components/ui/loading";
 import ToastMessage from "./ToastMessage";
 import { useNavigate } from "react-router-dom";
+import { handleAuthError } from "@/utils/handleAuthError";
 
 export default function DocumentAlert() {
     const navigate = useNavigate();
@@ -39,6 +40,7 @@ export default function DocumentAlert() {
                     }
                 );
 
+                if (handleAuthError(response, setToast, navigate)) return;
                 if (!response.ok) {
                     setToast({
                         visible: true,

@@ -20,6 +20,8 @@ import { Pagination } from '../components/ui/pagination';
 import { Loading } from '../components/ui/loading';
 import { Star } from 'lucide-react';
 import ToastMessage from '@/components/layout/ToastMessage';
+import { handleAuthError } from '@/utils/handleAuthError';
+import { useNavigate } from 'react-router-dom';
 
 
 interface Review {
@@ -44,7 +46,7 @@ const Reviews: React.FC = () => {
   const [searchFilter, setSearchFilter] = useState('');
 
   const [currentPage, setCurrentPage] = useState(1);
-
+  const navigate = useNavigate();
   const [toast, setToast] = useState<{
     visible: boolean;
     message: string;
@@ -69,6 +71,8 @@ const Reviews: React.FC = () => {
           }
         }
       );
+      if (handleAuthError(response, setToast, navigate)) return;
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Erro ao buscar avaliações');

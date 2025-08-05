@@ -29,6 +29,8 @@ import { Textarea } from '../components/ui/textarea';
 import { Pagination } from '../components/ui/pagination';
 import { Loading } from '../components/ui/loading';
 import ToastMessage from '@/components/layout/ToastMessage';
+import { handleAuthError } from '@/utils/handleAuthError';
+import { useNavigate } from 'react-router-dom';
 
 interface Travel {
     via_codigo: number;
@@ -56,6 +58,8 @@ const Travels: React.FC = () => {
     const [serviceTypeFilter, setServiceTypeFilter] = useState('all');
     const [originDestinationFilter, setOriginDestinationFilter] = useState('');
 
+    const navigate = useNavigate();
+
     const [currentPage, setCurrentPage] = useState(1);
 
     const [toast, setToast] = useState<{
@@ -82,6 +86,8 @@ const Travels: React.FC = () => {
                     }
                 }
             );
+            if (handleAuthError(response, setToast, navigate)) return;
+
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.message || 'Erro ao buscar viagens');
@@ -128,9 +134,9 @@ const Travels: React.FC = () => {
             const response = await fetch(`${BASE_URL}/api/admin/viagens/finalizar/${id}`, {
                 method: 'POST',
                 headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('token') || ''}`,
-                    }
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token') || ''}`,
+                }
             });
             fetchTravelsData();
 

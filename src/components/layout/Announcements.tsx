@@ -9,7 +9,7 @@ type AnunciosProps = {
 
 export default function Announcements() {
     const [anuncios, setAnuncios] = useState<AnunciosProps[]>([]);
-    const BASE_URL = "http://192.168.0.22:3000";
+    const BASE_URL = "https://backend-turma-a-2025.onrender.com";
 
     async function fetchData() {
         try {

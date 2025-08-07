@@ -91,7 +91,7 @@ export default function Documents() {
           onHide={() => setToast({ ...toast, visible: false })}
         />
       )}
-      <h1 className="text-2xl font-semibold mb-2">Documentos</h1>
+      <h1 className="text-2xl mb-2">Documentos</h1>
       <p className="mb-4 text-gray-600">
         Esta página é destinada à gestão de documentos dos mototaxistas.
       </p>

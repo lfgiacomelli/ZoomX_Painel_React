@@ -316,9 +316,9 @@ const Dashboard: React.FC = () => {
           </CardHeader>
           <CardContent>
             {loadingContador ? (
-              <div className="text-2xl font-bold text-black text-center">Atualizando...</div>
+              <div className="text-2xl text-black text-center">Atualizando...</div>
             ) : (
-              <div className="text-2xl font-bold text-black text-center">
+              <div className="text-2xl text-black text-center">
                 {totalCorridasFinalizadas !== null ? totalCorridasFinalizadas : 'N/A'}
               </div>
             )}
@@ -338,9 +338,9 @@ const Dashboard: React.FC = () => {
           </CardHeader>
           <CardContent>
             {loadingContador ? (
-              <div className="text-2xl font-bold text-black text-center">Atualizando...</div>
+              <div className="text-2xl text-black text-center">Atualizando...</div>
             ) : (
-              <div className="text-2xl font-bold text-black text-center">
+              <div className="text-2xl text-black text-center">
                 {totalAvaliacoes !== null ? totalAvaliacoes : 'N/A'}
               </div>
             )}
@@ -359,11 +359,11 @@ const Dashboard: React.FC = () => {
             <CardTitle className="text-sm font-medium text-center">Faturamento do dia</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-black text-center">
+            <div className="text-2xl text-black text-center">
               {loadingContador ? (
-                <div className="text-2xl font-bold text-black text-center">Atualizando...</div>
+                <div className="text-2xl text-black text-center">Atualizando...</div>
               ) : (
-                <div className="text-2xl font-bold text-black text-center">
+                <div className="text-2xl text-black text-center">
                   {faturamento ? `R$ ${parseFloat(faturamento.faturamento_diario).toFixed(2)}` : 'N/A'}
 
                 </div>
@@ -384,7 +384,7 @@ const Dashboard: React.FC = () => {
             <CardTitle className="text-sm font-medium">Mototáxistas disponíveis</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-black text-center">
+            <div className="text-2xl text-black text-center">
               {funcionariosAtivos.length}
             </div>
             <Button

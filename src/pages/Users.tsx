@@ -10,10 +10,20 @@ import { Loading } from '../components/ui/loading';
 import ToastMessage from '@/components/layout/ToastMessage';
 import { useNavigate } from 'react-router-dom';
 import { handleAuthError } from '@/utils/handleAuthError';
+import { useAuth } from "@/contexts/useAuth";
+import { verificarCargo } from "@/utils/verificarCargo";
+
+type Toast = {
+  visible: boolean;
+  message: string;
+  status?: "SUCCESS" | "ERROR" | "INFO" | "WARNING";
+}
+
 
 const Users: React.FC = () => {
   const BASE_URL = 'https://backend-turma-a-2025.onrender.com';
 
+  const cargo = verificarCargo();
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [nameFilter, setNameFilter] = useState('');
@@ -21,11 +31,7 @@ const Users: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
 
-  const [toast, setToast] = useState<{
-    visible: boolean;
-    message: string;
-    status?: "SUCCESS" | "ERROR" | "INFO" | "WARNING";
-  }>({
+  const [toast, setToast] = useState<Toast>({
     visible: false,
     message: "",
     status: "INFO",
@@ -248,21 +254,28 @@ const Users: React.FC = () => {
                       <th className="text-left py-3 px-4 font-righteous">Email</th>
                       <th className="text-left py-3 px-4 font-righteous">Telefone</th>
                       <th className="text-left py-3 px-4 font-righteous">Status</th>
-                      <th className="text-left py-3 px-4 font-righteous">Ações</th>
+                      {cargo !== "gerente" ? (
+                        <th className="text-center py-3 px-4 font-righteous">Ações desabilitadas</th>
+                      )
+                        : (
+                          <th className="text-center py-3 px-4 font-righteous">Ações</th>
+                        )
+                      }
                     </tr>
                   </thead>
                   <tbody>
                     {paginatedUsers.map((user) => (
                       <tr key={user.usu_codigo} className="border-b border-gray-100 hover:bg-gray-50">
                         <td className="py-3 px-4 font-medium">{user.usu_nome}</td>
-                        <td className="py-3 px-4 text-gray-600">{user.usu_email}</td>
-                        <td className="py-3 px-4 text-gray-600">{user.usu_telefone}</td>
+                        <td className="py-3 px-4 text-gray-600">{cargo !== "gerente" ? "---" : user.usu_email}</td>
+                        <td className="py-3 px-4 text-gray-600">{cargo !== "gerente" ? "---" : user.usu_telefone}</td>
                         <td className="py-3 px-4">{getStatusBadge(user.usu_ativo)}</td>
                         <td className="py-3 px-4">
-                          <div className="flex justify-start space-x-2">
+                          <div className="flex justify-center space-x-2">
                             <Button
                               size="sm"
                               variant="outline"
+                              disabled={cargo !== "gerente"}
                               onClick={() => handleBanUser(user.usu_codigo, user.usu_ativo)}
                               className={user.usu_ativo ? "text-orange-600 hover:text-orange-700" : "text-green-600 hover:text-green-700"}
                             >
@@ -271,6 +284,7 @@ const Users: React.FC = () => {
                             <Button
                               size="sm"
                               variant="outline"
+                              disabled={cargo !== "gerente"}
                               onClick={() => handleDeleteUser(user.usu_codigo)}
                               className="text-red-600 hover:text-red-700"
                             >

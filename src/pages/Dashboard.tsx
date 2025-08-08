@@ -16,7 +16,9 @@ import { useNavigate } from 'react-router-dom';
 import ShowPaymentsIfExists from '@/components/layout/ShowPaymentsIfExists';
 import EmployeesWithoutMotorcycles from '@/components/layout/EmployeesWithoutBike';
 import DocumentAlert from '@/components/layout/DocumentAlert';
+
 import { handleAuthError } from '@/utils/handleAuthError';
+import { verificarCargo } from '@/utils/verificarCargo';
 
 interface SolicitacaoPendente {
   sol_codigo: number;
@@ -54,6 +56,7 @@ interface Review {
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
+  const cargo = verificarCargo();
   const [solicitacoesPendentes, setSolicitacoesPendentes] = useState<SolicitacaoPendente[]>([]);
   const [viagensPendentes, setViagensPendentes] = useState<ViagemPendente[]>([]);
   const [totalCorridasFinalizadas, setTotalCorridasFinalizadas] = useState<number | null>(null);
@@ -398,9 +401,11 @@ const Dashboard: React.FC = () => {
 
         </Card>
       </div>
-
-      ---
-      <DocumentAlert />
+      {cargo !== "gerente" ? (
+        null
+      ) : (
+        <DocumentAlert />
+      )}
 
       <Card className="zoomx-card">
         <CardHeader>

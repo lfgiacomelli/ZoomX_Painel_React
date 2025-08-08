@@ -50,8 +50,10 @@ export default function DocumentAlert() {
                 }
 
                 const data = await response.json();
-                setCount(data.length);
-
+                setCount(Array.isArray(data) ? data.length : 0);
+                if (!Array.isArray(data)) {
+                  console.warn('Resposta inesperada:', data);
+                }
             } catch (err) {
                 console.error("Erro na requisição:", err);
                 setError("Falha ao verificar documentos pendentes");

@@ -400,7 +400,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       ---
-      <DocumentAlert />
+      {/*<DocumentAlert />*/}
 
       <Card className="zoomx-card">
         <CardHeader>

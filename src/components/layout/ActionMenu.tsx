@@ -21,13 +21,14 @@ type ActionMenuProps = {
   funCodigo: number;
   funDocumento?: string | null;
   onFotoAtualizada?: () => void;
+  disabled?: boolean;
 };
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const TARGET_WIDTH = 338;
 const TARGET_HEIGHT = 254;
 
-export function ActionMenu({ funCodigo, funDocumento, onFotoAtualizada }: ActionMenuProps) {
+export function ActionMenu({ funCodigo, funDocumento, onFotoAtualizada, disabled }: ActionMenuProps) {
   const navigate = useNavigate();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -199,20 +200,23 @@ export function ActionMenu({ funCodigo, funDocumento, onFotoAtualizada }: Action
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button size="sm" variant="outline" className="hover:bg-gray-100">
+          <Button
+            size="sm"
+            variant="outline"
+            className="hover:bg-gray-100"
+            disabled={disabled} // 🔹 Bloqueia botão do menu
+          >
             <EllipsisVertical className="w-4 h-4" />
             <span className="sr-only">Ações</span>
           </Button>
         </DropdownMenuTrigger>
+
         <DropdownMenuContent align="end" className="w-48">
           <DropdownMenuItem
-            disabled={!!funDocumento}
-            onClick={() => !funDocumento && setIsDialogOpen(true)}
-            className={
-              funDocumento
-                ? "text-gray-400 cursor-not-allowed"
-                : "hover:bg-gray-50"
-            }
+            disabled={!!funDocumento || disabled} // 🔹 Bloqueia item se já tem documento ou se está desativado
+            onClick={() => {
+              if (!funDocumento && !disabled) setIsDialogOpen(true);
+            }}
           >
             {!funDocumento ? (
               <>
@@ -226,14 +230,16 @@ export function ActionMenu({ funCodigo, funDocumento, onFotoAtualizada }: Action
               </>
             )}
           </DropdownMenuItem>
+
           <DropdownMenuItem
-            onClick={() => navigate(`/viagensFuncionario/${funCodigo}`)}
-            className="hover:bg-gray-50"
+            disabled={disabled} // 🔹 Bloqueia link de viagens
+            onClick={() => {
+              if (!disabled) navigate(`/viagensFuncionario/${funCodigo}`);
+            }}
           >
             <Route className="mr-2 h-4 w-4" />
             <span>Viagens</span>
           </DropdownMenuItem>
-
         </DropdownMenuContent>
       </DropdownMenu>
 

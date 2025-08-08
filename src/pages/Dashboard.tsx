@@ -18,7 +18,10 @@ import EmployeesWithoutMotorcycles from '@/components/layout/EmployeesWithoutBik
 import DocumentAlert from '@/components/layout/DocumentAlert';
 
 import { handleAuthError } from '@/utils/handleAuthError';
-import { verificarCargo } from '@/utils/verificarCargo';
+import { useCargo } from '@/hooks/useCargo';
+import MessageNotManager from '@/components/layout/MessageNotManager';
+
+import { ToastProps } from '@/types/toast';
 
 interface SolicitacaoPendente {
   sol_codigo: number;
@@ -56,7 +59,7 @@ interface Review {
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
-  const cargo = verificarCargo();
+  const cargo = useCargo();
   const [solicitacoesPendentes, setSolicitacoesPendentes] = useState<SolicitacaoPendente[]>([]);
   const [viagensPendentes, setViagensPendentes] = useState<ViagemPendente[]>([]);
   const [totalCorridasFinalizadas, setTotalCorridasFinalizadas] = useState<number | null>(null);
@@ -67,15 +70,8 @@ const Dashboard: React.FC = () => {
   const [funcionariosAtivos, setFuncionariosAtivos] = useState<any[]>([]);
   const [totalAvaliacoes, setTotalAvaliacoes] = useState<number>(0);
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [toast, setToast] = useState<{
-    visible: boolean;
-    message: string;
-    status?: "SUCCESS" | "ERROR" | "INFO" | "WARNING";
-  }>({
-    visible: false,
-    message: "",
-    status: "INFO",
-  });
+    const [toast, setToast] = useState<ToastProps>({ visible: false, message: "", status: "INFO" });
+  
 
 
 
@@ -398,15 +394,10 @@ const Dashboard: React.FC = () => {
               Ver Mototáxistas
             </Button>
           </CardContent>
-
         </Card>
       </div>
-      {cargo !== "gerente" ? (
-        null
-      ) : (
-        <DocumentAlert />
-      )}
-
+      {cargo === "gerente" && <DocumentAlert />}
+      {cargo !== "gerente" && cargo !== "atendente" && <MessageNotManager />}
       <Card className="zoomx-card">
         <CardHeader>
           <CardTitle className="font-righteous">Solicitações Pendentes</CardTitle>

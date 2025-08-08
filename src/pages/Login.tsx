@@ -15,6 +15,8 @@ import { Alert, AlertDescription } from '../components/ui/alert';
 import { XCircle, Eye, EyeOff, Loader2 } from 'lucide-react';
 import ToastMessage from '@/components/layout/ToastMessage';
 
+import { ToastProps } from '@/types/toast';
+
 const LoginPage: React.FC = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -26,15 +28,8 @@ const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
-  const [toast, setToast] = useState<{
-    visible: boolean;
-    message: string;
-    status?: "SUCCESS" | "ERROR" | "INFO" | "WARNING";
-  }>({
-    visible: false,
-    message: "",
-    status: "INFO",
-  });
+    const [toast, setToast] = useState<ToastProps>({ visible: false, message: "", status: "INFO" });
+  
 
   useEffect(() => {
     setIsMounted(true);

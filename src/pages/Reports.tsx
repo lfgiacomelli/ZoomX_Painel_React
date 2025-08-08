@@ -36,6 +36,7 @@ import { Loading } from '@/components/ui/loading';
 import ToastMessage from '@/components/layout/ToastMessage';
 import { handleAuthError } from '@/utils/handleAuthError';
 import { useNavigate } from 'react-router-dom';
+import { ToastProps} from '@/types/toast';
 
 interface UsuarioAtivo {
   usu_nome: string;
@@ -106,15 +107,7 @@ const Reports: React.FC = () => {
   const [data, setData] = useState<RelatorioData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [toast, setToast] = useState<{
-    visible: boolean;
-    message: string;
-    status?: "SUCCESS" | "ERROR" | "INFO" | "WARNING";
-  }>({
-    visible: false,
-    message: "",
-    status: "INFO",
-  });
+  const [toast, setToast] = useState<ToastProps>({ visible: false, message: "", status: "INFO" });
 
 
   useEffect(() => {

@@ -11,18 +11,13 @@ import { Pagination } from '../components/ui/pagination';
 import { ApiService } from '../services/api';
 import ToastMessage from '@/components/layout/ToastMessage';
 import { ActionMenu } from '@/components/layout/ActionMenu';
+import { useCargo } from '@/hooks/useCargo';
+import { ToastProps } from '@/types/toast';
 
 
 const Employees: React.FC = () => {
-  const [toast, setToast] = useState<{
-    visible: boolean;
-    message: string;
-    status?: "SUCCESS" | "ERROR" | "INFO" | "WARNING";
-  }>({
-    visible: false,
-    message: "",
-    status: "INFO",
-  });
+    const [toast, setToast] = useState<ToastProps>({ visible: false, message: "", status: "INFO" });
+  
 
   const [nameFilter, setNameFilter] = useState('');
   const [positionFilter, setPositionFilter] = useState('');
@@ -39,6 +34,8 @@ const Employees: React.FC = () => {
   const [selectedPagamentoId, setSelectedPagamentoId] = useState<number | null>(null);
   const [selectedStatusAtual, setSelectedStatusAtual] = useState<string | null>(null);
   const [formaPagamento, setFormaPagamento] = useState<string>('pix');
+
+  const cargo = useCargo();
 
   async function fetchFuncionarios() {
     try {
@@ -474,7 +471,7 @@ const Employees: React.FC = () => {
                     <SelectContent>
                       <SelectItem value="Mototaxista">Mototaxista</SelectItem>
                       <SelectItem value="Supervisor">Supervisor</SelectItem>
-                      <SelectItem value="Operador">Operador</SelectItem>
+                      <SelectItem value="Atendente">Atendente</SelectItem>
                       <SelectItem value="Gerente">Gerente</SelectItem>
                     </SelectContent>
                   </Select>
@@ -494,9 +491,13 @@ const Employees: React.FC = () => {
                   <label className="text-sm font-medium">CNH</label>
                   <Input
                     className="zoomx-input"
-                    value={editingEmployee?.cnh || ''}
-                    onChange={e => setEditingEmployee({ ...editingEmployee, cnh: e.target.value })}
+                    value={editingEmployee?.cnh || ""}
+                    onChange={(e) =>
+                      setEditingEmployee({ ...editingEmployee, cnh: e.target.value })
+                    }
                     maxLength={9}
+                    placeholder="Se aplicável"
+                    disabled={editingEmployee?.cargo !== "Mototaxista"}
                   />
                 </div>
               </div>
@@ -729,6 +730,7 @@ const Employees: React.FC = () => {
                           <ActionMenu
                             funCodigo={employee.fun_codigo}
                             funDocumento={employee.fun_documento}
+                            disabled={cargo !== "gerente" && cargo !== "atendente"}
                             onFotoAtualizada={() => {
                               fetchFuncionarios().then(data => setEmployees(data));
                             }}

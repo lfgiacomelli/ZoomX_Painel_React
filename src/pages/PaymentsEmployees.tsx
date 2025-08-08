@@ -5,6 +5,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { set } from 'date-fns';
 import { handleAuthError } from '@/utils/handleAuthError';
 import { useNavigate } from 'react-router-dom';
+import { ToastProps } from '@/types/toast';
 
 interface PaymentsEmployeesProps {
   pag_codigo: number;
@@ -21,11 +22,8 @@ export default function PaymentsEmployees() {
   const [payments, setPayments] = useState<PaymentsEmployeesProps[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingDiarias, setLoadingDiarias] = useState(false);
-  const [toast, setToast] = useState({
-    visible: false,
-    message: '',
-    status: 'INFO' as 'SUCCESS' | 'ERROR' | 'INFO' | 'WARNING',
-  });
+  const [toast, setToast] = useState<ToastProps>({ visible: false, message: "", status: "INFO" });
+
   const [filterToday, setFilterToday] = useState(false);
 
   useEffect(() => {

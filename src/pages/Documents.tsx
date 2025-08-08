@@ -3,6 +3,7 @@ import { useAuth } from "@/contexts/useAuth";
 import { handleAuthError } from "@/utils/handleAuthError";
 import { useNavigate } from "react-router-dom";
 import ToastMessage from "@/components/layout/ToastMessage";
+import { ToastProps } from "@/types/toast";
 
 type DocumentoFuncionario = {
   fun_codigo: number;
@@ -14,15 +15,9 @@ const BASE_URL = "https://backend-turma-a-2025.onrender.com";
 
 export default function Documents() {
   const navigate = useNavigate();
-  const [toast, setToast] = useState<{
-    visible: boolean;
-    message: string;
-    status?: "SUCCESS" | "ERROR" | "INFO" | "WARNING";
-  }>({
-    visible: false,
-    message: "",
-    status: "INFO",
-  });
+  const [toast, setToast] = useState<ToastProps>({ visible: false, message: "", status: "INFO" });
+
+
   const { funcionario } = useAuth();
   const [documents, setDocuments] = useState<DocumentoFuncionario[]>([]);
   const [loading, setLoading] = useState(true);

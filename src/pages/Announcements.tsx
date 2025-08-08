@@ -14,6 +14,8 @@ import emptyAnuncios from '../assets/empty.png'
 import ToastMessage from '@/components/layout/ToastMessage';
 import { handleAuthError } from '@/utils/handleAuthError';
 
+import { ToastProps } from  "@/types/toast";
+
 const Announcements: React.FC = () => {
   const navigate = useNavigate();
   const BASE_URL = 'https://backend-turma-a-2025.onrender.com';
@@ -22,15 +24,8 @@ const Announcements: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAnnouncement, setEditingAnnouncement] = useState<any>(null);
-  const [toast, setToast] = useState<{
-    visible: boolean;
-    message: string;
-    status?: "SUCCESS" | "ERROR" | "INFO" | "WARNING";
-  }>({
-    visible: false,
-    message: "",
-    status: "INFO",
-  });
+  const [toast, setToast] = useState<ToastProps>({ visible: false, message: "", status: "INFO" });
+
   const [formData, setFormData] = useState({
     anu_titulo: '',
     anu_descricao: '',

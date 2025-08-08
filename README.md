@@ -1,73 +1,64 @@
-# Welcome to your Lovable project
+📊 Painel de Gestão – ZoomX
+O Painel de Gestão do ZoomX é uma plataforma web desenvolvida para gerenciar um aplicativo de corridas de mototáxis.
+A ferramenta oferece uma gestão completa, desde o controle de corridas até a administração de pagamentos, funcionários e clientes.
+Ele oferece uma interface moderna, responsiva e rápida, construída com React, Vite, TypeScript, Tailwind CSS e shadcn-ui.
 
-## Project info
+🚀 Funcionalidades Principais
+Gestão de Funcionários → cadastro, edição, cargos e controle de status.
 
-**URL**: https://lovable.dev/projects/007c4fb1-7e9b-4131-ba56-b9563881c89f
+Controle Financeiro → visualização e geração de diárias, controle de corridas em andamento, pendentes e finalizadas.
 
-## How can I edit this code?
+Painel Responsivo → funciona em desktop, tablet e mobile.
 
-There are several ways of editing your application.
+Autenticação Segura → login com controle de permissões baseado em cargo.
 
-**Use Lovable**
+🛠 Tecnologias Utilizadas
+Vite → Build rápido e leve para aplicações React.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/007c4fb1-7e9b-4131-ba56-b9563881c89f) and start prompting.
+React → Biblioteca JavaScript para interfaces.
 
-Changes made via Lovable will be committed automatically to this repo.
+TypeScript → Tipagem estática para maior segurança no código.
 
-**Use your preferred IDE**
+Tailwind CSS → Estilização rápida e responsiva.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+shadcn-ui → Componentes de interface pré-construídos e acessíveis.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+📂 Como Executar Localmente
+É necessário ter Node.js e npm instalados (recomendo usar o nvm para gerenciar versões).
 
-Follow these steps:
+sh
+Copiar
+Editar
+# 1. Clone o repositório
+git clone https://github.com/lfgiacomelli/ZoomX_Plataforma_React
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# 2. Acesse a pasta do projeto
+cd zoomx-painel
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# 3. Instale as dependências
+npm install
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# 4. Inicie o servidor de desenvolvimento
 npm run dev
-```
+O painel estará disponível em:
 
-**Edit a file directly in GitHub**
+http://localhost:8080
+💻 Editando o Código
+Você pode escolher entre:
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+1. Editar no GitHub Codespaces
+No repositório, clique em Code → Codespaces → New Codespace.
 
-**Use GitHub Codespaces**
+O ambiente abrirá online e você poderá editar como se fosse um VS Code.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+2. Editar Localmente
+Baixe/clonar o projeto para sua máquina.
 
-## What technologies are used for this project?
+Abra no seu editor preferido (VS Code recomendado).
 
-This project is built with:
+Rode npm run dev para visualizar as alterações.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+📌 Observações
+O painel funciona 100% integrado ao backend do ZoomX feito em NodeJS, sendo necessário configurar as variáveis de ambiente para apontar para sua API.
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/007c4fb1-7e9b-4131-ba56-b9563881c89f) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+Recomendamos sempre criar branches para novas funcionalidades e depois realizar merge na main.

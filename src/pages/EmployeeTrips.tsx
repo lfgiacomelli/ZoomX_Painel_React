@@ -23,6 +23,7 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { handleAuthError } from "@/utils/handleAuthError";
 import ToastMessage from "@/components/layout/ToastMessage";
+import { ToastProps } from "@/types/toast";
 
 type Trip = {
     via_codigo: number;
@@ -52,15 +53,9 @@ export default function EmployeeTrips() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
-    const [toast, setToast] = useState<{
-        visible: boolean;
-        message: string;
-        status?: "SUCCESS" | "ERROR" | "INFO" | "WARNING";
-    }>({
-        visible: false,
-        message: "",
-        status: "INFO",
-    });
+    const [toast, setToast] = useState<ToastProps>({ visible: false, message: "", status: "INFO" });
+
+
     useEffect(() => {
         if (!funCodigo) return;
 

@@ -3,6 +3,7 @@ import { Mail, Check, Settings, User, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import EmailHeader from '@/components/layout/EmailHeader';
 import ToastMessage from '@/components/layout/ToastMessage';
+import { ToastProps } from '@/types/toast';
 
 export default function Email() {
     const [formData, setFormData] = useState({
@@ -18,15 +19,7 @@ export default function Email() {
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
-    const [toast, setToast] = useState<{
-        visible: boolean;
-        message: string;
-        status?: "SUCCESS" | "ERROR" | "INFO" | "WARNING";
-    }>({
-        visible: false,
-        message: "",
-        status: "INFO",
-    });
+    const [toast, setToast] = useState<ToastProps>({ visible: false, message: "", status: "INFO" });
 
     const handleChange = (e) => {
         const { name, value } = e.target;

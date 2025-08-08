@@ -23,6 +23,7 @@ import { useAuth } from '@/contexts/useAuth';
 import ToastMessage from '@/components/layout/ToastMessage';
 import { handleAuthError } from '@/utils/handleAuthError';
 import { useNavigate } from 'react-router-dom';
+import { ToastProps } from '@/types/toast';
 
 interface Request {
   sol_codigo: number;
@@ -73,15 +74,8 @@ const Requests: React.FC = () => {
   const [loadingApprove, setLoadingApprove] = useState(false);
 
   const navigate = useNavigate();
-  const [toast, setToast] = useState<{
-    visible: boolean;
-    message: string;
-    status?: "SUCCESS" | "ERROR" | "INFO" | "WARNING";
-  }>({
-    visible: false,
-    message: "",
-    status: "INFO",
-  });
+  const [toast, setToast] = useState<ToastProps>({ visible: false, message: "", status: "INFO" });
+
 
   async function fetchRequestsData() {
     setLoading(true);

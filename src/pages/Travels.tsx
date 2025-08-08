@@ -31,6 +31,7 @@ import { Loading } from '../components/ui/loading';
 import ToastMessage from '@/components/layout/ToastMessage';
 import { handleAuthError } from '@/utils/handleAuthError';
 import { useNavigate } from 'react-router-dom';
+import { ToastProps } from '@/types/toast';
 
 interface Travel {
     via_codigo: number;
@@ -62,15 +63,8 @@ const Travels: React.FC = () => {
 
     const [currentPage, setCurrentPage] = useState(1);
 
-    const [toast, setToast] = useState<{
-        visible: boolean;
-        message: string;
-        status?: "SUCCESS" | "ERROR" | "INFO" | "WARNING";
-    }>({
-        visible: false,
-        message: "",
-        status: "INFO",
-    });
+    const [toast, setToast] = useState<ToastProps>({ visible: false, message: "", status: "INFO" });
+
 
     const itemsPerPage = 10;
 

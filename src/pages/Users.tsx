@@ -10,20 +10,13 @@ import { Loading } from '../components/ui/loading';
 import ToastMessage from '@/components/layout/ToastMessage';
 import { useNavigate } from 'react-router-dom';
 import { handleAuthError } from '@/utils/handleAuthError';
-import { useAuth } from "@/contexts/useAuth";
-import { verificarCargo } from "@/utils/verificarCargo";
-
-type Toast = {
-  visible: boolean;
-  message: string;
-  status?: "SUCCESS" | "ERROR" | "INFO" | "WARNING";
-}
-
+import { useCargo } from "@/hooks/useCargo";
+import { ToastProps } from '@/types/toast';
 
 const Users: React.FC = () => {
   const BASE_URL = 'https://backend-turma-a-2025.onrender.com';
 
-  const cargo = verificarCargo();
+  const cargo = useCargo();
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [nameFilter, setNameFilter] = useState('');
@@ -31,11 +24,7 @@ const Users: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
 
-  const [toast, setToast] = useState<Toast>({
-    visible: false,
-    message: "",
-    status: "INFO",
-  });
+  const [toast, setToast] = useState<ToastProps>({ visible: false, message: "", status: "INFO" });
 
   const itemsPerPage = 10;
 

@@ -11,6 +11,7 @@ import ToastMessage from '@/components/layout/ToastMessage';
 import EmployeesWithoutMotorcycles from '@/components/layout/EmployeesWithoutBike';
 import { handleAuthError } from '@/utils/handleAuthError';
 import { useNavigate } from 'react-router-dom';
+import { ToastProps } from '@/types/toast';
 
 interface Motorcycle {
   mot_codigo: number;
@@ -41,17 +42,15 @@ const Motorcycles: React.FC = () => {
   const [refreshEmployees, setRefreshEmployees] = useState(0);
   const navigate = useNavigate();
 
-  const [toast, setToast] = useState<{
-    visible: boolean;
-    message: string;
-    status?: "SUCCESS" | "ERROR" | "INFO" | "WARNING";
-  }>({
-    visible: false,
-    message: "",
-    status: "INFO",
-  });
+  const [toast, setToast] = useState<ToastProps>({ visible: false, message: "", status: "INFO" });
+
 
   const itemsPerPage = 10;
+  function validarPlaca(placa: string) {
+    const regexAntigo = /^[A-Z]{3}[0-9]{4}$/i;
+    const regexMercosul = /^[A-Z]{3}[0-9][A-Z][0-9]{2}$/i;
+    return regexAntigo.test(placa) || regexMercosul.test(placa);
+  }
 
   async function fetchMotorcycles() {
     setLoading(true);
@@ -285,10 +284,17 @@ const Motorcycles: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    if (!validarPlaca(licensePlate.trim().toUpperCase())) {
+      setToast({
+        visible: true,
+        message: 'Formato de placa inválido. Use ABC1234 ou ABC1D23.',
+        status: 'ERROR',
+      });
+      return;
+    }
     const motorcycleData = {
       mot_modelo: model,
-      mot_placa: licensePlate,
+      mot_placa: licensePlate.trim().toUpperCase(),
       mot_ano: Number(year),
       mot_cor: color,
       fun_codigo: employeeCode === '' || employeeCode === 0 ? null : Number(employeeCode),

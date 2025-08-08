@@ -47,15 +47,21 @@ export default function EmployeesWithoutMotorcycles() {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`,
                 },
             });
+
             if (handleAuthError(response, setToast, navigate)) return;
 
+            const data = await response.json();
+
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Erro ao buscar funcionários sem moto');
+                throw new Error(data.message || 'Erro ao buscar funcionários sem moto');
             }
 
-            const data = await response.json();
-            setEmployeesWithoutMotorcycles(data.funcionarios);
+            if (Array.isArray(data.funcionarios)) {
+                setEmployeesWithoutMotorcycles(data.funcionarios);
+            } else {
+                setEmployeesWithoutMotorcycles([]);
+            }
+
         } catch (error) {
             setToast({
                 visible: true,
@@ -66,6 +72,7 @@ export default function EmployeesWithoutMotorcycles() {
             setLoading(false);
         }
     }
+
 
     if (employeesWithoutMotorcycles.length === 0) {
         return null;

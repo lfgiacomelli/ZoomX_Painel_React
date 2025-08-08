@@ -135,7 +135,7 @@ const LoginPage: React.FC = () => {
               <Input
                 id="email"
                 type="email"
-                placeholder="seu@email.com"
+                placeholder="funcionario@zoomx.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -148,13 +148,6 @@ const LoginPage: React.FC = () => {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password" className="text-gray-700">Senha</Label>
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="text-xs text-blue-600 hover:text-blue-800"
-                >
-                  {showPassword ? 'Ocultar' : 'Mostrar'}
-                </button>
               </div>
               <div className="relative">
                 <Input
@@ -180,21 +173,6 @@ const LoginPage: React.FC = () => {
                 </button>
               </div>
             </div>
-
-            <div className="flex items-center justify-between text-sm">
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <label htmlFor="remember-me" className="ml-2 block text-gray-700">
-                  Lembrar de mim
-                </label>
-              </div>
-            </div>
-
             <Button
               type="submit"
               className="w-full h-10 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white shadow-sm transition-all duration-200"

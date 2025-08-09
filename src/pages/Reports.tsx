@@ -1,8 +1,9 @@
+import React, { useEffect, useState, useCallback } from 'react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
-import React, { useEffect, useState } from 'react';
+
 import {
   Card,
   CardContent,
@@ -18,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../components/ui/select';
+
 import {
   BarChart,
   Bar,
@@ -32,218 +34,221 @@ import {
   Pie,
   Cell,
 } from 'recharts';
+
 import { Loading } from '@/components/ui/loading';
 import ToastMessage from '@/components/layout/ToastMessage';
+
 import { handleAuthError } from '@/utils/handleAuthError';
 import { useNavigate } from 'react-router-dom';
-import { ToastProps} from '@/types/toast';
 
-interface UsuarioAtivo {
-  usu_nome: string;
-  total_corridas: number;
-  total_gasto: number;
-}
-
-interface MototaxistaAtivo {
-  fun_nome: string;
-  total_corridas: number;
-  total_faturado: number;
-  media_avaliacao: number | null;
-}
-
-interface HorarioPico {
-  hora: string;
-  total: number;
-  periodo: string;
-}
-
-interface RotasPopulares {
-  rota: string;
-  total_viagens: number;
-  valor_medio: number;
-}
-
-interface RelatorioData {
-  data_inicio: string;
-  data_fim: string;
-  usuarios: {
-    total: number;
-    ativos: number;
-    banidos: number;
-    novos: number;
-  };
-  corridas: {
-    total: number;
-    finalizadas: number;
-    em_andamento: number;
-    canceladas: number;
-    valor_medio: number;
-    faturamento_total: number;
-  };
-  usuariosAtivos: UsuarioAtivo[];
-  mototaxistasAtivos: MototaxistaAtivo[];
-  receitaMensal: {
-    labels: string[];
-    valoresReceita: number[];
-    valoresCorridas: number[];
-  };
-  statusCorridas: {
-    labels: string[];
-    valores: number[];
-    cores: Record<string, string>;
-  };
-  horariosPico: HorarioPico[];
-  rotasPopulares: RotasPopulares[];
-}
+import type { ToastProps } from '@/types/toast';
+import type { RelatorioData } from '@/types/reports';
 
 const BASE_URL = 'https://backend-turma-a-2025.onrender.com';
 const API_URL = '/api/admin/relatorios';
+
+const useRelatorioData = (period: string, reportType: string) => {
+  const [data, setData] = useState<RelatorioData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [toast, setToast] = useState<ToastProps>({ visible: false, message: '', status: 'INFO' });
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchRelatorio = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch(`${BASE_URL}${API_URL}`, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+          },
+        });
+
+        if (handleAuthError(res, setToast, navigate)) return;
+
+        if (!res.ok) throw new Error('Erro ao buscar relatório');
+
+        const json = await res.json();
+
+        // Normalizar dados para números
+        const normalizeNumber = (value: any) => (value !== undefined ? Number(value) : 0);
+
+        // Normalize principais campos numéricos
+        json.usuarios = {
+          total: normalizeNumber(json.usuarios.total),
+          ativos: normalizeNumber(json.usuarios.ativos),
+          banidos: normalizeNumber(json.usuarios.banidos),
+          novos: normalizeNumber(json.usuarios.novos),
+        };
+
+        json.corridas = {
+          total: normalizeNumber(json.corridas.total),
+          finalizadas: normalizeNumber(json.corridas.finalizadas),
+          em_andamento: normalizeNumber(json.corridas.em_andamento),
+          canceladas: normalizeNumber(json.corridas.canceladas),
+          valor_medio: normalizeNumber(json.corridas.valor_medio),
+          faturamento_total: normalizeNumber(json.corridas.faturamento_total),
+        };
+
+        // Mapear arrays com conversão numérica
+        json.usuariosAtivos = (json.usuariosAtivos || []).map((u: any) => ({
+          usu_nome: u.usu_nome,
+          total_corridas: normalizeNumber(u.total_corridas),
+          total_gasto: normalizeNumber(u.total_gasto),
+        }));
+
+        json.mototaxistasAtivos = (json.mototaxistasAtivos || []).map((m: any) => ({
+          fun_nome: m.fun_nome,
+          total_corridas: normalizeNumber(m.total_corridas),
+          total_faturado: normalizeNumber(m.total_faturado),
+          media_avaliacao: m.media_avaliacao ? normalizeNumber(m.media_avaliacao) : null,
+        }));
+
+        json.horariosPico = (json.horariosPico || []).map((h: any) => ({
+          hora: h.hora,
+          total: normalizeNumber(h.total),
+          periodo: h.periodo,
+        }));
+
+        json.rotasPopulares = (json.rotasPopulares || []).map((r: any) => ({
+          rota: r.rota,
+          total_viagens: normalizeNumber(r.total_viagens),
+          valor_medio: normalizeNumber(r.valor_medio),
+        }));
+
+        if (json.receitaMensal) {
+          json.receitaMensal.valoresReceita = (json.receitaMensal.valoresReceita || []).map(normalizeNumber);
+          json.receitaMensal.valoresCorridas = (json.receitaMensal.valoresCorridas || []).map(normalizeNumber);
+        }
+
+        if (json.statusCorridas) {
+          json.statusCorridas.valores = (json.statusCorridas.valores || []).map(normalizeNumber);
+        }
+
+        setData(json);
+      } catch (err: any) {
+        setError(err.message || 'Erro desconhecido');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRelatorio();
+  }, [period, reportType, navigate]);
+
+  return { data, loading, error, toast, setToast };
+};
+
+const ExportButtons = ({
+  data,
+  onError,
+}: {
+  data: RelatorioData | null;
+  onError: (message: string) => void;
+}) => {
+  const exportReport = useCallback(
+    (format: 'pdf' | 'excel') => {
+      if (!data) {
+        onError('Nenhum dado disponível para exportação.');
+        return;
+      }
+
+      const rows = [
+        ['Período', `${data.data_inicio} até ${data.data_fim}`],
+        ['Total de Corridas', data.corridas.total],
+        ['Corridas Finalizadas', data.corridas.finalizadas],
+        ['Corridas Canceladas', data.corridas.canceladas],
+        ['Faturamento Total', `R$ ${data.corridas.faturamento_total.toFixed(2)}`],
+        ['Valor Médio por Corrida', `R$ ${data.corridas.valor_medio.toFixed(2)}`],
+        ['Usuários Ativos', data.usuarios.ativos],
+        ['Total de Usuários', data.usuarios.total],
+        ['Usuários Novos', data.usuarios.novos],
+        ['Usuários Banidos', data.usuarios.banidos],
+      ];
+
+      if (format === 'pdf') {
+        const doc = new jsPDF();
+        doc.text('Relatório Geral - ZoomX', 14, 20);
+        autoTable(doc, {
+          head: [['Métrica', 'Valor']],
+          body: rows,
+          startY: 30,
+        });
+        doc.save('relatorio-zoomx.pdf');
+      } else if (format === 'excel') {
+        const worksheetData = rows.map(([key, value]) => ({ Métrica: key, Valor: value }));
+        const worksheet = XLSX.utils.json_to_sheet(worksheetData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Relatório');
+
+        const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+        const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+        saveAs(blob, 'relatorio-zoomx.xlsx');
+      }
+    },
+    [data, onError]
+  );
+
+  return (
+    <div className="flex space-x-2">
+      <Button variant="outline" onClick={() => exportReport('pdf')}>
+        Exportar PDF
+      </Button>
+      <Button variant="outline" onClick={() => exportReport('excel')}>
+        Exportar Excel
+      </Button>
+    </div>
+  );
+};
+
+const SummaryCard = ({
+  title,
+  value,
+  description,
+  descriptionColor = 'text-gray-600',
+}: {
+  title: string;
+  value: React.ReactNode;
+  description?: string;
+  descriptionColor?: string;
+}) => (
+  <Card className="zoomx-card">
+    <CardHeader className="pb-2">
+      <CardTitle className="text-sm font-medium">{title}</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <div className="text-2xl font-bold text-black">{value}</div>
+      {description && <p className={`text-xs ${descriptionColor}`}>{description}</p>}
+    </CardContent>
+  </Card>
+);
 
 const Reports: React.FC = () => {
   const [period, setPeriod] = useState('month');
   const [reportType, setReportType] = useState('general');
 
-  const navigate = useNavigate();
-  const [data, setData] = useState<RelatorioData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [toast, setToast] = useState<ToastProps>({ visible: false, message: "", status: "INFO" });
+  const { data, loading, error, toast, setToast } = useRelatorioData(period, reportType);
 
+  if (loading)
+    return (
+      <div className="flex flex-col items-center justify-center">
+        <Loading />
+        Montando relatório...
+      </div>
+    );
 
-  useEffect(() => {
-    async function fetchRelatorio() {
-      try {
-        setLoading(true);
-        const res = await fetch(`${BASE_URL}${API_URL}`,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${localStorage.getItem('token') || ''}`,
-            }
-          }
-        );
-        if (handleAuthError(res, setToast, navigate)) return;
+  if (error)
+    return (
+      <div className="text-red-600">
+        Erro: {error}
+      </div>
+    );
 
-        if (!res.ok) throw new Error('Erro ao buscar relatório');
-        const json = await res.json();
-
-        json.usuarios.total = Number(json.usuarios.total);
-        json.usuarios.ativos = Number(json.usuarios.ativos);
-        json.usuarios.banidos = Number(json.usuarios.banidos);
-        json.usuarios.novos = Number(json.usuarios.novos);
-
-        json.corridas.total = Number(json.corridas.total);
-        json.corridas.finalizadas = Number(json.corridas.finalizadas);
-        json.corridas.em_andamento = Number(json.corridas.em_andamento);
-        json.corridas.canceladas = Number(json.corridas.canceladas);
-        json.corridas.valor_medio = Number(json.corridas.valor_medio);
-        json.corridas.faturamento_total = Number(json.corridas.faturamento_total);
-
-        json.usuariosAtivos = json.usuariosAtivos.map((u: any) => ({
-          usu_nome: u.usu_nome,
-          total_corridas: Number(u.total_corridas),
-          total_gasto: Number(u.total_gasto),
-        }));
-
-        json.mototaxistasAtivos = json.mototaxistasAtivos.map((m: any) => ({
-          fun_nome: m.fun_nome,
-          total_corridas: Number(m.total_corridas),
-          total_faturado: Number(m.total_faturado),
-          media_avaliacao: m.media_avaliacao ? Number(m.media_avaliacao) : null,
-        }));
-
-        json.horariosPico = json.horariosPico.map((h: any) => ({
-          hora: h.hora,
-          total: Number(h.total),
-          periodo: h.periodo,
-        }));
-
-        json.rotasPopulares = json.rotasPopulares.map((r: any) => ({
-          rota: r.rota,
-          total_viagens: Number(r.total_viagens),
-          valor_medio: Number(r.valor_medio),
-        }));
-
-        json.receitaMensal.valoresReceita = json.receitaMensal.valoresReceita.map((v: string) =>
-          Number(v)
-        );
-        json.receitaMensal.valoresCorridas = json.receitaMensal.valoresCorridas.map((v: string) =>
-          Number(v)
-        );
-
-        json.statusCorridas.valores = json.statusCorridas.valores.map((v: string) =>
-          Number(v)
-        );
-
-        setData(json);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchRelatorio();
-  }, [period, reportType]);
-
-  const exportReport = (format: string) => {
-    if (!data) {
-      setToast({
-        visible: true,
-        message: 'Nenhum dado disponível para exportação.',
-        status: 'ERROR',
-      });
-      return;
-    }
-
-    const rows = [
-      ['Período', `${data.data_inicio} até ${data.data_fim}`],
-      ['Total de Corridas', data.corridas.total],
-      ['Corridas Finalizadas', data.corridas.finalizadas],
-      ['Corridas Canceladas', data.corridas.canceladas],
-      ['Faturamento Total', `R$ ${data.corridas.faturamento_total.toFixed(2)}`],
-      ['Valor Médio por Corrida', `R$ ${data.corridas.valor_medio.toFixed(2)}`],
-      ['Usuários Ativos', data.usuarios.ativos],
-      ['Total de Usuários', data.usuarios.total],
-      ['Usuários Novos', data.usuarios.novos],
-      ['Usuários Banidos', data.usuarios.banidos],
-    ];
-
-    if (format === 'pdf') {
-      const doc = new jsPDF();
-      doc.text('Relatório Geral - ZoomX', 14, 20);
-
-      autoTable(doc, {
-        head: [['Métrica', 'Valor']],
-        body: rows,
-        startY: 30,
-      });
-
-      doc.save('relatorio-zoomx.pdf');
-    }
-
-    if (format === 'excel') {
-      const worksheetData = rows.map(([key, value]) => ({ Métrica: key, Valor: value }));
-      const worksheet = XLSX.utils.json_to_sheet(worksheetData);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Relatório');
-
-      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-      const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
-
-      saveAs(blob, 'relatorio-zoomx.xlsx');
-    }
-  };
-
-
-  if (loading) return (
-    <div style={{ justifyContent: 'center', display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
-      <Loading />
-      Montando relatório...
-    </div>
-  );
-  if (error) return <div className="text-red-600">Erro: {error}</div>;
   if (!data) return null;
 
+  // Dados para gráficos
   const dailyData = data.horariosPico.map((h) => ({
     day: h.hora,
     corridas: h.total,
@@ -278,17 +283,15 @@ const Reports: React.FC = () => {
           onHide={() => setToast({ ...toast, visible: false })}
         />
       )}
+
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-righteous text-black">Relatórios</h1>
-        <div className="flex space-x-2">
-          <Button variant="outline" onClick={() => exportReport('pdf')}>
-            Exportar PDF
-          </Button>
-
-          <Button variant="outline" onClick={() => exportReport('excel')}>
-            Exportar Excel
-          </Button>
-        </div>
+        <ExportButtons
+          data={data}
+          onError={(msg) =>
+            setToast({ visible: true, message: msg, status: 'ERROR' })
+          }
+        />
       </div>
 
       <Card className="zoomx-card">
@@ -330,47 +333,31 @@ const Reports: React.FC = () => {
       </Card>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card className="zoomx-card">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Total de Corridas</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-black">{data.corridas.total}</div>
-            <p className="text-xs text-green-600">
-              Finalizadas: {data.corridas.finalizadas} | Canceladas: {data.corridas.canceladas}
-            </p>
-          </CardContent>
-        </Card>
+        <SummaryCard
+          title="Total de Corridas"
+          value={data.corridas.total}
+          description={`Finalizadas: ${data.corridas.finalizadas} | Canceladas: ${data.corridas.canceladas}`}
+          descriptionColor="text-green-600"
+        />
 
-        <Card className="zoomx-card">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Total de Entregas</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-black">--</div>
-            <p className="text-xs text-gray-600">Sem dados disponíveis</p>
-          </CardContent>
-        </Card>
+        <SummaryCard
+          title="Total de Entregas"
+          value="--"
+          description="Sem dados disponíveis"
+          descriptionColor="text-gray-600"
+        />
 
-        <Card className="zoomx-card">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Faturamento Total</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-black">R$ {data.corridas.faturamento_total.toFixed(2)}</div>
-            <p className="text-xs text-gray-600">Valor médio: R$ {data.corridas.valor_medio.toFixed(2)}</p>
-          </CardContent>
-        </Card>
+        <SummaryCard
+          title="Faturamento Total"
+          value={`R$ ${data.corridas.faturamento_total.toFixed(2)}`}
+          description={`Valor médio: R$ ${data.corridas.valor_medio.toFixed(2)}`}
+        />
 
-        <Card className="zoomx-card">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Usuários Ativos</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-black">{data.usuarios.ativos}</div>
-            <p className="text-xs text-gray-600">Total usuários: {data.usuarios.total}</p>
-          </CardContent>
-        </Card>
+        <SummaryCard
+          title="Usuários Ativos"
+          value={data.usuarios.ativos}
+          description={`Total usuários: ${data.usuarios.total}`}
+        />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

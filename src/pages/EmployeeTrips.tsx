@@ -21,24 +21,12 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, MapPin, Calendar, DollarSign, CreditCard, Bike } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { handleAuthError } from "@/utils/handleAuthError";
 import ToastMessage from "@/components/layout/ToastMessage";
-import { ToastProps } from "@/types/toast";
 
-type Trip = {
-    via_codigo: number;
-    via_origem: string;
-    via_destino: string;
-    via_valor: string;
-    via_formapagamento: string;
-    via_data: string;
-    via_servico: string;
-    via_status: string;
-    via_observacoes: string;
-    mot_modelo: string;
-    mot_placa: string;
-    fun_nome: string;
-};
+import { handleAuthError } from "@/utils/handleAuthError";
+
+import { ToastProps } from "@/types/toast";
+import { Trip } from "@/types/travel";
 
 const statusVariantMap: Record<string, string> = {
     "concluído": "default",

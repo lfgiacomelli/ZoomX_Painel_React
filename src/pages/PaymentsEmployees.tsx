@@ -2,19 +2,14 @@ import { useState, useEffect } from 'react';
 import { CheckCircle, XCircle, Clock, Info, Plus } from 'lucide-react';
 import ToastMessage from '@/components/layout/ToastMessage';
 import { Skeleton } from '@/components/ui/skeleton';
-import { set } from 'date-fns';
-import { handleAuthError } from '@/utils/handleAuthError';
-import { useNavigate } from 'react-router-dom';
-import { ToastProps } from '@/types/toast';
 
-interface PaymentsEmployeesProps {
-  pag_codigo: number;
-  fun_nome: string;
-  pag_valor: number;
-  pag_status: 'PAGO' | 'PENDENTE' | 'CANCELADO' | string;
-  pag_data: string;
-  pag_forma_pagament: string;
-}
+import { handleAuthError } from '@/utils/handleAuthError';
+
+import { useNavigate } from 'react-router-dom';
+
+import { ToastProps } from '@/types/toast';
+import { PaymentsEmployeesProps } from '@/types/paymentsemployees';
+
 
 export default function PaymentsEmployees() {
   const navigate = useNavigate();

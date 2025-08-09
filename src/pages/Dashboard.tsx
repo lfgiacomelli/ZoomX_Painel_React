@@ -22,40 +22,14 @@ import { useCargo } from '@/hooks/useCargo';
 import MessageNotManager from '@/components/layout/MessageNotManager';
 
 import { ToastProps } from '@/types/toast';
-
-interface SolicitacaoPendente {
-  sol_codigo: number;
-  sol_origem: string;
-  sol_destino: string;
-  sol_valor: string;
-  sol_formapagamento: string;
-  usu_nome: string;
-}
-
-interface ViagemPendente {
-  via_codigo: number;
-  via_origem: string;
-  via_destino: string;
-  via_valor: string;
-  via_formapagamento: string;
-  funcionario_nome: string;
-  usuario_nome: string;
-  via_data: string;
-  via_servico: string;
-  via_observacoes: string | null;
-}
+import { SolicitacaoPendente } from '@/types/pendingrequest';
+import { ViagemPendente } from '@/types/pendingtravel';
+import { Review } from '@/types/review';
 
 interface ContadorData {
   total: number;
 }
 
-interface Review {
-  id: number;
-  usuario_nome: string;
-  nota: number;
-  comentario: string;
-  data: string;
-}
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();

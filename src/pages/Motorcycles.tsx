@@ -9,19 +9,14 @@ import { Pagination } from '../components/ui/pagination';
 import { Loading } from '../components/ui/loading';
 import ToastMessage from '@/components/layout/ToastMessage';
 import EmployeesWithoutMotorcycles from '@/components/layout/EmployeesWithoutBike';
-import { handleAuthError } from '@/utils/handleAuthError';
-import { useNavigate } from 'react-router-dom';
-import { ToastProps } from '@/types/toast';
 
-interface Motorcycle {
-  mot_codigo: number;
-  mot_modelo: string;
-  mot_placa: string;
-  mot_ano: number;
-  mot_cor: string;
-  fun_codigo: number | null;
-  fun_nome?: string;
-}
+import { handleAuthError } from '@/utils/handleAuthError';
+
+import { useNavigate } from 'react-router-dom';
+
+import { ToastProps } from '@/types/toast';
+import { Motorcycle } from '@/types/motorcycle';
+
 
 const Motorcycles: React.FC = () => {
   const BASE_URL = 'https://backend-turma-a-2025.onrender.com';

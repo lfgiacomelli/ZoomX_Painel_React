@@ -1,24 +1,9 @@
-
 export interface Motorcycle {
-  id: string;
-  brand: string;
-  model: string;
-  year: number;
-  licensePlate: string;
-  status: 'available' | 'in_use' | 'maintenance';
-  employeeId?: string;
-  employeeName?: string;
-  createdAt: string;
-  updatedAt: string;
+  mot_codigo: number;
+  mot_modelo: string;
+  mot_placa: string;
+  mot_ano: number;
+  mot_cor: string;
+  fun_codigo: number | null;
+  fun_nome?: string;
 }
-
-export interface CreateMotorcycleData {
-  brand: string;
-  model: string;
-  year: number;
-  licensePlate: string;
-  status: 'available' | 'in_use' | 'maintenance';
-  employeeId?: string;
-}
-
-export interface UpdateMotorcycleData extends Partial<CreateMotorcycleData> {}

@@ -7,15 +7,8 @@ import { ToastProps } from '@/types/toast';
 
 export default function Email() {
     const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        phone: '',
-        message: '',
-        company: '',
-        address_company: '',
-        address_number: '',
-        bairro: '',
-        cep: ''
+         name: '', email: '', phone: '', message: '', company: '',
+        address_company: '', address_number: '', bairro: '', cep: ''
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
@@ -95,8 +88,7 @@ export default function Email() {
             <div className="max-w-6xl mx-auto p-16">
                 <div className="text-center mb-20">
                     <h1 className="text-3xl sm:text-4xl font-light text-gray-900 mb-3">
-                        <span className="block">Soluções para</span>
-                        <span className="font-medium">Gestão de Mototáxi</span>
+                        <span className="block">Desenvolvido por quem entende do assunto</span>
                     </h1>
                     <div className="w-20 h-1 bg-blue-500 mx-auto mt-4"></div>
                     <p className="mt-6 text-lg text-gray-600 max-w-2xl mx-auto">

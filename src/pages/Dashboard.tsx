@@ -44,8 +44,8 @@ const Dashboard: React.FC = () => {
   const [funcionariosAtivos, setFuncionariosAtivos] = useState<any[]>([]);
   const [totalAvaliacoes, setTotalAvaliacoes] = useState<number>(0);
   const [reviews, setReviews] = useState<Review[]>([]);
-    const [toast, setToast] = useState<ToastProps>({ visible: false, message: "", status: "INFO" });
-  
+  const [toast, setToast] = useState<ToastProps>({ visible: false, message: "", status: "INFO" });
+
 
 
 
@@ -70,12 +70,16 @@ const Dashboard: React.FC = () => {
         const data: SolicitacaoPendente[] = await res.json();
         setSolicitacoesPendentes(data);
         if (data.length > 0) {
+          const audio = new Audio('/notificacao.mp3');
+          audio.play();
+
           setToast({
             visible: true,
             message: `Você tem ${data.length} solicitações pendentes.`,
             status: 'INFO',
           });
         }
+
       } catch (error) {
         console.error('Erro ao buscar solicitações pendentes:', error);
       } finally {
@@ -281,6 +285,8 @@ const Dashboard: React.FC = () => {
           Atualizado em {new Date().toLocaleDateString('pt-BR')}
         </div>
       </div>
+
+
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="zoomx-card">

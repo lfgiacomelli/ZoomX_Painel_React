@@ -135,7 +135,6 @@ const Requests: React.FC = () => {
       setLoadingFuncionarios(false);
     }
   }
-
   useEffect(() => {
     fetchRequestsData();
     fetchFuncionarios();
@@ -152,6 +151,16 @@ const Requests: React.FC = () => {
 
     return () => clearInterval(intervalId);
   }, []);
+
+  useEffect(() => {
+    if (!requests) return; 
+    const pendingRequest = requests.filter(request => request.sol_status.toLowerCase() === 'pendente');
+    if (pendingRequest.length > 0) {
+      const audio = new Audio('/notificacao.mp3');
+      audio.play();
+    }
+  }, [requests]);
+
   const filteredRequests = requests.filter((request) => {
     const matchesType =
       typeFilter === 'all' ||

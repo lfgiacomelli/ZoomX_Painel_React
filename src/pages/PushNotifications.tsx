@@ -2,50 +2,6 @@ import ToastMessage from "@/components/layout/ToastMessage";
 import { ToastProps } from "@/types/toast";
 import React, { useEffect, useState } from "react";
 
-const ideiasZoomX = [
-  "Olá {nome}, precisa de um mototáxi rápido? Chame no ZoomX agora mesmo! 🏍️⚡",
-  "Ei {nome}, viaje com segurança e agilidade usando o mototáxi ZoomX. 🛡️✅",
-  "Oi {nome}, simule suas rotas e valores conosco, é sem compromisso 😉🗺️.",
-  "Ei {nome}, evite atrasos! Agende seu mototáxi com antecedência pelo ZoomX. ⏰📲",
-  "Oi {nome}, já avaliou sua última corrida? Conte pra gente e ajude a melhorar. ⭐📝",
-  "Olá {nome}, seu mototáxi ZoomX está a caminho! Fique tranquilo e seguro. 🚦📍",
-  "Ei {nome}, precisa de uma corrida rápida? O ZoomX sempre mantém presença! 🚀✨",
-  "Olá {nome}, dúvidas ou problemas? Nosso suporte ZoomX mototáxi está sempre disponível. 📞💬",
-];
-
-function ListaIdeiasNotificacoes({ onSelect }: { onSelect: (texto: string) => void }) {
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-
-  function handleClick(index: number) {
-    setSelectedIndex(index);
-    onSelect(ideiasZoomX[index]);
-  }
-
-  return (
-    <div className="bg-gray-100 rounded-lg p-4 mb-6">
-      <h2 className="text-lg mb-3 text-gray-900">
-        Está sem ideias? Clique em uma das sugestões abaixo!
-      </h2>
-      <ul className="space-y-2 max-h-60 overflow-y-auto">
-        {ideiasZoomX.map((texto, i) => (
-          <li
-            key={i}
-            onClick={() => handleClick(i)}
-            className={`cursor-pointer p-2 rounded border ${
-              selectedIndex === i
-                ? "bg-gray-300 border-gray-700"
-                : "border-transparent hover:bg-gray-200"
-            }`}
-            title="Clique para usar esta ideia"
-          >
-            {texto}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
 export default function PushNotifications() {
   const [usuarios, setUsuarios] = useState<any[]>([]);
   const [loadingTokens, setLoadingTokens] = useState(false);
@@ -271,13 +227,12 @@ export default function PushNotifications() {
                 <button
                   type="submit"
                   disabled={sending || selectedCount === 0}
-                  className={`w-full flex items-center justify-center py-3 px-6 rounded-lg font-medium transition-colors ${
-                    sending
+                  className={`w-full flex items-center justify-center py-3 px-6 rounded-lg font-medium transition-colors ${sending
                       ? "bg-gray-400 cursor-not-allowed"
                       : selectedCount === 0
-                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      : "bg-gray-900 hover:bg-black text-white"
-                  }`}
+                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        : "bg-gray-900 hover:bg-black text-white"
+                    }`}
                 >
                   {sending ? (
                     <>
@@ -312,8 +267,6 @@ export default function PushNotifications() {
                 </button>
               </div>
             </form>
-            <ListaIdeiasNotificacoes onSelect={handleSelectIdea} />
-
           </div>
         </div>
       </div>

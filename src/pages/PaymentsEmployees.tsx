@@ -13,7 +13,6 @@ import { PaymentsEmployeesProps } from '@/types/paymentsemployees';
 
 export default function PaymentsEmployees() {
   const navigate = useNavigate();
-  const [totalValue, setTotalValue] = useState(0);
   const [payments, setPayments] = useState<PaymentsEmployeesProps[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingDiarias, setLoadingDiarias] = useState(false);

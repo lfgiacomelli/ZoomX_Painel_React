@@ -26,6 +26,8 @@ import {
   useSidebar,
 } from '../ui/sidebar';
 import { useAuth } from '@/contexts/useAuth';
+import { useCargo } from '@/hooks/useCargo';
+import { title } from 'process';
 
 const baseMenuItems = [
   { title: 'Dashboard', url: '/', icon: BarChart },
@@ -55,14 +57,22 @@ export function AppSidebar() {
   const navigate = useNavigate();
   const { logout, funcionario } = useAuth();
 
-  const cargo = funcionario?.cargo;
+  const cargo = useCargo();
+  const funCodigo = funcionario?.id;
+  const menuItems =
+    cargo === "mototaxista"
+      ? [
+        { title: "Dashboard", url: "/dashboard", icon: BarChart },
+        { title: "Minhas Viagens", url: `/viagensFuncionario/${funCodigo}`, icon: LocateIcon },
+        { title: "Conta", url: "/conta", icon: User },
+      ]
+      : [
+        ...baseMenuItems,
+        ...(cargo === "Gerente" || cargo === "Administrador"
+          ? [{ title: "Documentos", url: "/documentos", icon: File }]
+          : []),
+      ];
 
-  const menuItems = [
-    ...baseMenuItems,
-    ...(funcionario?.cargo === 'Gerente' || funcionario?.cargo === 'Administrador'
-      ? [{ title: 'Documentos', url: '/documentos', icon: File }]
-      : []),
-  ];
 
 
   const [weather, setWeather] = useState<WeatherData | null>(null);

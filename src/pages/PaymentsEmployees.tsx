@@ -62,6 +62,7 @@ export default function PaymentsEmployees() {
         const data = await response.json();
         if (!response.ok) throw new Error(data?.message || 'Erro ao gerar diárias');
         setToast({ visible: true, message: '✅ Diárias geradas com sucesso!', status: 'SUCCESS' });
+        console.log(response.status)
         fetchPayments();
       }
       if (handleAuthError(response, setToast, navigate)) return;

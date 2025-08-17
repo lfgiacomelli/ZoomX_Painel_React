@@ -18,7 +18,7 @@ const LimitedDashboard: FC = () => {
 
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
-  const [travel, setTravel] = useState<Trip[]>([]); // Viagens em andamento
+  const [travel, setTravel] = useState<Trip[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const navigate = useNavigate();
@@ -89,8 +89,17 @@ const LimitedDashboard: FC = () => {
 
   useEffect(() => {
     if (!id) return;
-    fetchViagensEmAndamento();
-    fetchTrips();
+
+    const fetchAllData = async () => {
+      await fetchViagensEmAndamento();
+      await fetchTrips();
+    };
+
+    fetchAllData();
+
+    const intervalId = setInterval(fetchAllData, 20000);
+
+    return () => clearInterval(intervalId);
   }, [id]);
 
   const generateMapsLink = (origin: string, destination?: string) => {

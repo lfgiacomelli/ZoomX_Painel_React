@@ -198,7 +198,6 @@ const LimitedDashboard: FC = () => {
         </Card>
       )}
 
-      {/* Estatísticas rápidas */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="shadow-md">
           <CardHeader>
@@ -250,7 +249,6 @@ const LimitedDashboard: FC = () => {
         </Card>
       </div>
 
-      {/* Últimas corridas */}
       <Card className="shadow-md">
         <CardHeader>
           <CardTitle>Últimas Corridas</CardTitle>

@@ -58,13 +58,6 @@ export default function PushNotifications() {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
-  function handleSelectIdea(texto: string) {
-    setForm({
-      title: texto.split(".")[0].slice(0, 50) || "Notificação ZoomX",
-      body: texto,
-    });
-  }
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setToast({ visible: false, message: "", status: "INFO" });
@@ -101,7 +94,7 @@ export default function PushNotifications() {
       }
       setToast({
         visible: true,
-        message: "Notificações enviadas com sucesso",
+        message: `Notificações enviadas com sucesso para ${usuariosSelecionados.length} ${usuariosSelecionados.length > 1 ? "usuários" : "usuário"}`,
         status: "SUCCESS",
       });
       setForm({ title: "", body: "" });
@@ -228,10 +221,10 @@ export default function PushNotifications() {
                   type="submit"
                   disabled={sending || selectedCount === 0}
                   className={`w-full flex items-center justify-center py-3 px-6 rounded-lg font-medium transition-colors ${sending
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : selectedCount === 0
-                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                        : "bg-gray-900 hover:bg-black text-white"
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : selectedCount === 0
+                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      : "bg-gray-900 hover:bg-black text-white"
                     }`}
                 >
                   {sending ? (

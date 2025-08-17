@@ -22,11 +22,14 @@ import Home from "./pages/Home";
 import Email from "./pages/E-mail";
 import PaymentsEmployees from "./pages/PaymentsEmployees";
 import EmployeeTrips from "./pages/EmployeeTrips";
+import LimitedDashboard from "./pages/LimitedDashboard";
 import Documentos from "./pages/Documents";
 import PushNotifications from './pages/PushNotifications';
+import EmployeeMotorcycle from './pages/EmployeeMotorcycle';
+
 import { PrivateRoute } from './routes/PrivateRoutes';
 import { useCargo } from "./hooks/useCargo";
-import LimitedDashboard from "./pages/LimitedDashboard";
+import DailyBilling from "./pages/DailyBilling";
 
 const queryClient = new QueryClient();
 
@@ -48,8 +51,6 @@ const App = () => {
 
 function AppRoutes() {
   const cargo = useCargo();
-  const { funcionario } = useAuth();
-  const funCodigo = funcionario?.id;
   return (
     <Routes>
       <Route path="/home" element={<Home />} />
@@ -61,6 +62,8 @@ function AppRoutes() {
           <>
             <Route path="/" element={<Layout><LimitedDashboard /></Layout>} />
             <Route path={`/viagensFuncionario/:funCodigo`} element={<Layout><EmployeeTrips /></Layout>} />
+            <Route path={`/ganhosDiarios/:funCodigo`} element={<Layout><DailyBilling /></Layout>} />
+            <Route path={`/motocicletaFuncionario/:funCodigo`} element={<Layout><EmployeeMotorcycle /></Layout>} />
             <Route path="/conta" element={<Layout><Account /></Layout>} />
             <Route path="*" element={<Layout><NotFound /></Layout>} />
           </>

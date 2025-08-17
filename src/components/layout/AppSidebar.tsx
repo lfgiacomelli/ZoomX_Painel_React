@@ -12,6 +12,7 @@ import {
   BarChart2Icon,
   LogOut,
   Bell,
+  BikeIcon,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -62,8 +63,10 @@ export function AppSidebar() {
   const menuItems =
     cargo === "mototaxista"
       ? [
-        { title: "Dashboard", url: "/dashboard", icon: BarChart },
+        { title: "Dashboard", url: "/", icon: BarChart },
         { title: "Minhas Viagens", url: `/viagensFuncionario/${funCodigo}`, icon: LocateIcon },
+        { title: "Minha Motocicleta", url: `/motocicletaFuncionario/${funCodigo}`, icon: Bike },
+        { title: "Meus ganhos diários", url: `/ganhosDiarios/${funCodigo}`, icon: BarChart2Icon },
         { title: "Conta", url: "/conta", icon: User },
       ]
       : [
@@ -137,7 +140,7 @@ export function AppSidebar() {
             <h1 className="text-2xl font-righteous text-black">ZX</h1>
           </div>
         ) : (
-          <>
+          <div className="text-center">
             <h1 className="text-xl font-righteous text-black text-center">ZoomX</h1>
             <h1 className="text-sm font-righteous text-black text-center">
               Painel de gestão
@@ -167,7 +170,7 @@ export function AppSidebar() {
                 </span>
               </div>
             )}
-          </>
+          </div>
         )}
 
         <SidebarTrigger className="mt-2 " />

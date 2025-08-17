@@ -11,4 +11,5 @@ export type Trip = {
     mot_modelo: string;
     mot_placa: string;
     fun_nome: string;
+    usu_nome: string;
 };

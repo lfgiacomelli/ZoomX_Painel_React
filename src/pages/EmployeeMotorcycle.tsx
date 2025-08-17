@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useAuth } from "@/contexts/useAuth";
+import { mapColor } from "@/utils/motorcyclesColors";
 
 export default function EmployeeMotorcycle() {
     const { funcionario } = useAuth();
@@ -24,20 +25,8 @@ export default function EmployeeMotorcycle() {
 
     const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://192.168.0.12:3000";
 
-    switch(motorcycle?.mot_cor.toLocaleLowerCase()) {
-        case "amarelo":
-            motorcycle.mot_cor = "yellow";
-            break;
-        case "preto":
-            motorcycle.mot_cor = "black";
-        break;
-        case "branca":
-            motorcycle.mot_cor = "white";
-            break;
-        default:
-            motorcycle.mot_cor = "black";
-        break;
-    }
+    
+
 
     const fetchMotorcycleData = useCallback(async () => {
         if (!funcionarioId) return;
@@ -162,9 +151,10 @@ export default function EmployeeMotorcycle() {
                                         <div className="flex items-center gap-2">
                                             <div
                                                 className="w-6 h-6 rounded-full border border-gray-200"
-                                                style={{ backgroundColor: motorcycle.mot_cor }}
+                                                style={{ backgroundColor: mapColor(motorcycle?.mot_cor) }}
                                             />
-                                            <span className="capitalize">{motorcycle.mot_cor}</span>
+                                            <span className="capitalize">{motorcycle?.mot_cor}</span>
+
                                         </div>
                                     </div>
                                 </div>

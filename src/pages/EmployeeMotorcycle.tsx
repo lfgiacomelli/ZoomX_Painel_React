@@ -24,6 +24,21 @@ export default function EmployeeMotorcycle() {
 
     const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://192.168.0.12:3000";
 
+    switch(motorcycle?.mot_cor.toLocaleLowerCase()) {
+        case "amarelo":
+            motorcycle.mot_cor = "yellow";
+            break;
+        case "preto":
+            motorcycle.mot_cor = "black";
+        break;
+        case "branca":
+            motorcycle.mot_cor = "white";
+            break;
+        default:
+            motorcycle.mot_cor = "black";
+        break;
+    }
+
     const fetchMotorcycleData = useCallback(async () => {
         if (!funcionarioId) return;
 

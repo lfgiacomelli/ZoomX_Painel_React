@@ -52,7 +52,7 @@ export default function DocumentAlert() {
                 const data = await response.json();
                 setCount(Array.isArray(data) ? data.length : 0);
                 if (!Array.isArray(data)) {
-                  console.warn('Resposta inesperada:', data);
+                    console.warn('Resposta inesperada:', data);
                 }
             } catch (err) {
                 console.error("Erro na requisição:", err);

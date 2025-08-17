@@ -72,10 +72,8 @@ const useRelatorioData = (period: string, reportType: string) => {
 
         const json = await res.json();
 
-        // Normalizar dados para números
         const normalizeNumber = (value: any) => (value !== undefined ? Number(value) : 0);
 
-        // Normalize principais campos numéricos
         json.usuarios = {
           total: normalizeNumber(json.usuarios.total),
           ativos: normalizeNumber(json.usuarios.ativos),
@@ -92,7 +90,6 @@ const useRelatorioData = (period: string, reportType: string) => {
           faturamento_total: normalizeNumber(json.corridas.faturamento_total),
         };
 
-        // Mapear arrays com conversão numérica
         json.usuariosAtivos = (json.usuariosAtivos || []).map((u: any) => ({
           usu_nome: u.usu_nome,
           total_corridas: normalizeNumber(u.total_corridas),

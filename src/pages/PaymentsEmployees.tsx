@@ -1,15 +1,33 @@
-import { useState, useEffect } from 'react';
-import { CheckCircle, XCircle, Clock, Info, Plus } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { CheckCircle, XCircle, Clock, Plus, Filter, Calendar, User, Frown } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { format, isToday, parseISO } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+
 import ToastMessage from '@/components/layout/ToastMessage';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 import { handleAuthError } from '@/utils/handleAuthError';
-
-import { useNavigate } from 'react-router-dom';
+import { formatCurrency } from '@/utils/formatCurrency';
 
 import { ToastProps } from '@/types/toast';
 import { PaymentsEmployeesProps } from '@/types/paymentsemployees';
 
+type PaymentStatus = 'PAGO' | 'PENDENTE' | 'CANCELADO' | 'TODOS';
+type PaymentMethod = 'PIX' | 'DINHEIRO' | 'TED' | 'TODOS';
 
 export default function PaymentsEmployees() {
   const navigate = useNavigate();
@@ -18,7 +36,19 @@ export default function PaymentsEmployees() {
   const [loadingDiarias, setLoadingDiarias] = useState(false);
   const [toast, setToast] = useState<ToastProps>({ visible: false, message: "", status: "INFO" });
 
-  const [filterToday, setFilterToday] = useState(false);
+  // Filter states
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<PaymentStatus>('TODOS');
+  const [methodFilter, setMethodFilter] = useState<PaymentMethod>('TODOS');
+  const [dateFilter, setDateFilter] = useState<string | null>(null);
+  const [columnFilters, setColumnFilters] = useState<Record<string, boolean>>({
+    id: true,
+    employee: true,
+    amount: true,
+    method: true,
+    date: true,
+    status: true,
+  });
 
   useEffect(() => {
     fetchPayments();
@@ -34,12 +64,18 @@ export default function PaymentsEmployees() {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       });
+      
       if (handleAuthError(response, setToast, navigate)) return;
+      
       const data = await response.json();
       setPayments(data);
     } catch (error) {
       console.error('Erro ao buscar pagamentos:', error);
-      setToast({ visible: true, message: 'Erro ao buscar pagamentos. Tente novamente mais tarde.', status: 'ERROR' });
+      setToast({ 
+        visible: true, 
+        message: 'Erro ao buscar pagamentos. Tente novamente mais tarde.', 
+        status: 'ERROR' 
+      });
     } finally {
       setLoading(false);
     }
@@ -57,67 +93,151 @@ export default function PaymentsEmployees() {
       });
 
       if (response.status === 204) {
-        setToast({ visible: true, message: 'As diárias já foram geradas hoje.', status: 'INFO' });
+        setToast({ 
+          visible: true, 
+          message: 'As diárias já foram geradas hoje.', 
+          status: 'INFO' 
+        });
       } else {
         const data = await response.json();
         if (!response.ok) throw new Error(data?.message || 'Erro ao gerar diárias');
-        setToast({ visible: true, message: '✅ Diárias geradas com sucesso!', status: 'SUCCESS' });
-        console.log(response.status)
+        setToast({ 
+          visible: true, 
+          message: 'Diárias geradas com sucesso!', 
+          status: 'SUCCESS' 
+        });
         fetchPayments();
       }
+      
       if (handleAuthError(response, setToast, navigate)) return;
 
     } catch (error: any) {
       console.error('Erro ao gerar diárias:', error);
-      setToast({ visible: true, message: error?.message || 'Erro inesperado. Tente novamente mais tarde.', status: 'ERROR' });
+      setToast({ 
+        visible: true, 
+        message: error?.message || 'Erro inesperado. Tente novamente mais tarde.', 
+        status: 'ERROR' 
+      });
     } finally {
       setLoadingDiarias(false);
     }
   };
 
-  const isToday = (dateStr: string) => {
-    const date = new Date(dateStr);
-    const today = new Date();
-    return (
-      date.getUTCDate() === today.getUTCDate() &&
-      date.getUTCMonth() === today.getUTCMonth() &&
-      date.getUTCFullYear() === today.getUTCFullYear()
-    );
-  };
+  const filteredPayments = useMemo(() => {
+    return payments.filter(payment => {
+      // Search term filter (matches ID or employee name)
+      const matchesSearch = 
+        payment.pag_codigo.toString().includes(searchTerm) ||
+        payment.fun_nome.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      // Status filter
+      const matchesStatus = 
+        statusFilter === 'TODOS' || 
+        (statusFilter === 'PAGO' && payment.pag_status.toUpperCase() === 'PAGO') ||
+        (statusFilter === 'PENDENTE' && payment.pag_status.toUpperCase() === 'PENDENTE') ||
+        (statusFilter === 'CANCELADO' && (
+          payment.pag_status.toUpperCase() === 'CANCELADO' || 
+          (payment.pag_status.toUpperCase() === 'PENDENTE' && !isToday(parseISO(payment.pag_data)))
+        ));
+      
+      // Method filter
+      const matchesMethod = 
+        methodFilter === 'TODOS' || 
+        payment.pag_forma_pagament.toUpperCase() === methodFilter;
+      
+      // Date filter
+      const matchesDate = 
+        !dateFilter || 
+        format(parseISO(payment.pag_data), 'yyyy-MM-dd') === dateFilter;
+      
+      return matchesSearch && matchesStatus && matchesMethod && matchesDate;
+    });
+  }, [payments, searchTerm, statusFilter, methodFilter, dateFilter]);
 
-  const filteredPayments = filterToday
-    ? payments.filter((p) => isToday(p.pag_data))
-    : payments;
+  const paymentStats = useMemo(() => {
+    return payments.reduce((acc, payment) => {
+      const status = 
+        payment.pag_status.toUpperCase() === 'PENDENTE' && !isToday(parseISO(payment.pag_data)) 
+          ? 'CANCELADO' 
+          : payment.pag_status.toUpperCase();
+      
+      acc.total++;
+      acc.totalAmount += payment.pag_valor;
+      
+      if (status === 'PAGO') {
+        acc.paid++;
+        acc.paidAmount += payment.pag_valor;
+      } else if (status === 'PENDENTE') {
+        acc.pending++;
+        acc.pendingAmount += payment.pag_valor;
+      } else if (status === 'CANCELADO') {
+        acc.canceled++;
+      }
+      
+      return acc;
+    }, {
+      total: 0,
+      paid: 0,
+      pending: 0,
+      canceled: 0,
+      totalAmount: 0,
+      paidAmount: 0,
+      pendingAmount: 0,
+    });
+  }, [payments]);
 
-  const renderStatus = (payment: PaymentsEmployeesProps) => {
-    const baseClass = 'flex items-center gap-1 text-sm font-medium';
-    const status = payment.pag_status.toUpperCase();
+  const renderStatusBadge = (payment: PaymentsEmployeesProps) => {
+    const status = 
+      payment.pag_status.toUpperCase() === 'PENDENTE' && !isToday(parseISO(payment.pag_data))
+        ? 'CANCELADO' 
+        : payment.pag_status.toUpperCase();
 
-    const effectiveStatus =
-      status === 'PENDENTE' && !isToday(payment.pag_data) ? 'CANCELADO' : status;
-
-    switch (effectiveStatus) {
+    switch (status) {
       case 'PAGO':
-        return <span className={`${baseClass} text-green-600`}><CheckCircle size={16} /> Pago</span>;
+        return (
+          <Badge variant="success" className="gap-1">
+            <CheckCircle className="h-3 w-3" />
+            Pago
+          </Badge>
+        );
       case 'PENDENTE':
-        return <span className={`${baseClass} text-yellow-600`}><Clock size={16} /> Pendente</span>;
+        return (
+          <Badge variant="pending" className="gap-1">
+            <Clock className="h-3 w-3" />
+            Pendente
+          </Badge>
+        );
       case 'CANCELADO':
-        return <span className={`${baseClass} text-red-600`}><XCircle size={16} /> Cancelado</span>;
+        return (
+          <Badge variant="destructive" className="gap-1">
+            <XCircle className="h-3 w-3" />
+            Cancelado
+          </Badge>
+        );
       default:
-        return <span className={`${baseClass} text-gray-500`}><Info size={16} /> {status}</span>;
+        return (
+          <Badge variant="outline" className="gap-1">
+            {status}
+          </Badge>
+        );
     }
   };
 
-  const formatCurrency = (value: number) =>
-    value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-
-  const formatDate = (dateStr: string) => {
-    const [year, month, day] = dateStr.split('T')[0].split('-');
-    return `${day}/${month}/${year}`;
+  const renderPaymentMethod = (method: string) => {
+    switch (method.toUpperCase()) {
+      case 'PIX':
+        return <Badge variant="default">PIX</Badge>;
+      case 'DINHEIRO':
+        return <Badge variant="secondary">Dinheiro</Badge>;
+      case 'TED':
+        return <Badge variant="outline">TED</Badge>;
+      default:
+        return <span className="text-muted-foreground">{method || 'Não especificado'}</span>;
+    }
   };
 
   return (
-    <section className="p-6">
+    <div className="grid auto-rows-max items-start gap-4 md:gap-8">
       {toast.visible && (
         <ToastMessage
           message={toast.message}
@@ -126,86 +246,239 @@ export default function PaymentsEmployees() {
         />
       )}
 
-      <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
+      <div className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-800">Diárias dos Funcionários</h1>
-          <p className="text-sm text-gray-500 mt-1">Gerencie os pagamentos pendentes, pagos e crie novas diárias.</p>
+          <h1 className="text-2xl font-bold tracking-tight">Gestão de Diárias</h1>
+          <p className="text-muted-foreground">
+            Visualize e gerencie os pagamentos de diárias dos funcionários
+          </p>
         </div>
-
-        <div className="flex items-center gap-4">
-          <label className="flex items-center gap-2 cursor-pointer select-none text-gray-700 font-medium text-sm">
-            <input
-              type="checkbox"
-              checked={filterToday}
-              onChange={() => setFilterToday(!filterToday)}
-              className="w-4 h-4"
-            />
-            Ver hoje
-          </label>
-
-          <button
-            onClick={handlePayments}
-            disabled={loadingDiarias}
-            className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow hover:bg-blue-700 transition disabled:opacity-50"
-          >
-            <Plus size={16} />
-            {loadingDiarias ? 'Gerando...' : 'Gerar Diárias'}
-          </button>
-        </div>
+        
+        <Button onClick={handlePayments} disabled={loadingDiarias}>
+          <Plus className="mr-2 h-4 w-4" />
+          {loadingDiarias ? 'Gerando...' : 'Gerar Diárias'}
+        </Button>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm overflow-x-auto border border-gray-100">
-        <table className="min-w-full text-sm">
-          <thead className="bg-gray-50 text-gray-600 uppercase text-xs font-medium">
-            <tr>
-              <th className="px-6 py-4 text-left">Código do pagamento</th>
-              <th className="px-6 py-4 text-left">Funcionário</th>
-              <th className="px-6 py-4 text-left">Valor</th>
-              <th className="px-6 py-4 text-center">Forma de Pagamento</th>
-              <th className="px-6 py-4 text-left">Data</th>
-              <th className="px-6 py-4 text-left">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              Array.from({ length: 5 }).map((_, idx) => (
-                <tr key={idx} className="border-t">
-                  {Array(6)
-                    .fill(0)
-                    .map((_, colIdx) => (
-                      <td key={colIdx} className="px-6 py-4">
-                        <Skeleton className="h-4 w-full max-w-[120px]" />
-                      </td>
-                    ))}
-                </tr>
-              ))
-            ) : filteredPayments.length > 0 ? (
-              filteredPayments.map((payment) => (
-                <tr key={payment.pag_codigo} className="border-t hover:bg-gray-50 transition">
-                  <td className="px-6 py-4 text-gray-700">{payment.pag_codigo}</td>
-                  <td className="px-6 py-4 text-gray-900 font-medium">{payment.fun_nome}</td>
-                  <td className="px-6 py-4">{formatCurrency(payment.pag_valor)}</td>
-                  <td className="px-6 py-4 text-gray-700 text-center">
-                    {payment.pag_forma_pagament.toLowerCase() === 'pix' ? (
-                      <span className="text-green-600 font-medium">PIX</span>
-                    ) : (
-                      payment.pag_forma_pagament || 'Não especificado'
-                    )}
-                  </td>
-                  <td className="px-6 py-4">{formatDate(payment.pag_data)}</td>
-                  <td className="px-6 py-4">{renderStatus(payment)}</td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
-                  Nenhum pagamento encontrado.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-    </section>
+      <Tabs defaultValue="overview">
+        <TabsList className="grid w-full grid-cols-2 max-w-xs">
+          <TabsTrigger value="overview">Visão Geral</TabsTrigger>
+          <TabsTrigger value="payments">Pagamentos</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="overview">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total de Pagamentos</CardTitle>
+                <User className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{paymentStats.total}</div>
+                <p className="text-xs text-muted-foreground">
+                  {formatCurrency(paymentStats.totalAmount)}
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Pagamentos Realizados</CardTitle>
+                <CheckCircle className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{paymentStats.paid}</div>
+                <p className="text-xs text-muted-foreground">
+                  {formatCurrency(paymentStats.paidAmount)}
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Pagamentos Pendentes</CardTitle>
+                <Clock className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{paymentStats.pending}</div>
+                <p className="text-xs text-muted-foreground">
+                  {formatCurrency(paymentStats.pendingAmount)}
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Pagamentos Cancelados</CardTitle>
+                <XCircle className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{paymentStats.canceled}</div>
+                <p className="text-xs text-muted-foreground">
+                  {Math.round((paymentStats.canceled / paymentStats.total) * 100)}% do total
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+          <h1>Para confirmar e autorizar o pagamento, vá para a seção "Funcionários"</h1>
+        </TabsContent>
+        
+        <TabsContent value="payments">
+          <Card>
+            <CardHeader>
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <CardTitle>Lista de Pagamentos</CardTitle>
+                
+                <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+                  <Input
+                    placeholder="Pesquisar funcionário ou ID..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full md:w-[300px]"
+                  />
+                  
+                  <div className="flex gap-2">
+                    <Select 
+                      value={statusFilter}
+                      onValueChange={(value) => setStatusFilter(value as PaymentStatus)}
+                    >
+                      <SelectTrigger className="w-[120px]">
+                        <SelectValue placeholder="Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="TODOS">Todos</SelectItem>
+                        <SelectItem value="PAGO">Pago</SelectItem>
+                        <SelectItem value="PENDENTE">Pendente</SelectItem>
+                        <SelectItem value="CANCELADO">Cancelado</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    
+                    <Select 
+                      value={methodFilter}
+                      onValueChange={(value) => setMethodFilter(value as PaymentMethod)}
+                    >
+                      <SelectTrigger className="w-[120px]">
+                        <SelectValue placeholder="Método" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="TODOS">Todos</SelectItem>
+                        <SelectItem value="PIX">PIX</SelectItem>
+                        <SelectItem value="DINHEIRO">Dinheiro</SelectItem>
+                        <SelectItem value="TED">TED</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    
+                    <Input
+                      type="date"
+                      value={dateFilter || ''}
+                      onChange={(e) => setDateFilter(e.target.value || null)}
+                      className="w-[140px]"
+                    />
+                  </div>
+                  
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" className="ml-auto">
+                        <Filter className="mr-2 h-4 w-4" />
+                        Colunas
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      {Object.entries({
+                        id: 'ID',
+                        employee: 'Funcionário',
+                        amount: 'Valor',
+                        method: 'Método',
+                        date: 'Data',
+                        status: 'Status',
+                      }).map(([key, label]) => (
+                        <DropdownMenuCheckboxItem
+                          key={key}
+                          checked={columnFilters[key]}
+                          onCheckedChange={(checked) =>
+                            setColumnFilters({ ...columnFilters, [key]: checked })
+                          }
+                        >
+                          {label}
+                        </DropdownMenuCheckboxItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </div>
+            </CardHeader>
+            
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    {columnFilters.id && <TableHead>ID</TableHead>}
+                    {columnFilters.employee && <TableHead>Funcionário</TableHead>}
+                    {columnFilters.amount && <TableHead className="text-right">Valor</TableHead>}
+                    {columnFilters.method && <TableHead>Método</TableHead>}
+                    {columnFilters.date && <TableHead>Data</TableHead>}
+                    {columnFilters.status && <TableHead>Status</TableHead>}
+                  </TableRow>
+                </TableHeader>
+                
+                <TableBody>
+                  {loading ? (
+                    Array.from({ length: 5 }).map((_, idx) => (
+                      <TableRow key={idx}>
+                        {Object.entries(columnFilters).map(([key]) => (
+                          <TableCell key={key}>
+                            <Skeleton className="h-4 w-full" />
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))
+                  ) : filteredPayments.length > 0 ? (
+                    filteredPayments.map((payment) => (
+                      <TableRow key={payment.pag_codigo}>
+                        {columnFilters.id && (
+                          <TableCell className="font-medium">#{payment.pag_codigo}</TableCell>
+                        )}
+                        {columnFilters.employee && (
+                          <TableCell>{payment.fun_nome}</TableCell>
+                        )}
+                        {columnFilters.amount && (
+                          <TableCell className="text-right">
+                            {formatCurrency(payment.pag_valor)}
+                          </TableCell>
+                        )}
+                        {columnFilters.method && (
+                          <TableCell>
+                            {renderPaymentMethod(payment.pag_forma_pagament)}
+                          </TableCell>
+                        )}
+                        {columnFilters.date && (
+                          <TableCell>
+                            {format(parseISO(payment.pag_data), 'dd/MM/yyyy', { locale: ptBR })}
+                          </TableCell>
+                        )}
+                        {columnFilters.status && (
+                          <TableCell>
+                            {renderStatusBadge(payment)}
+                          </TableCell>
+                        )}
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={Object.values(columnFilters).filter(Boolean).length} className="h-24 text-center">
+                        <div className="flex flex-col items-center gap-2 py-8 text-muted-foreground">
+                          <Frown className="h-8 w-8" />
+                          Nenhum pagamento encontrado
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 }

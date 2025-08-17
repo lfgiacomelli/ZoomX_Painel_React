@@ -1,15 +1,20 @@
 // LimitedDashboard.tsx
-import React, { FC, useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
-import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { FC, useEffect, useState } from "react";
+
+  import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import ToastMessage from "@/components/layout/ToastMessage";
+
 import { AlertCircle, MapPin, Navigation, Wallet } from "lucide-react";
 
 import { ToastProps } from "@/types/toast";
-import { handleAuthError } from "@/utils/handleAuthError";
-import ToastMessage from "@/components/layout/ToastMessage";
+
 import { useAuth } from "@/contexts/useAuth";
+
+import { handleAuthError } from "@/utils/handleAuthError";
+
 import { Trip } from "@/types/travel";
 
 const LimitedDashboard: FC = () => {
@@ -20,9 +25,13 @@ const LimitedDashboard: FC = () => {
   const [loading, setLoading] = useState(true);
   const [travel, setTravel] = useState<Trip[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [pagouHoje, setPagouHoje] = useState(false);
+  const [diaria, setDiaria] = useState(null);
+  const [mensagem, setMensagem] = useState("");
 
   const navigate = useNavigate();
-  const BASE_URL = "https://backend-turma-a-2025.onrender.com";
+  // const BASE_URL = "https://backend-turma-a-2025.onrender.com";
+  const BASE_URL = "http://192.168.0.12:3000";
 
   const [toast, setToast] = useState<ToastProps>({
     visible: false,
@@ -112,6 +121,37 @@ const LimitedDashboard: FC = () => {
       origin
     )}`;
   };
+  async function fetchPaymentData() {
+    if (!id) return;
+
+    try {
+      const response = await fetch(`${BASE_URL}/api/admin/funcionarios/pagou-hoje/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      const data = await response.json();
+
+      if (data.pagou_hoje) {
+        setPagouHoje(true);
+        setDiaria(data.diaria);
+        setMensagem(data.mensagem || "Você já pagou a diária hoje!");
+      } else {
+        setPagouHoje(false);
+        setMensagem("Você ainda não pagou a diária de hoje.");
+      }
+
+    } catch (error) {
+      console.error("Erro ao buscar pagamento:", error);
+      setMensagem("Erro ao verificar pagamento.");
+    } finally {
+      setLoading(false);
+    }
+  }
+  useEffect(() => {
+    fetchPaymentData();
+  }, [id]);
 
   return (
     <div className="space-y-6">
@@ -197,8 +237,7 @@ const LimitedDashboard: FC = () => {
           </CardContent>
         </Card>
       )}
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="shadow-md">
           <CardHeader>
             <CardTitle>Total de Corridas</CardTitle>
@@ -247,6 +286,34 @@ const LimitedDashboard: FC = () => {
             )}
           </CardContent>
         </Card>
+        <Card className="shadow-md">
+          <CardHeader>
+            <CardTitle>Status da Diária</CardTitle>
+          </CardHeader>
+          <CardContent className="text-center">
+            {loading ? (
+              <Skeleton className="h-8 w-40 mx-auto" />
+            ) : (
+              <>
+                <p
+                  className={`text-lg font-semibold mb-2 ${pagouHoje ? "text-green-600" : "text-red-600"
+                    }`}
+                >
+                  {mensagem}
+                </p>
+
+                {pagouHoje && diaria ? (
+                  null
+                ) : (
+                  <div className="border border-gray-200 rounded-lg p-4 bg-red-50 text-red-700 font-semibold">
+                    Você ainda não pagou a diária de hoje.
+                  </div>
+                )}
+              </>
+            )}
+          </CardContent>
+        </Card>
+
       </div>
 
       <Card className="shadow-md">

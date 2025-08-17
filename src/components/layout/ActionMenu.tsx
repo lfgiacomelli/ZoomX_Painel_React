@@ -204,7 +204,7 @@ export function ActionMenu({ funCodigo, funDocumento, onFotoAtualizada, disabled
             size="sm"
             variant="outline"
             className="hover:bg-gray-100"
-            disabled={disabled} // 🔹 Bloqueia botão do menu
+            disabled={disabled} 
           >
             <EllipsisVertical className="w-4 h-4" />
             <span className="sr-only">Ações</span>
@@ -213,7 +213,7 @@ export function ActionMenu({ funCodigo, funDocumento, onFotoAtualizada, disabled
 
         <DropdownMenuContent align="end" className="w-48">
           <DropdownMenuItem
-            disabled={!!funDocumento || disabled} // 🔹 Bloqueia item se já tem documento ou se está desativado
+            disabled={!!funDocumento || disabled}
             onClick={() => {
               if (!funDocumento && !disabled) setIsDialogOpen(true);
             }}
@@ -232,7 +232,7 @@ export function ActionMenu({ funCodigo, funDocumento, onFotoAtualizada, disabled
           </DropdownMenuItem>
 
           <DropdownMenuItem
-            disabled={disabled} // 🔹 Bloqueia link de viagens
+            disabled={disabled}
             onClick={() => {
               if (!disabled) navigate(`/viagensFuncionario/${funCodigo}`);
             }}

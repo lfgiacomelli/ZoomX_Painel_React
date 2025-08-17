@@ -9,6 +9,7 @@ type DocumentoFuncionario = {
   fun_codigo: number;
   fun_nome: string;
   fun_documento: string;
+  url: string;
 };
 
 const BASE_URL = "https://backend-turma-a-2025.onrender.com";
@@ -103,10 +104,12 @@ export default function Documents() {
               className="border rounded-lg shadow-sm bg-white p-2 flex flex-col items-center"
             >
               <img
-                src={`${BASE_URL}${doc.fun_documento}`}
+                src={doc.url}
                 alt={`Documento de ${doc.fun_nome}`}
+
                 className="w-full max-w-[240px] h-auto object-contain rounded border bg-gray-50"
               />
+
               <p className="mt-2 font-medium text-sm text-gray-800 text-center">
                 {doc.fun_nome}
               </p>

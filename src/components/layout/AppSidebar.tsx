@@ -71,7 +71,7 @@ export function AppSidebar() {
       ]
       : [
         ...baseMenuItems,
-        ...(cargo === "Gerente" || cargo === "Administrador"
+        ...(cargo === "gerente" || cargo === "atendente"
           ? [{ title: "Documentos", url: "/documentos", icon: File }]
           : []),
       ];

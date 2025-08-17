@@ -30,8 +30,7 @@ const LimitedDashboard: FC = () => {
   const [mensagem, setMensagem] = useState("");
 
   const navigate = useNavigate();
-  // const BASE_URL = "https://backend-turma-a-2025.onrender.com";
-  const BASE_URL = "http://192.168.0.12:3000";
+  const BASE_URL = "https://backend-turma-a-2025.onrender.com";
 
   const [toast, setToast] = useState<ToastProps>({
     visible: false,

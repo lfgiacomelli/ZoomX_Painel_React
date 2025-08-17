@@ -23,7 +23,8 @@ export default function EmployeeMotorcycle() {
     const [loading, setLoading] = useState(true);
     const [lastUpdated, setLastUpdated] = useState<string | null>(null);
 
-    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://192.168.0.12:3000";
+      const BASE_URL = "https://backend-turma-a-2025.onrender.com";
+    
 
     
 
@@ -34,7 +35,7 @@ export default function EmployeeMotorcycle() {
         try {
             setLoading(true);
             const response = await fetch(
-                `${API_BASE_URL}/api/admin/motocicletas/funcionario/${funcionarioId}`,
+                `${BASE_URL}/api/admin/motocicletas/funcionario/${funcionarioId}`,
                 {
                     headers: {
                         "Content-Type": "application/json",

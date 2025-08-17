@@ -4,5 +4,5 @@ export interface PaymentsEmployeesProps {
   pag_valor: number;
   pag_status: 'PAGO' | 'PENDENTE' | 'CANCELADO' | string;
   pag_data: string;
-  pag_forma_pagament: string;
+  pag_forma_pagamento: string;
 }

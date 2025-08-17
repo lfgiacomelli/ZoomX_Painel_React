@@ -130,7 +130,6 @@ export default function PaymentsEmployees() {
         payment.pag_codigo.toString().includes(searchTerm) ||
         payment.fun_nome.toLowerCase().includes(searchTerm.toLowerCase());
       
-      // Status filter
       const matchesStatus = 
         statusFilter === 'TODOS' || 
         (statusFilter === 'PAGO' && payment.pag_status.toUpperCase() === 'PAGO') ||
@@ -143,7 +142,7 @@ export default function PaymentsEmployees() {
       // Method filter
       const matchesMethod = 
         methodFilter === 'TODOS' || 
-        payment.pag_forma_pagament.toUpperCase() === methodFilter;
+        payment.pag_forma_pagamento.toUpperCase() === methodFilter;
       
       // Date filter
       const matchesDate = 
@@ -448,7 +447,7 @@ export default function PaymentsEmployees() {
                         )}
                         {columnFilters.method && (
                           <TableCell>
-                            {renderPaymentMethod(payment.pag_forma_pagament)}
+                            {renderPaymentMethod(payment.pag_forma_pagamento)}
                           </TableCell>
                         )}
                         {columnFilters.date && (

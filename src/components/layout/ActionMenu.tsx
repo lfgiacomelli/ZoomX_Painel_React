@@ -147,8 +147,7 @@ export function ActionMenu({ funCodigo, funDocumento, onFotoAtualizada, disabled
 
     try {
       const response = await fetch(
-        // "https://backend-turma-a-2025.onrender.com/api/admin/foto-funcionario/upload-foto-cnh",
-        "http://192.168.0.12:3000/api/admin/foto-funcionario/upload-foto-cnh",
+        "https://backend-turma-a-2025.onrender.com/api/admin/foto-funcionario/upload-foto-cnh",
         {
           method: "POST",
           body: formData,

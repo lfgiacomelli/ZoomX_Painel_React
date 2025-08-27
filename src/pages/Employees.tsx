@@ -495,7 +495,7 @@ const Employees: React.FC = () => {
                       setEditingEmployee({ ...editingEmployee, cnh: e.target.value })
                     }
                     maxLength={9}
-                    placeholder="Se aplicável"
+                    placeholder={editingEmployee?.cargo !== "Mototaxista" ? "CNH não aplicável" : "Digite a CNH"}
                     disabled={editingEmployee?.cargo !== "Mototaxista"}
                   />
                 </div>

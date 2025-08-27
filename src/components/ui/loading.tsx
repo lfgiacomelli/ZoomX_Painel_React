@@ -1,22 +1,22 @@
-
-import{ FC } from 'react';
+import { BlinkBlur } from 'react-loading-indicators';
 
 interface LoadingProps {
-  size?: 'sm' | 'md' | 'lg';
   text?: string;
 }
 
-export const Loading: FC<LoadingProps> = ({ size = 'md', text = 'Carregando...' }) => {
-  const sizeClasses = {
-    sm: 'w-4 h-4',
-    md: 'w-8 h-8',
-    lg: 'w-12 h-12'
-  };
-
+export const Loading = ({ text }: LoadingProps) => {
   return (
-    <div className="flex flex-col items-center justify-center p-4">
-      <div className={`animate-spin rounded-full border-2 border-gray-300 border-t-black ${sizeClasses[size]}`}></div>
-      <h3 className="mt-2 text-gray-700">{text}</h3>
+    <div className="flex flex-col items-center justify-center h-full w-full">
+      <BlinkBlur
+        color="#2222"
+        size="medium"
+        textColor="#222"
+      />
+      {text && (
+        <span className="text-[#222] text-lg animate-pulse mt-2">
+          {text}
+        </span>
+      )}
     </div>
-  );
-};
+  )
+}

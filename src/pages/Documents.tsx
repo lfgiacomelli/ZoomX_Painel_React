@@ -4,6 +4,7 @@ import { handleAuthError } from "@/utils/handleAuthError";
 import { useNavigate } from "react-router-dom";
 import ToastMessage from "@/components/layout/ToastMessage";
 import { ToastProps } from "@/types/toast";
+import { Loading } from "@/components/ui/loading";
 
 type DocumentoFuncionario = {
   fun_codigo: number;
@@ -66,8 +67,8 @@ export default function Documents() {
     }
   }, [unauthorized]);
 
-  if (!funcionario) {
-    return <p className="text-center text-gray-500">Carregando usuário...</p>;
+  if (loading) {
+    return <Loading text="Carregando documentos..." />;
   }
 
   if (unauthorized) {

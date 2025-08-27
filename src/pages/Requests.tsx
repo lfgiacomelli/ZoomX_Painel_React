@@ -302,8 +302,7 @@ const Requests: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
-        <Loading />
-        <h2 className="text-lg font-medium text-gray-600">Atualizando solicitações...</h2>
+        <Loading text='Carregando solicitações...' />
       </div>
     )
   }
@@ -378,7 +377,7 @@ const Requests: React.FC = () => {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <Loading />
+            <Loading text='Carregando solicitações...' />
           ) : (
             <>
               <div className="overflow-x-auto">

@@ -1,8 +1,11 @@
 import ToastMessage from "@/components/layout/ToastMessage";
 import { ToastProps } from "@/types/toast";
 import React, { useEffect, useState } from "react";
+import { handleAuthError } from "@/utils/handleAuthError";
+import { useNavigate } from "react-router-dom";
 
 export default function PushNotifications() {
+  const navigate = useNavigate();
   const [usuarios, setUsuarios] = useState<any[]>([]);
   const [loadingTokens, setLoadingTokens] = useState(false);
   const [selectedTokens, setSelectedTokens] = useState<Set<string>>(new Set());
@@ -27,6 +30,7 @@ export default function PushNotifications() {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         });
+        if (handleAuthError(res, setToast, navigate)) return;
         if (!res.ok) throw new Error("Erro ao buscar usuários");
         const data = await res.json();
         setUsuarios(data);
@@ -129,7 +133,6 @@ export default function PushNotifications() {
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Recipient Selection */}
         <div className="lg:col-span-1">
           <div className="bg-white rounded-xl shadow-sm p-6 h-full">
             <div className="flex justify-between items-center mb-4">

@@ -4,7 +4,6 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../components/ui/dialog';
-import { Badge } from '../components/ui/badge';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import { Pagination } from '../components/ui/pagination';
 import { Loading } from '@/components/ui/loading';
@@ -278,7 +277,7 @@ const Announcements: React.FC = () => {
       )}
       {isLoading ? (
         <div className="flex justify-center items-center h-64">
-          <Loading />
+          <Loading text='Carregando anúncios...' />
         </div>
       ) : (
         <>

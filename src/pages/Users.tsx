@@ -232,7 +232,7 @@ const Users: React.FC = () => {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <Loading />
+            <Loading text='Carregando usuários...' />
           ) : (
             <>
               <div className="overflow-x-auto">

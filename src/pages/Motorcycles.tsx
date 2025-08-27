@@ -462,7 +462,7 @@ const Motorcycles: React.FC = () => {
         <CardContent>
 
           {loading ? (
-            <Loading />
+            <Loading text='Carregando motocicletas...' />
           ) : (
             <>
               <div className="overflow-x-auto">

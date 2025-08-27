@@ -39,6 +39,6 @@ export function mapColor(cor: string | undefined) {
         case "cobre":
             return "darkorange";
         default:
-            return "black"; // cor padrão caso não reconheça
+            return "black";
     }
 }

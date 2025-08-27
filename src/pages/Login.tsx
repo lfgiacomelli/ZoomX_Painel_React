@@ -28,8 +28,8 @@ const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
-    const [toast, setToast] = useState<ToastProps>({ visible: false, message: "", status: "INFO" });
-  
+  const [toast, setToast] = useState<ToastProps>({ visible: false, message: "", status: "INFO" });
+
 
   useEffect(() => {
     setIsMounted(true);
@@ -39,6 +39,7 @@ const LoginPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setToast({ ...toast, visible: false });
 
     if (!email || !senha) {
       setError('Por favor, preencha todos os campos.');
@@ -56,39 +57,49 @@ const LoginPage: React.FC = () => {
 
       const data = await res.json();
 
-      if (res.ok && data.sucesso) {
-        login(data.token, data.funcionario);
+      if (res.ok) {
+        if (data.sucesso) {
+          login(data.token, data.funcionario);
 
-        try {
-          await fetch('https://backend-turma-a-2025.onrender.com/api/admin/pagamentos/gerar-diarias', {
-            method: 'POST',
-            headers: {
-              Authorization: `Bearer ${data.token}`,
-            },
+          try {
+            await fetch('https://backend-turma-a-2025.onrender.com/api/admin/pagamentos/gerar-diarias', {
+              method: 'POST',
+              headers: { Authorization: `Bearer ${data.token}` },
+            });
+          } catch (gerarError) {
+            console.error('Erro ao gerar diárias:', gerarError);
+          }
+
+          navigate('/');
+        } else {
+          setError('E-mail ou senha incorretos.');
+          setToast({
+            visible: true,
+            message: 'E-mail ou senha incorretos.',
+            status: 'ERROR',
           });
-        } catch (gerarError) {
-          console.error('Erro ao gerar diárias:', gerarError);
         }
-
-        navigate('/');
+      } else {
+        setError('Erro ao tentar fazer login. Tente novamente mais tarde.');
+        setToast({
+          visible: true,
+          message: 'Erro ao tentar fazer login. Tente novamente mais tarde.',
+          status: 'ERROR',
+        });
       }
     } catch (err) {
       console.error('Erro de conexão:', err);
+      setError('Não foi possível conectar ao servidor. Verifique sua conexão.');
       setToast({
         visible: true,
-        message: 'Erro ao fazer login. Verifique suas credenciais e tente novamente.',
+        message: 'Erro de conexão. Verifique sua internet.',
         status: 'ERROR',
       });
-      setToast({
-        visible: true,
-        message: 'Erro de conexão.',
-        status: 'ERROR',
-      })
-      setError('Não foi possível conectar ao servidor. Verifique sua conexão.');
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 px-4">

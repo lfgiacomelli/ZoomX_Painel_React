@@ -13,7 +13,8 @@ import {
 import { Button } from '@/components/ui/button';
 import mockup from '../assets/mockup_app.png';
 import HomeHeader from '@/components/layout/HomeHeader';
-import Announcements from '@/components/layout/Announcements';
+import WorkWithUs  from '@/components/layout/WorkWithUs';
+import Footer from '@/components/layout/AppFooter';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -188,7 +189,7 @@ export default function Home() {
           </div>
         </div>
       </section>
-
+      <WorkWithUs />
       <section className="py-20 bg-gradient-to-r from-blue-600 to-blue-500 text-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
@@ -235,6 +236,7 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
+      <Footer />
     </div>
   );
 }

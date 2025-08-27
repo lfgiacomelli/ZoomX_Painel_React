@@ -1,12 +1,12 @@
 
-import React from 'react';
+import{ FC } from 'react';
 
 interface LoadingProps {
   size?: 'sm' | 'md' | 'lg';
   text?: string;
 }
 
-export const Loading: React.FC<LoadingProps> = ({ size = 'md', text = 'Carregando...' }) => {
+export const Loading: FC<LoadingProps> = ({ size = 'md', text = 'Carregando...' }) => {
   const sizeClasses = {
     sm: 'w-4 h-4',
     md: 'w-8 h-8',
@@ -16,6 +16,7 @@ export const Loading: React.FC<LoadingProps> = ({ size = 'md', text = 'Carregand
   return (
     <div className="flex flex-col items-center justify-center p-4">
       <div className={`animate-spin rounded-full border-2 border-gray-300 border-t-black ${sizeClasses[size]}`}></div>
+      <h3 className="mt-2 text-gray-700">{text}</h3>
     </div>
   );
 };

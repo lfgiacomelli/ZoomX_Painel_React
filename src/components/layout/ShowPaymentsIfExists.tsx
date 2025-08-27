@@ -110,7 +110,7 @@ export default function DailyPaymentsCard() {
             <CardContent>
                 {loading ? (
                     <Box sx={{ width: '100%' }}>
-                        <LinearProgress color="warning" />
+                        <LinearProgress color="success" />
                     </Box>
                 ) : haPagamentos ? (
                     <div className="bg-green-50 border border-green-300 rounded-lg shadow-lg p-6">

@@ -301,7 +301,7 @@ const Travels: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                     {loading ? (
-                        <Loading />
+                        <Loading text='Carregando viagens...' />
                     ) : travels.length === 0 ? (
                         <div className="text-center text-gray-500 py-4">Nenhuma viagem encontrada.</div>
                     ) : (

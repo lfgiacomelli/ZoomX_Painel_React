@@ -198,7 +198,7 @@ const Reviews: React.FC = () => {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <Loading />
+            <Loading text='Carregando avaliações...' />
           ) : reviews.length === 0 ? (
             <div className="text-center text-gray-500 py-4">Nenhuma avaliação encontrada.</div>
           ) : (

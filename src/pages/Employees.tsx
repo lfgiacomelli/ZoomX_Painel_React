@@ -14,10 +14,9 @@ import { ActionMenu } from '@/components/layout/ActionMenu';
 import { useCargo } from '@/hooks/useCargo';
 import { ToastProps } from '@/types/toast';
 
-
 const Employees: React.FC = () => {
-    const [toast, setToast] = useState<ToastProps>({ visible: false, message: "", status: "INFO" });
-  
+  const [toast, setToast] = useState<ToastProps>({ visible: false, message: "", status: "INFO" });
+
 
   const [nameFilter, setNameFilter] = useState('');
   const [positionFilter, setPositionFilter] = useState('');
@@ -623,7 +622,7 @@ const Employees: React.FC = () => {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <Loading />
+            <Loading text='Carregando funcionários...' />
           ) : (
             <>
               <div className="overflow-x-auto">
@@ -707,30 +706,44 @@ const Employees: React.FC = () => {
                             </div>
                           </div>
                         </td>
+                        {employee.fun_cargo.toLowerCase() === 'gerente' ? (
+                          <td className="py-3 px-4 text-center">
+                            <Badge className="bg-gray-700 text-white">Não aplicável</Badge>
+                          </td>
+                        ) : (
+                          <td className="py-3 px-4 text-center">
+                            {employee.pag_status === 'pago' ? (
+                              <Badge className="bg-green-100 text-green-800">Pago</Badge>
+                            ) : (
+                              <Badge className="bg-yellow-100 text-yellow-800">Pendente</Badge>
+                            )}
+                          </td>
+                        )
+                        }
                         <td className="py-3 px-4 text-center">
-                          {employee.pag_status === 'pago' ? (
-                            <Badge className="bg-green-100 text-green-800">Pago</Badge>
+                          {employee.fun_cargo.toLowerCase() === "gerente" ? (
+                            <Badge className="bg-gray-700 text-white">Ação desabilitada</Badge>
                           ) : (
-                            <Badge className="bg-yellow-100 text-yellow-800">Pendente</Badge>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => openPaymentModal(employee.pag_codigo, employee.pag_status)}
+                              disabled={employee.pag_status === 'pago'}
+                            >
+                              <Check className="w-4 h-4 text-green-600" />
+                              {employee.pag_status === 'pago' ? 'Pago' : 'Marcar Pago'}
+                            </Button>
                           )}
                         </td>
-                        <td className="py-3 px-4 text-center">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => openPaymentModal(employee.pag_codigo, employee.pag_status)}
-                            disabled={employee.pag_status === 'pago'}
-                          >
-                            <Check className="w-4 h-4 text-green-600" />
-                            {employee.pag_status === 'pago' ? 'Pago' : 'Marcar Pago'}
-                          </Button>
 
-                        </td>
                         <td className="py-3 px-4 text-center">
                           <ActionMenu
                             funCodigo={employee.fun_codigo}
                             funDocumento={employee.fun_documento}
-                            disabled={cargo !== "gerente" && cargo !== "atendente"}
+                            disabled={
+                              (cargo !== "gerente" && cargo !== "atendente") ||
+                              employee.fun_cargo.toLowerCase() === "gerente"
+                            }
                             onFotoAtualizada={() => {
                               fetchFuncionarios().then(data => setEmployees(data));
                             }}

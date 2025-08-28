@@ -9,6 +9,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useAuth } from "@/contexts/useAuth";
 import { mapColor } from "@/utils/motorcyclesColors";
+import { Loading } from "@/components/ui/loading";
 
 export default function EmployeeMotorcycle() {
     const { funcionario } = useAuth();
@@ -68,6 +69,10 @@ export default function EmployeeMotorcycle() {
     }, [fetchMotorcycleData]);
 
     const handleRefresh = () => fetchMotorcycleData();
+
+    if(loading){
+        return <Loading text="Carregando dados da motocicleta..." />;
+    }
 
     return (
         <div className="p-6 max-w-full mx-auto space-y-8">

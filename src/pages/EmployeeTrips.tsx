@@ -28,6 +28,7 @@ import { handleAuthError } from "@/utils/handleAuthError";
 
 import { ToastProps } from "@/types/toast";
 import { Trip } from "@/types/travel";
+import { Loading } from "@/components/ui/loading";
 
 const statusVariantMap: Record<string, string> = {
   "concluído": "default",
@@ -98,12 +99,7 @@ export default function EmployeeTrips() {
   const totalFaturamento = filteredTrips.reduce((acc, trip) => acc + parseFloat(trip.via_valor), 0);
 
   if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-12 gap-3">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="text-sm text-muted-foreground">Carregando histórico de viagens...</p>
-      </div>
-    );
+    return <Loading text="Carregando histórico de viagens..." />;
   }
 
   if (error) {
@@ -294,4 +290,3 @@ export default function EmployeeTrips() {
     </div>
   );
 }
-    

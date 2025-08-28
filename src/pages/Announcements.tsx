@@ -276,9 +276,7 @@ const Announcements: React.FC = () => {
         />
       )}
       {isLoading ? (
-        <div className="flex justify-center items-center h-64">
           <Loading text='Carregando anúncios...' />
-        </div>
       ) : (
         <>
           <div className="flex items-center justify-between">

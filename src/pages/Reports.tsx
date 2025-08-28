@@ -230,9 +230,7 @@ const Reports: React.FC = () => {
 
   if (loading)
     return (
-      <div className="flex flex-col items-center justify-center">
         <Loading text='Montando relatório...' />
-      </div>
     );
 
   if (error)

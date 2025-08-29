@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { CheckCircle, XCircle, Clock, Plus, Filter, Calendar, User, Frown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { format, isToday, parseISO } from 'date-fns';
+import { format, isToday, parseISO, isBefore, startOfDay, startOfToday } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 import ToastMessage from '@/components/layout/ToastMessage';
@@ -36,7 +36,6 @@ export default function PaymentsEmployees() {
   const [loadingDiarias, setLoadingDiarias] = useState(false);
   const [toast, setToast] = useState<ToastProps>({ visible: false, message: "", status: "INFO" });
 
-  // Filter states
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<PaymentStatus>('TODOS');
   const [methodFilter, setMethodFilter] = useState<PaymentMethod>('TODOS');
@@ -123,46 +122,46 @@ export default function PaymentsEmployees() {
     }
   };
 
+  // Função para determinar status real
+  const getPaymentStatus = (payment: PaymentsEmployeesProps) => {
+    const rawStatus = payment.pag_status.toUpperCase();
+    const paymentDate = parseISO(payment.pag_data);
+    // Se PENDENTE e data antes de hoje, marca como CANCELADO
+    if (rawStatus === 'PENDENTE' && isBefore(startOfDay(paymentDate), startOfToday())) {
+      return 'CANCELADO';
+    }
+    return rawStatus;
+  };
+
+  // Filtragem
   const filteredPayments = useMemo(() => {
     return payments.filter(payment => {
-      // Search term filter (matches ID or employee name)
+      const status = getPaymentStatus(payment);
+
       const matchesSearch = 
         payment.pag_codigo.toString().includes(searchTerm) ||
         payment.fun_nome.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      const matchesStatus = 
-        statusFilter === 'TODOS' || 
-        (statusFilter === 'PAGO' && payment.pag_status.toUpperCase() === 'PAGO') ||
-        (statusFilter === 'PENDENTE' && payment.pag_status.toUpperCase() === 'PENDENTE') ||
-        (statusFilter === 'CANCELADO' && (
-          payment.pag_status.toUpperCase() === 'CANCELADO' || 
-          (payment.pag_status.toUpperCase() === 'PENDENTE' && !isToday(parseISO(payment.pag_data)))
-        ));
-      
-      // Method filter
-      const matchesMethod = 
-        methodFilter === 'TODOS' || 
-        payment.pag_forma_pagamento.toUpperCase() === methodFilter;
-      
-      // Date filter
-      const matchesDate = 
-        !dateFilter || 
-        format(parseISO(payment.pag_data), 'yyyy-MM-dd') === dateFilter;
-      
+
+      const matchesStatus =
+        statusFilter === 'TODOS' || status === statusFilter;
+
+      const matchesMethod =
+        methodFilter === 'TODOS' || payment.pag_forma_pagamento.toUpperCase() === methodFilter;
+
+      const matchesDate =
+        !dateFilter || format(parseISO(payment.pag_data), 'yyyy-MM-dd') === dateFilter;
+
       return matchesSearch && matchesStatus && matchesMethod && matchesDate;
     });
   }, [payments, searchTerm, statusFilter, methodFilter, dateFilter]);
 
   const paymentStats = useMemo(() => {
     return payments.reduce((acc, payment) => {
-      const status = 
-        payment.pag_status.toUpperCase() === 'PENDENTE' && !isToday(parseISO(payment.pag_data)) 
-          ? 'CANCELADO' 
-          : payment.pag_status.toUpperCase();
-      
+      const status = getPaymentStatus(payment);
+
       acc.total++;
       acc.totalAmount += payment.pag_valor;
-      
+
       if (status === 'PAGO') {
         acc.paid++;
         acc.paidAmount += payment.pag_valor;
@@ -172,7 +171,7 @@ export default function PaymentsEmployees() {
       } else if (status === 'CANCELADO') {
         acc.canceled++;
       }
-      
+
       return acc;
     }, {
       total: 0,
@@ -186,52 +185,26 @@ export default function PaymentsEmployees() {
   }, [payments]);
 
   const renderStatusBadge = (payment: PaymentsEmployeesProps) => {
-    const status = 
-      payment.pag_status.toUpperCase() === 'PENDENTE' && !isToday(parseISO(payment.pag_data))
-        ? 'CANCELADO' 
-        : payment.pag_status.toUpperCase();
+    const status = getPaymentStatus(payment);
 
     switch (status) {
       case 'PAGO':
-        return (
-          <Badge variant="success" className="gap-1">
-            <CheckCircle className="h-3 w-3" />
-            Pago
-          </Badge>
-        );
+        return <Badge variant="success" className="gap-1"><CheckCircle className="h-3 w-3" />Pago</Badge>;
       case 'PENDENTE':
-        return (
-          <Badge variant="pending" className="gap-1">
-            <Clock className="h-3 w-3" />
-            Pendente
-          </Badge>
-        );
+        return <Badge variant="pending" className="gap-1"><Clock className="h-3 w-3" />Pendente</Badge>;
       case 'CANCELADO':
-        return (
-          <Badge variant="destructive" className="gap-1">
-            <XCircle className="h-3 w-3" />
-            Cancelado
-          </Badge>
-        );
+        return <Badge variant="destructive" className="gap-1"><XCircle className="h-3 w-3" />Cancelado</Badge>;
       default:
-        return (
-          <Badge variant="outline" className="gap-1">
-            {status}
-          </Badge>
-        );
+        return <Badge variant="outline" className="gap-1">{status}</Badge>;
     }
   };
 
   const renderPaymentMethod = (method: string) => {
     switch (method.toUpperCase()) {
-      case 'PIX':
-        return <Badge variant="default">PIX</Badge>;
-      case 'DINHEIRO':
-        return <Badge variant="secondary">Dinheiro</Badge>;
-      case 'TED':
-        return <Badge variant="outline">TED</Badge>;
-      default:
-        return <span className="text-muted-foreground">{method || 'Não especificado'}</span>;
+      case 'PIX': return <Badge variant="default">PIX</Badge>;
+      case 'DINHEIRO': return <Badge variant="secondary">Dinheiro</Badge>;
+      case 'TED': return <Badge variant="outline">TED</Badge>;
+      default: return <span className="text-muted-foreground">{method || 'Não especificado'}</span>;
     }
   };
 
@@ -274,9 +247,6 @@ export default function PaymentsEmployees() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{paymentStats.total}</div>
-                <p className="text-xs text-muted-foreground">
-                  {formatCurrency(paymentStats.totalAmount)}
-                </p>
               </CardContent>
             </Card>
             
@@ -287,9 +257,6 @@ export default function PaymentsEmployees() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{paymentStats.paid}</div>
-                <p className="text-xs text-muted-foreground">
-                  {formatCurrency(paymentStats.paidAmount)}
-                </p>
               </CardContent>
             </Card>
             
@@ -300,9 +267,6 @@ export default function PaymentsEmployees() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{paymentStats.pending}</div>
-                <p className="text-xs text-muted-foreground">
-                  {formatCurrency(paymentStats.pendingAmount)}
-                </p>
               </CardContent>
             </Card>
             
@@ -313,9 +277,6 @@ export default function PaymentsEmployees() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{paymentStats.canceled}</div>
-                <p className="text-xs text-muted-foreground">
-                  {Math.round((paymentStats.canceled / paymentStats.total) * 100)}% do total
-                </p>
               </CardContent>
             </Card>
           </div>
@@ -434,32 +395,12 @@ export default function PaymentsEmployees() {
                   ) : filteredPayments.length > 0 ? (
                     filteredPayments.map((payment) => (
                       <TableRow key={payment.pag_codigo}>
-                        {columnFilters.id && (
-                          <TableCell className="font-medium">#{payment.pag_codigo}</TableCell>
-                        )}
-                        {columnFilters.employee && (
-                          <TableCell>{payment.fun_nome}</TableCell>
-                        )}
-                        {columnFilters.amount && (
-                          <TableCell className="text-right">
-                            {formatCurrency(payment.pag_valor)}
-                          </TableCell>
-                        )}
-                        {columnFilters.method && (
-                          <TableCell>
-                            {renderPaymentMethod(payment.pag_forma_pagamento)}
-                          </TableCell>
-                        )}
-                        {columnFilters.date && (
-                          <TableCell>
-                            {format(parseISO(payment.pag_data), 'dd/MM/yyyy', { locale: ptBR })}
-                          </TableCell>
-                        )}
-                        {columnFilters.status && (
-                          <TableCell>
-                            {renderStatusBadge(payment)}
-                          </TableCell>
-                        )}
+                        {columnFilters.id && <TableCell className="font-medium">#{payment.pag_codigo}</TableCell>}
+                        {columnFilters.employee && <TableCell>{payment.fun_nome}</TableCell>}
+                        {columnFilters.amount && <TableCell className="text-right">{formatCurrency(payment.pag_valor)}</TableCell>}
+                        {columnFilters.method && <TableCell>{renderPaymentMethod(payment.pag_forma_pagamento)}</TableCell>}
+                        {columnFilters.date && <TableCell>{format(parseISO(payment.pag_data), 'dd/MM/yyyy', { locale: ptBR })}</TableCell>}
+                        {columnFilters.status && <TableCell>{renderStatusBadge(payment)}</TableCell>}
                       </TableRow>
                     ))
                   ) : (

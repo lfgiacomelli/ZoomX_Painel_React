@@ -56,7 +56,11 @@ export default function Documents() {
         const data = await response.json();
         setDocuments(data);
       } catch (error) {
-        console.error("Erro ao buscar documentos:", error);
+        setToast({
+          visible: true,
+          message: "Erro ao buscar documentos. Tente novamente mais tarde.",
+          status: "ERROR",
+        });
       } finally {
         setLoading(false);
       }
@@ -90,7 +94,7 @@ export default function Documents() {
       )}
       <h1 className="text-2xl mb-2">Documentos</h1>
       <p className="mb-4 text-gray-600">
-        Esta página é destinada à gestão de documentos dos mototaxistas.
+        Gerencie documentos de funcionários cadastrados no sistema.
       </p>
 
       {loading ? (

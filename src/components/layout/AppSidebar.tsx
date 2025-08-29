@@ -3,7 +3,6 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   BarChart,
   File,
-  LocateIcon,
   UserCircle,
   Bike,
   Star,
@@ -12,7 +11,9 @@ import {
   BarChart2Icon,
   LogOut,
   Bell,
-  BikeIcon,
+  Clipboard,
+  UserCog,
+  Route
 } from 'lucide-react';
 import {
   Sidebar,
@@ -28,17 +29,16 @@ import {
 } from '../ui/sidebar';
 import { useAuth } from '@/contexts/useAuth';
 import { useCargo } from '@/hooks/useCargo';
-import { title } from 'process';
 
 const baseMenuItems = [
   { title: 'Dashboard', url: '/', icon: BarChart },
-  { title: 'Solicitações', url: '/solicitacoes', icon: File },
-  { title: 'Viagens', url: '/viagens', icon: LocateIcon },
+  { title: 'Solicitações', url: '/solicitacoes', icon: Clipboard },
+  { title: 'Viagens', url: '/viagens', icon: Route },
   { title: 'Funcionários', url: '/funcionarios', icon: UserCircle },
   { title: 'Motocicletas', url: '/motocicletas', icon: Bike },
   { title: 'Diárias', url: '/diarias', icon: BarChart2Icon },
   { title: 'Avaliações', url: '/avaliacoes', icon: Star },
-  { title: 'Usuários', url: '/usuarios', icon: User },
+  { title: 'Usuários', url: '/usuarios', icon: UserCog },
   { title: 'Notificações', url: '/notificacoes', icon: Bell },
   { title: 'Anúncios', url: '/anuncios', icon: Edit },
   { title: 'Relatórios', url: '/relatorios', icon: BarChart2Icon },
@@ -64,17 +64,24 @@ export function AppSidebar() {
     cargo === "mototaxista"
       ? [
         { title: "Dashboard", url: "/", icon: BarChart },
-        { title: "Minhas Viagens", url: `/viagensFuncionario/${funCodigo}`, icon: LocateIcon },
+        { title: "Minhas Viagens", url: `/viagensFuncionario/${funCodigo}`, icon: Route },
         { title: "Minha Motocicleta", url: `/motocicletaFuncionario/${funCodigo}`, icon: Bike },
         { title: "Meus ganhos diários", url: `/ganhosDiarios/${funCodigo}`, icon: BarChart2Icon },
         { title: "Conta", url: "/conta", icon: User },
       ]
-      : [
-        ...baseMenuItems,
-        ...(cargo === "gerente" || cargo === "atendente"
-          ? [{ title: "Documentos", url: "/documentos", icon: File }]
-          : []),
-      ];
+      : (() => {
+        let items = [...baseMenuItems];
+
+        if (cargo === "gerente" || cargo === "atendente") {
+          items.splice(items.length - 1, 0, {
+            title: "Documentos",
+            url: "/documentos",
+            icon: File,
+          });
+        }
+
+        return items;
+      })();
 
 
 

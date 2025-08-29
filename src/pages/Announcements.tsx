@@ -9,11 +9,14 @@ import { Pagination } from '../components/ui/pagination';
 import { Loading } from '@/components/ui/loading';
 import { useNavigate } from 'react-router-dom';
 
-import emptyAnuncios from '../assets/empty.png'
 import ToastMessage from '@/components/layout/ToastMessage';
 import { handleAuthError } from '@/utils/handleAuthError';
 
+import noDataAnimation from '@/assets/animations/no_data.json';
+
 import { ToastProps } from  "@/types/toast";
+import Lottie from 'lottie-react';
+
 
 const Announcements: React.FC = () => {
   const navigate = useNavigate();
@@ -189,9 +192,9 @@ const Announcements: React.FC = () => {
   };
   if (anuncios.length === 0 && !isLoading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 flex flex-col items-center justify-center">
         <h1 className="text-3xl font-righteous text-black">Anúncios</h1>
-        <img src={emptyAnuncios} alt='sem anúncios' className="w-90 h-90 mx-auto" />
+        <Lottie animationData={noDataAnimation} loop style={{ width: 400, height: 300, justifyContent: 'center', alignItems: 'center' }} />
         <p className="text-center" style={{ fontSize: '1.25rem' }}>Nenhum anúncio encontrado.</p>
         <div className="flex justify-center">
           <Button className="zoomx-button mt-4" onClick={handleNew}>

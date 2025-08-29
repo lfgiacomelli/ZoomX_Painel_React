@@ -53,6 +53,8 @@ const useRelatorioData = (period: string, reportType: string) => {
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<ToastProps>({ visible: false, message: '', status: 'INFO' });
   const navigate = useNavigate();
+  const [recusadas, setRecusadas] = useState<{ total: number }>({ total: 0 });
+
 
   useEffect(() => {
     const fetchRelatorio = async () => {
@@ -135,15 +137,46 @@ const useRelatorioData = (period: string, reportType: string) => {
     fetchRelatorio();
   }, [period, reportType, navigate]);
 
+  async function fetchRecusadas() {
+    try {
+      const response = await fetch(`http://192.168.1.106:3000/api/admin/relatorios/recusadas`, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+        },
+      });
+
+      if (handleAuthError(response, setToast, navigate)) return;
+
+      if (!response.ok) throw new Error('Erro ao buscar relatórios recusados');
+
+      const data = await response.json();
+      const total = parseInt(data.solicitacoes_recusadas[0]?.total_recusadas || '0', 10);
+
+      setRecusadas({ total });
+    } catch (error) {
+      console.error('Erro ao buscar recusadas:', error);
+      setRecusadas({ total: 0 });
+    }
+  }
+
+  useEffect(() => {
+    fetchRecusadas();
+  }, []);
+
+
+
   return { data, loading, error, toast, setToast };
 };
 
 const ExportButtons = ({
   data,
   onError,
+  setToast
 }: {
   data: RelatorioData | null;
   onError: (message: string) => void;
+  setToast: (toast: ToastProps) => void;
 }) => {
   const exportReport = useCallback(
     (format: 'pdf' | 'excel') => {
@@ -174,6 +207,9 @@ const ExportButtons = ({
           startY: 30,
         });
         doc.save('relatorio-zoomx.pdf');
+        setTimeout(() => {
+          setToast({ visible: true, message: 'Relatório exportado para PDF com sucesso!', status: 'SUCCESS' });
+        }, 500);
       } else if (format === 'excel') {
         const worksheetData = rows.map(([key, value]) => ({ Métrica: key, Valor: value }));
         const worksheet = XLSX.utils.json_to_sheet(worksheetData);
@@ -183,6 +219,9 @@ const ExportButtons = ({
         const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
         const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
         saveAs(blob, 'relatorio-zoomx.xlsx');
+        setTimeout(() => {
+          setToast({ visible: true, message: 'Relatório exportado para Excel com sucesso!', status: 'SUCCESS' });
+        }, 500);
       }
     },
     [data, onError]
@@ -227,10 +266,35 @@ const Reports: React.FC = () => {
   const [reportType, setReportType] = useState('general');
 
   const { data, loading, error, toast, setToast } = useRelatorioData(period, reportType);
+  const [recusadas, setRecusadas] = useState<{ total: number }>({ total: 0 });
+
+  useEffect(() => {
+    async function fetchRecusadas() {
+      try {
+        const response = await fetch(`https://backend-turma-a-2025.onrender.com/api/admin/relatorios/recusadas`, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+          },
+        });
+
+        if (!response.ok) throw new Error('Erro ao buscar relatórios recusados');
+
+        const data = await response.json();
+        const total = parseInt(data.solicitacoes_recusadas[0]?.total_recusadas || '0', 10);
+
+        setRecusadas({ total });
+      } catch (error) {
+        setRecusadas({ total: 0 });
+      }
+    }
+
+    fetchRecusadas();
+  }, []);
 
   if (loading)
     return (
-        <Loading text='Montando relatório...' />
+      <Loading text='Montando relatório...' />
     );
 
   if (error)
@@ -242,7 +306,6 @@ const Reports: React.FC = () => {
 
   if (!data) return null;
 
-  // Dados para gráficos
   const dailyData = data.horariosPico.map((h) => ({
     day: h.hora,
     corridas: h.total,
@@ -282,51 +345,14 @@ const Reports: React.FC = () => {
         <h1 className="text-3xl font-righteous text-black">Relatórios</h1>
         <ExportButtons
           data={data}
+          setToast={setToast}
           onError={(msg) =>
             setToast({ visible: true, message: msg, status: 'ERROR' })
           }
         />
       </div>
 
-      <Card className="zoomx-card">
-        <CardHeader>
-          <CardTitle className="font-righteous">Filtros</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="text-sm font-medium">Período</label>
-              <Select value={period} onValueChange={setPeriod}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="week">Esta Semana</SelectItem>
-                  <SelectItem value="month">Este Mês</SelectItem>
-                  <SelectItem value="quarter">Este Trimestre</SelectItem>
-                  <SelectItem value="year">Este Ano</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <label className="text-sm font-medium">Tipo de Relatório</label>
-              <Select value={reportType} onValueChange={setReportType}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="general">Relatório Geral</SelectItem>
-                  <SelectItem value="financial">Relatório Financeiro</SelectItem>
-                  <SelectItem value="operational">Relatório Operacional</SelectItem>
-                  <SelectItem value="performance">Performance</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
         <SummaryCard
           title="Total de Corridas"
           value={data.corridas.total}
@@ -340,6 +366,15 @@ const Reports: React.FC = () => {
           description="Sem dados disponíveis"
           descriptionColor="text-gray-600"
         />
+
+        <SummaryCard
+          title="Total de Solicitações Recusadas"
+          value={recusadas.total > 0 ? `${recusadas.total}` : "Sem dados disponíveis"}
+          description={recusadas.total > 0 ? `Solicitações recusadas: ${recusadas.total}` : "Sem dados disponíveis"}
+          descriptionColor="text-red-600"
+        />
+
+
 
         <SummaryCard
           title="Faturamento Total"
@@ -486,6 +521,7 @@ const Reports: React.FC = () => {
                   <td className="py-3 px-4">--</td>
                   <td className="py-3 px-4 text-gray-600">Sem dados</td>
                 </tr>
+
                 <tr className="border-b border-gray-100">
                   <td className="py-3 px-4 font-medium">Faturamento Total</td>
                   <td className="py-3 px-4">R$ {data.corridas.faturamento_total.toFixed(2)}</td>

@@ -29,6 +29,9 @@ import { handleAuthError } from "@/utils/handleAuthError";
 import { ToastProps } from "@/types/toast";
 import { Trip } from "@/types/travel";
 import { Loading } from "@/components/ui/loading";
+import noDataAnimation from '@/assets/animations/no_data.json';
+
+import Lottie from "lottie-react";
 
 const statusVariantMap: Record<string, string> = {
   "concluído": "default",
@@ -44,7 +47,7 @@ export default function EmployeeTrips() {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const [toast, setToast] = useState<ToastProps>({ visible: false, message: "", status: "INFO" });
-  const [filterDate, setFilterDate] = useState<string>(""); // filtro de data
+  const [filterDate, setFilterDate] = useState<string>("");
 
   useEffect(() => {
     if (!funCodigo) return;
@@ -111,17 +114,6 @@ export default function EmployeeTrips() {
     );
   }
 
-  if (trips.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-12 gap-3">
-        <p className="font-medium">Nenhuma viagem registrada</p>
-        <p className="text-sm text-muted-foreground">
-          Este funcionário ainda não realizou nenhuma viagem.
-        </p>
-      </div>
-    );
-  }
-
   const fun_nome = trips[0].fun_nome;
 
   return (
@@ -141,7 +133,6 @@ export default function EmployeeTrips() {
         </p>
       </div>
 
-      {/* Filtro de data */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           <Calendar className="h-4 w-4 text-muted-foreground" />
@@ -165,7 +156,6 @@ export default function EmployeeTrips() {
         </Button>
       </div>
 
-      {/* Tabela */}
       <div className="rounded-md border">
         <Table>
           <TableHeader className="bg-muted/50">
@@ -220,8 +210,16 @@ export default function EmployeeTrips() {
           </TableBody>
         </Table>
       </div>
-
-      {/* Detalhes das viagens */}
+      {!filteredTrips.length && (
+        <div className="flex flex-col items-center justify-center py-12 gap-3">
+          <Lottie
+            animationData={noDataAnimation}
+            loop
+            style={{ width: 400, height: 300 }}
+          />
+          <p className="text-2xl text-muted-foreground">Nenhuma viagem encontrada.</p>
+        </div>
+      )}
       {filteredTrips.map((trip) => (
         <Card key={`details-${trip.via_codigo}`} className="mt-6">
           <CardHeader className="pb-3">
@@ -268,7 +266,7 @@ export default function EmployeeTrips() {
               <div className="space-y-2">
                 <h3 className="font-medium flex items-center gap-2">
                   <Bike className="h-4 w-4" />
-                  Veículo
+                  Motocicleta utilizada
                 </h3>
                 <div className="pl-6">
                   <p>{trip.mot_modelo} • {trip.mot_placa}</p>

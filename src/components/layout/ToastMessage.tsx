@@ -1,43 +1,32 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, ReactNode } from "react";
 import { CheckCircle, XCircle, Info, AlertTriangle } from "lucide-react";
 
 type ToastMessageProps = {
   message: string;
   onHide?: () => void;
   status?: "SUCCESS" | "ERROR" | "INFO" | "WARNING";
+  icon?: ReactNode; 
 };
 
 const statusStyles = {
-  SUCCESS: {
-    bg: "bg-white",
-    border: "border-l-4 border-emerald-500",
-    icon: <CheckCircle className="w-5 h-5 text-emerald-500" />,
-    textColor: "text-gray-800",
-  },
-  ERROR: {
-    bg: "bg-white",
-    border: "border-l-4 border-rose-500",
-    icon: <XCircle className="w-5 h-5 text-rose-500" />,
-    textColor: "text-gray-800",
-  },
-  WARNING: {
-    bg: "bg-white",
-    border: "border-l-4 border-amber-500",
-    icon: <AlertTriangle className="w-5 h-5 text-amber-500" />,
-    textColor: "text-gray-800",
-  },
-  INFO: {
-    bg: "bg-white",
-    border: "border-l-4 border-slate-500",
-    icon: <Info className="w-5 h-5 text-slate-500" />,
-    textColor: "text-gray-800",
-  },
+  SUCCESS: { bg: "bg-white", border: "border-l-4 border-emerald-500", textColor: "text-gray-800" },
+  ERROR: { bg: "bg-white", border: "border-l-4 border-rose-500", textColor: "text-gray-800" },
+  WARNING: { bg: "bg-white", border: "border-l-4 border-amber-500", textColor: "text-gray-800" },
+  INFO: { bg: "bg-white", border: "border-l-4 border-slate-500", textColor: "text-gray-800" },
+};
+
+const defaultIcons = {
+  SUCCESS: <CheckCircle className="w-5 h-5 text-emerald-500" />,
+  ERROR: <XCircle className="w-5 h-5 text-rose-500" />,
+  WARNING: <AlertTriangle className="w-5 h-5 text-amber-500" />,
+  INFO: <Info className="w-5 h-5 text-slate-500" />,
 };
 
 export default function ToastMessage({
   message,
   onHide,
   status = "INFO",
+  icon,
 }: ToastMessageProps) {
   const [visible, setVisible] = useState(true);
   const [isExiting, setIsExiting] = useState(false);
@@ -47,7 +36,7 @@ export default function ToastMessage({
       setIsExiting(true);
       setTimeout(() => {
         setVisible(false);
-        if (onHide) onHide();
+        onHide?.();
       }, 300);
     }, 2700);
 
@@ -56,7 +45,8 @@ export default function ToastMessage({
 
   if (!visible) return null;
 
-  const { bg, border, icon, textColor } = statusStyles[status];
+  const { bg, border, textColor } = statusStyles[status];
+  const renderIcon = icon ?? defaultIcons[status];
 
   return (
     <div
@@ -73,9 +63,7 @@ export default function ToastMessage({
       aria-live="assertive"
       aria-atomic="true"
     >
-      <div className="flex-shrink-0 pt-0.5 mr-3">
-        {icon}
-      </div>
+      <div className="flex-shrink-0 pt-0.5 mr-3">{renderIcon}</div>
       <div className="flex-1">
         <p className="text-sm font-medium leading-tight">{message}</p>
       </div>
@@ -84,7 +72,7 @@ export default function ToastMessage({
           setIsExiting(true);
           setTimeout(() => {
             setVisible(false);
-            if (onHide) onHide();
+            onHide?.();
           }, 300);
         }}
         className="ml-4 text-gray-400 hover:text-gray-500 focus:outline-none"

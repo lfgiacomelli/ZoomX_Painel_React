@@ -139,7 +139,7 @@ const useRelatorioData = (period: string, reportType: string) => {
 
   async function fetchRecusadas() {
     try {
-      const response = await fetch(`http://192.168.1.106:3000/api/admin/relatorios/recusadas`, {
+      const response = await fetch(`https://backend-turma-a-2025.onrender.com/api/admin/relatorios/recusadas`, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${localStorage.getItem('token') || ''}`,

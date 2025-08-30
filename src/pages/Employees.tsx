@@ -5,7 +5,7 @@ import { Input } from '../components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
 import { Badge } from '../components/ui/badge';
-import { Plus, Edit, Trash2, ToggleLeft, ToggleRight, Check, X, EllipsisVertical } from 'lucide-react';
+import { Plus, Edit, Trash2, ToggleLeft, ToggleRight, Check, UserX } from 'lucide-react';
 import { Loading } from '../components/ui/loading';
 import { Pagination } from '../components/ui/pagination';
 import { ApiService } from '../services/api';
@@ -667,26 +667,6 @@ const Employees: React.FC = () => {
                                 Editar
                               </span>
                             </div>
-
-                            <div className="relative group">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleDelete(employee.fun_codigo)}
-                                className="text-red-600 hover:text-red-700"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                              <span
-                                className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 
-                                        whitespace-nowrap rounded bg-gray-900 text-white text-xs 
-                                        px-2 py-1 opacity-0 group-hover:opacity-100 
-                                        pointer-events-none transition-opacity duration-300"
-                              >
-                                Demitir
-                              </span>
-                            </div>
-
                             <div className="relative group">
                               <Button
                                 size="sm"
@@ -704,6 +684,24 @@ const Employees: React.FC = () => {
                      px-2 py-1 opacity-0 group-hover:opacity-100 
                      pointer-events-none transition-opacity duration-300">
                                 {employee.fun_ativo ? 'Desativar' : 'Ativar'}
+                              </span>
+                            </div>
+                            <div className="relative group">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleDelete(employee.fun_codigo)}
+                                className="text-red-600 hover:text-red-700"
+                              >
+                                <UserX className="w-4 h-4" />
+                              </Button>
+                              <span
+                                className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 
+                                        whitespace-nowrap rounded bg-gray-900 text-white text-xs 
+                                        px-2 py-1 opacity-0 group-hover:opacity-100 
+                                        pointer-events-none transition-opacity duration-300"
+                              >
+                                Demitir
                               </span>
                             </div>
                           </div>

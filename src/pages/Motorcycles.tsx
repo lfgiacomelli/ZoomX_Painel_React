@@ -16,12 +16,19 @@ import { useNavigate } from 'react-router-dom';
 
 import { ToastProps } from '@/types/toast';
 import { Motorcycle } from '@/types/motorcycle';
+import { ThreeDot } from 'react-loading-indicators';
 
+
+type FuncionarioProps = {
+  fun_codigo: number;
+  fun_nome: string;
+}
 
 const Motorcycles: React.FC = () => {
   const BASE_URL = 'https://backend-turma-a-2025.onrender.com';
 
   const [motorcycles, setMotorcycles] = useState<Motorcycle[]>([]);
+  const [funcionarios, setFuncionarios] = useState<FuncionarioProps[]>([]);
   const [loading, setLoading] = useState(true);
   const [brandFilter, setBrandFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -46,6 +53,46 @@ const Motorcycles: React.FC = () => {
     const regexMercosul = /^[A-Z]{3}[0-9][A-Z][0-9]{2}$/i;
     return regexAntigo.test(placa) || regexMercosul.test(placa);
   }
+
+  async function listarFuncionarios() {
+    setLoading(true);
+    try {
+      const response = await fetch(`${BASE_URL}/api/admin/funcionarios/listar-sem-moto`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token') || ''}`,
+        },
+      });
+
+      if (handleAuthError(response, setToast, navigate)) return;
+
+      if (response.status === 204) {
+        // Nenhum funcionário sem moto
+        setFuncionarios([]);
+        return;
+      }
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.mensagem || 'Erro ao carregar lista de funcionários.');
+      }
+
+      setFuncionarios(Array.isArray(data) ? data : []);
+
+    } catch (error: any) {
+      console.error('Erro ao buscar funcionários:', error);
+      setToast({
+        visible: true,
+        message: error.message || 'Erro ao carregar lista de funcionários.',
+        status: 'ERROR',
+      });
+    } finally {
+      setLoading(false);
+    }
+  }
+
+
 
   async function fetchMotorcycles() {
     setLoading(true);
@@ -209,6 +256,7 @@ const Motorcycles: React.FC = () => {
 
       await response.json();
 
+      await fetchMotorcycles();
       setToast({
         visible: true,
         message: 'Motocicleta excluída com sucesso!',
@@ -233,6 +281,7 @@ const Motorcycles: React.FC = () => {
 
   useEffect(() => {
     fetchMotorcycles();
+    listarFuncionarios();
   }, []);
 
 
@@ -379,25 +428,43 @@ const Motorcycles: React.FC = () => {
                 </div>
               </div>
               <div>
-                <label className="text-sm font-medium">Funcionário (Código)</label>
-                <Input
-                  type="number"
-                  className="zoomx-input"
-                  value={employeeCode}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setEmployeeCode(val === '' ? '' : Number(val));
-                  }}
-                  placeholder="Anote o código do funcionário e insira aqui"
-                />
+                <label className="text-sm font-medium">Proprietário</label>
+                <Select
+                  value={employeeCode === '' ? '' : String(employeeCode)}
+                  onValueChange={(value) => setEmployeeCode(value === '' ? '' : Number(value))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione um funcionário">
+                      {employeeCode &&
+                        funcionarios.find(f => String(f.fun_codigo) === String(employeeCode))?.fun_nome}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {funcionarios.map((funcionario) => (
+                      <SelectItem
+                        key={funcionario.fun_codigo}
+                        value={String(funcionario.fun_codigo)}
+                      >
+                        {funcionario.fun_nome}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
+
               <div className="flex justify-end space-x-2">
                 <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
                   Cancelar
                 </Button>
-                <Button type="submit" className="zoomx-button">
-                  Salvar
-                </Button>
+                {loading ? (
+                  <Button type="submit" className="zoomx-button" disabled>
+                    <ThreeDot size='small' color={"#fff"} />
+                  </Button>
+                ) : (
+                  <Button type="submit" className="zoomx-button">
+                    Salvar
+                  </Button>
+                )}
               </div>
             </form>
           </DialogContent>

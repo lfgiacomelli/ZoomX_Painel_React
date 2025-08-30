@@ -133,11 +133,11 @@ const Reviews: React.FC = () => {
           onHide={() => setToast({ ...toast, visible: false })}
         />
       )}
-      <div className="flex items-center justify-between mb-6">
+      <div className="items-center mb-6 flex-col">
         <h1 className="text-3xl font-righteous text-black">Avaliações</h1>
+        <p className="text-gray-600">As avaliações estão disponíveis apenas para visualização, não é possível excluir ou editar.</p>
       </div>
 
-      ---
 
       <Card className="zoomx-card mb-6">
         <CardHeader>

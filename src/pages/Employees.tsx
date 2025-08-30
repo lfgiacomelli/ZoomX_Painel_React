@@ -514,6 +514,7 @@ const Employees: React.FC = () => {
                     value={editingEmployee?.telefone || ''}
                     onChange={e => setEditingEmployee({ ...editingEmployee, telefone: e.target.value })}
                     required
+                    maxLength={11}
                   />
                 </div>
                 <div>

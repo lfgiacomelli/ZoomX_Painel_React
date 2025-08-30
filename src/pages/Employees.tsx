@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
 import { Badge } from '../components/ui/badge';
 import { Plus, Edit, Trash2, ToggleLeft, ToggleRight, Check, UserX } from 'lucide-react';
 import { Loading } from '../components/ui/loading';
@@ -13,6 +13,8 @@ import ToastMessage from '@/components/layout/ToastMessage';
 import { ActionMenu } from '@/components/layout/ActionMenu';
 import { useCargo } from '@/hooks/useCargo';
 import { ToastProps } from '@/types/toast';
+import { id } from 'date-fns/locale';
+import { ThreeDot } from 'react-loading-indicators';
 
 const Employees: React.FC = () => {
   const [toast, setToast] = useState<ToastProps>({ visible: false, message: "", status: "INFO" });
@@ -27,12 +29,16 @@ const Employees: React.FC = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
   const [employees, setEmployees] = useState<any[]>([]);
 
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [selectedPagamentoId, setSelectedPagamentoId] = useState<number | null>(null);
   const [selectedStatusAtual, setSelectedStatusAtual] = useState<string | null>(null);
   const [formaPagamento, setFormaPagamento] = useState<string>('pix');
+
+  const [isModalDeleteOpen, setIsModalDeleteOpen] = useState(false);
+  const [deletingEmployeeId, setDeletingEmployeeId] = useState<number | null>(null);
 
   const cargo = useCargo();
 
@@ -51,6 +57,7 @@ const Employees: React.FC = () => {
 
   async function adicionarFuncionario(employeeData: any) {
     try {
+      setConfirmLoading(true);
       const data = await ApiService.post('/api/admin/funcionarios/adicionar', employeeData);
 
       const token = localStorage.getItem('token');
@@ -90,12 +97,15 @@ const Employees: React.FC = () => {
         status: 'ERROR',
       });
       throw new Error(error.message || 'Erro ao adicionar funcionário');
+    } finally {
+      setConfirmLoading(false);
     }
   }
 
 
   async function editarFuncionario(id: number, employeeData: any) {
     try {
+      setConfirmLoading(true);
       return await ApiService.put(`/api/admin/funcionarios/editar/${id}`, employeeData);
     } catch (error: any) {
       setToast({
@@ -104,12 +114,24 @@ const Employees: React.FC = () => {
         status: 'ERROR',
       });
       throw new Error(error.message || 'Erro ao editar funcionário');
+    } finally {
+      setConfirmLoading(false);
     }
   }
 
   async function deletarFuncionario(id: number) {
     try {
-      return await ApiService.delete(`/api/admin/funcionarios/excluir/${id}`);
+      setConfirmLoading(true);
+      await ApiService.delete(`/api/admin/funcionarios/excluir/${id}`);
+
+      setToast({
+        visible: true,
+        message: 'Funcionário excluído com sucesso!',
+        status: 'SUCCESS',
+      });
+
+      setEmployees(prev => prev.filter(emp => emp.fun_codigo !== id));
+
     } catch (error: any) {
       setToast({
         visible: true,
@@ -117,6 +139,8 @@ const Employees: React.FC = () => {
         status: 'ERROR',
       });
       throw new Error(error.message || 'Erro ao deletar funcionário');
+    } finally {
+      setConfirmLoading(false);
     }
   }
 
@@ -202,33 +226,43 @@ const Employees: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (employeeId: number) => {
-    if (confirm('Tem certeza que deseja excluir este funcionário?')) {
-      setLoading(true);
-      try {
-        await deletarFuncionario(employeeId);
-        setToast({
-          visible: true,
-          message: 'Funcionário excluído com sucesso!',
-          status: 'SUCCESS',
-        });
-        setEmployees(prevEmployees => prevEmployees.filter(emp => emp.fun_codigo !== employeeId));
-      } catch (error: any) {
-        console.error("Erro ao excluir funcionário:", error);
-        setToast({
-          visible: true,
-          message: error.message || 'Erro ao excluir funcionário.',
-          status: 'ERROR',
-        });
-      } finally {
-        setLoading(false);
-      }
+  const handleOpenDelete = (employeeId: number) => {
+    setDeletingEmployeeId(employeeId);
+    setIsModalDeleteOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    setConfirmLoading(true);
+    if (!deletingEmployeeId) return;
+
+    try {
+      await deletarFuncionario(deletingEmployeeId);
+      setToast({
+        visible: true,
+        message: "Funcionário excluído com sucesso!",
+        status: "SUCCESS",
+      });
+      setEmployees((prev) =>
+        prev.filter((emp) => emp.fun_codigo !== deletingEmployeeId)
+      );
+    } catch (error: any) {
+      console.error("Erro ao excluir funcionário:", error);
+      setToast({
+        visible: true,
+        message: error.message || "Erro ao excluir funcionário.",
+        status: "ERROR",
+      });
+    } finally {
+      setIsModalDeleteOpen(false);
+      setDeletingEmployeeId(null);
+      setConfirmLoading(false);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setConfirmLoading(true);
 
     try {
       if (editingEmployee?.id) {
@@ -284,6 +318,7 @@ const Employees: React.FC = () => {
       });
     } finally {
       setLoading(false);
+      setConfirmLoading(false);
     }
   };
 
@@ -395,6 +430,29 @@ const Employees: React.FC = () => {
       )}
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-righteous text-black">Funcionários</h1>
+        <Dialog open={isModalDeleteOpen} onOpenChange={setIsModalDeleteOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Confirmar Demissão</DialogTitle>
+            </DialogHeader>
+            <p>Tem certeza que deseja demitir este funcionário?</p>
+            <p className="text-sm text-gray-500">Esta ação não pode ser desfeita. Ao confirmar, todos os dados do funcionário serão excluídos de forma permanente.</p>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsModalDeleteOpen(false)}>
+                Cancelar
+              </Button>
+              {confirmLoading ? (
+                <Button variant="destructive" onClick={handleConfirmDelete}>
+                  <ThreeDot color="white" size='small' />
+                </Button>
+              ) : (
+                <Button variant="destructive" onClick={handleConfirmDelete}>
+                  Confirmar Demissão
+                </Button>
+              )}
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
           <DialogTrigger asChild>
             <Button
@@ -544,9 +602,15 @@ const Employees: React.FC = () => {
                 <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
                   Cancelar
                 </Button>
-                <Button type="submit" className="zoomx-button">
-                  Salvar
-                </Button>
+                {confirmLoading ? (
+                  <Button type="submit" className="zoomx-button">
+                    <ThreeDot color="#fff" size="small" />
+                  </Button>
+                ) : (
+                  <Button type="submit" className="zoomx-button">
+                    Salvar
+                  </Button>
+                )}
               </div>
             </form>
           </DialogContent>
@@ -690,16 +754,16 @@ const Employees: React.FC = () => {
                               <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={() => handleDelete(employee.fun_codigo)}
+                                onClick={() => handleOpenDelete(employee.fun_codigo)}
                                 className="text-red-600 hover:text-red-700"
                               >
                                 <UserX className="w-4 h-4" />
                               </Button>
                               <span
                                 className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 
-                                        whitespace-nowrap rounded bg-gray-900 text-white text-xs 
-                                        px-2 py-1 opacity-0 group-hover:opacity-100 
-                                        pointer-events-none transition-opacity duration-300"
+                    whitespace-nowrap rounded bg-gray-900 text-white text-xs 
+                    px-2 py-1 opacity-0 group-hover:opacity-100 
+                    pointer-events-none transition-opacity duration-300"
                               >
                                 Demitir
                               </span>

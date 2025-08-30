@@ -24,6 +24,8 @@ import ToastMessage from '@/components/layout/ToastMessage';
 import { handleAuthError } from '@/utils/handleAuthError';
 import { useNavigate } from 'react-router-dom';
 import { ToastProps } from '@/types/toast';
+import Lottie from 'lottie-react';
+import noDataAnimation from '@/assets/animations/no_data.json';
 
 interface Request {
   sol_codigo: number;
@@ -153,7 +155,7 @@ const Requests: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!requests) return; 
+    if (!requests) return;
     const pendingRequest = requests.filter(request => request.sol_status.toLowerCase() === 'pendente');
     if (pendingRequest.length > 0) {
       const audio = new Audio('/notificacao.mp3');
@@ -334,7 +336,7 @@ const Requests: React.FC = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Todos os tipos</SelectItem>
-                  <SelectItem value="taxi">Moto Táxi</SelectItem>
+                  <SelectItem value="taxi">Mototáxi</SelectItem>
                   <SelectItem value="delivery">Entrega</SelectItem>
                 </SelectContent>
               </Select>
@@ -376,7 +378,16 @@ const Requests: React.FC = () => {
           <CardDescription>{filteredRequests.length} solicitação(ões) encontrada(s)</CardDescription>
         </CardHeader>
         <CardContent>
-          {loading ? (
+          {filteredRequests.length === 0 && !loading ? (
+            <div className="flex flex-col items-center justify-center py-12 gap-3">
+              <Lottie
+                animationData={noDataAnimation}
+                loop
+                style={{ width: 400, height: 300 }}
+              />
+              <p className="text-2xl text-muted-foreground">Nenhuma solicitação encontrada para o filtro "{statusFilter}".</p>
+            </div>
+          ) : loading ? (
             <Loading text='Carregando solicitações...' />
           ) : (
             <>

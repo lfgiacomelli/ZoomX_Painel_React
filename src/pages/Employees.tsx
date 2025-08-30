@@ -677,11 +677,13 @@ const Employees: React.FC = () => {
                               >
                                 <Trash2 className="w-4 h-4" />
                               </Button>
-                              <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 
-                     whitespace-nowrap rounded bg-gray-900 text-white text-xs 
-                     px-2 py-1 opacity-0 group-hover:opacity-100 
-                     pointer-events-none transition-opacity duration-300">
-                                Excluir
+                              <span
+                                className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 
+                                        whitespace-nowrap rounded bg-gray-900 text-white text-xs 
+                                        px-2 py-1 opacity-0 group-hover:opacity-100 
+                                        pointer-events-none transition-opacity duration-300"
+                              >
+                                Demitir
                               </span>
                             </div>
 

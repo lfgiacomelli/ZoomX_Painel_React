@@ -51,7 +51,6 @@ export default function EmployeesWithoutMotorcycles() {
       if (handleAuthError(response, setToast, navigate)) return;
 
       if (response.status === 204) {
-        // Nenhum mototaxista sem moto
         setEmployeesWithoutMotorcycles([]);
         return;
       }

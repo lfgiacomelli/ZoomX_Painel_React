@@ -326,7 +326,7 @@ const Travels: React.FC = () => {
                                     </thead>
                                     <tbody>
                                         {paginatedTravels.map((travel) => (
-                                            <tr key={travel.via_codigo} className="border-b text-center border-gray-100 hover:bg-gray-50">
+                                            <tr key={travel.via_codigo} className="border-b text-center border-gray-100">
                                                 <td className="px-4 py-2">{travel.via_origem}</td>
                                                 <td className="px-4 py-2">{travel.via_destino}</td>
                                                 <td className="px-4 py-2">R$ {parseFloat(travel.via_valor).toFixed(2)}</td>

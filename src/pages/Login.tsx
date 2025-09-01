@@ -16,6 +16,7 @@ import { XCircle, Eye, EyeOff, Loader2 } from 'lucide-react';
 import ToastMessage from '@/components/layout/ToastMessage';
 
 import { ToastProps } from '@/types/toast';
+import { ThreeDot } from 'react-loading-indicators';
 
 const LoginPage: React.FC = () => {
   const { login } = useAuth();
@@ -186,20 +187,12 @@ const LoginPage: React.FC = () => {
             >
               {loading ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Entrando...
+                  <ThreeDot size='small' color='white' />
                 </>
               ) : (
                 'Entrar'
               )}
             </Button>
-
-            <div className="text-center text-sm text-gray-500">
-              Não tem uma conta?{' '}
-              <Link to="/registro" className="font-medium text-blue-600 hover:text-blue-500">
-                Solicite acesso
-              </Link>
-            </div>
           </form>
         </CardContent>
       </Card>

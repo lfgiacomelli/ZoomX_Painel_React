@@ -11,7 +11,7 @@ import LinearProgress from '@mui/material/LinearProgress';
 
 import { Button } from '@/components/ui/button';
 import ToastMessage from '@/components/layout/ToastMessage';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import ShowPaymentsIfExists from '@/components/layout/ShowPaymentsIfExists';
 import EmployeesWithoutMotorcycles from '@/components/layout/EmployeesWithoutBike';
@@ -229,7 +229,13 @@ const Dashboard: React.FC = () => {
   }, []);
 
   const goToSolicitacoes = () => {
-    navigate('/solicitacoes');
+    return (
+      <Link to="/solicitacoes" aria-label="Ver solicitações">
+        <Button className="zoomx-button mt-4 w-full">
+          Ver Solicitações
+        </Button>
+      </Link>
+    )
   };
 
   async function handleFinalizarTodas() {
@@ -301,13 +307,11 @@ const Dashboard: React.FC = () => {
                 {totalCorridasFinalizadas !== null ? totalCorridasFinalizadas : 'N/A'}
               </div>
             )}
-            <Button
-              className="zoomx-button mt-4 w-full"
-              onClick={() => navigate('/viagens')}
-              aria-label="Ver viagens"
-            >
-              Ver viagens
-            </Button>
+            <Link to="/viagens" aria-label="Ver viagens">
+              <Button className="zoomx-button mt-4 w-full">
+                Ver viagens
+              </Button>
+            </Link>
           </CardContent>
         </Card>
 
@@ -323,13 +327,14 @@ const Dashboard: React.FC = () => {
                 {totalAvaliacoes !== null ? totalAvaliacoes : 'N/A'}
               </div>
             )}
-            <Button
-              className="zoomx-button mt-4 w-full"
-              onClick={() => navigate('/avaliacoes')}
-              aria-label="Ver avaliações"
-            >
-              Ver avaliações
-            </Button>
+            <Link to="/avaliacoes" aria-label="Ver avaliações">
+              <Button
+                className="zoomx-button mt-4 w-full"
+                aria-label="Ver avaliações"
+              >
+                Ver avaliações
+              </Button>
+            </Link>
           </CardContent>
         </Card>
 
@@ -347,13 +352,14 @@ const Dashboard: React.FC = () => {
 
                 </div>
               )}
-              <Button
-                className="zoomx-button mt-4 w-full"
-                onClick={() => navigate('/relatorios')}
-                aria-label="Ver relatório"
-              >
-                Ver relatório
-              </Button>
+              <Link to="/relatorios" aria-label="Ver relatório">
+                <Button
+                  className="zoomx-button mt-4 w-full"
+                  aria-label="Ver relatório"
+                >
+                  Ver relatório
+                </Button>
+              </Link>
             </div>
           </CardContent>
         </Card>
@@ -366,13 +372,14 @@ const Dashboard: React.FC = () => {
             <div className="text-2xl text-black text-center">
               {funcionariosAtivos.length}
             </div>
-            <Button
-              className="zoomx-button mt-4 w-full"
-              onClick={() => navigate('/funcionarios')}
-              aria-label="Ver lista de mototáxistas ativos"
-            >
-              Ver Mototáxistas
-            </Button>
+            <Link to='/funcionarios' aria-label="Ver lista de mototáxistas ativos">
+              <Button
+                className="zoomx-button mt-4 w-full"
+                aria-label="Ver lista de mototáxistas ativos"
+              >
+                Ver Mototáxistas
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       </div>
@@ -407,13 +414,7 @@ const Dashboard: React.FC = () => {
                         <strong>Usuário:</strong> {sol.usu_nome}
                       </p>
                     </div>
-                    <button
-                      onClick={goToSolicitacoes}
-                      className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition"
-                      aria-label={`Ver detalhes da solicitação ${sol.sol_codigo}`}
-                    >
-                      Ver Solicitações
-                    </button>
+                    {goToSolicitacoes()}
                   </li>
                 ))}
               </ul>

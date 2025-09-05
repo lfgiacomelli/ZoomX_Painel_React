@@ -429,7 +429,8 @@ const Motorcycles: React.FC = () => {
               </div>
               <div>
                 <label className="text-sm font-medium">Proprietário</label>
-                <Select
+                {funcionarios.length === 0 ? <p className="text-sm text-gray-500">Nenhum funcionário disponível sem motocicleta.</p> :
+                  <Select
                   value={employeeCode === '' ? '' : String(employeeCode)}
                   onValueChange={(value) => setEmployeeCode(value === '' ? '' : Number(value))}
                 >
@@ -449,7 +450,7 @@ const Motorcycles: React.FC = () => {
                       </SelectItem>
                     ))}
                   </SelectContent>
-                </Select>
+                </Select>}
               </div>
 
               <div className="flex justify-end space-x-2">

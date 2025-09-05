@@ -12,7 +12,7 @@ import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
 import { Label } from '../components/ui/label';
 import { Alert, AlertDescription } from '../components/ui/alert';
-import { XCircle, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { XCircle, Eye, EyeOff, Loader2, FunctionSquareIcon } from 'lucide-react';
 import ToastMessage from '@/components/layout/ToastMessage';
 
 import { ToastProps } from '@/types/toast';
@@ -62,14 +62,23 @@ const LoginPage: React.FC = () => {
         if (data.sucesso) {
           login(data.token, data.funcionario);
 
-          try {
-            await fetch('https://backend-turma-a-2025.onrender.com/api/admin/pagamentos/gerar-diarias', {
-              method: 'POST',
-              headers: { Authorization: `Bearer ${data.token}` },
-            });
-          } catch (gerarError) {
-            console.error('Erro ao gerar diárias:', gerarError);
+          if (
+            data.funcionario.cargo &&
+            ["gerente", "atendente"].includes(data.funcionario.cargo.toLowerCase())
+          ) {
+            try {
+              await fetch(
+                "https://backend-turma-a-2025.onrender.com/api/admin/pagamentos/gerar-diarias",
+                {
+                  method: "POST",
+                  headers: { Authorization: `Bearer ${data.token}` },
+                }
+              );
+            } catch (gerarError) {
+              console.error("Erro ao gerar diárias:", gerarError);
+            }
           }
+
 
           navigate('/');
         } else {

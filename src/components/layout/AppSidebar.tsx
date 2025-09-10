@@ -135,7 +135,6 @@ export function AppSidebar() {
   const handleLogout = () => {
     if (confirm('Deseja realmente sair da conta?')) {
       logout();
-      navigate('/login');
     }
   };
 

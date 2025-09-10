@@ -25,6 +25,7 @@ import { formatCurrency } from '@/utils/formatCurrency';
 
 import { ToastProps } from '@/types/toast';
 import { PaymentsEmployeesProps } from '@/types/paymentsemployees';
+import { Loading } from '@/components/ui/loading';
 
 type PaymentStatus = 'PAGO' | 'PENDENTE' | 'CANCELADO' | 'TODOS';
 type PaymentMethod = 'PIX' | 'DINHEIRO' | 'TED' | 'TODOS';
@@ -63,17 +64,17 @@ export default function PaymentsEmployees() {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       });
-      
+
       if (handleAuthError(response, setToast, navigate)) return;
-      
+
       const data = await response.json();
       setPayments(data);
     } catch (error) {
       console.error('Erro ao buscar pagamentos:', error);
-      setToast({ 
-        visible: true, 
-        message: 'Erro ao buscar pagamentos. Tente novamente mais tarde.', 
-        status: 'ERROR' 
+      setToast({
+        visible: true,
+        message: 'Erro ao buscar pagamentos. Tente novamente mais tarde.',
+        status: 'ERROR'
       });
     } finally {
       setLoading(false);
@@ -92,53 +93,50 @@ export default function PaymentsEmployees() {
       });
 
       if (response.status === 204) {
-        setToast({ 
-          visible: true, 
-          message: 'As diárias já foram geradas hoje.', 
-          status: 'INFO' 
+        setToast({
+          visible: true,
+          message: 'As diárias já foram geradas hoje.',
+          status: 'INFO'
         });
       } else {
         const data = await response.json();
         if (!response.ok) throw new Error(data?.message || 'Erro ao gerar diárias');
-        setToast({ 
-          visible: true, 
-          message: 'Diárias geradas com sucesso!', 
-          status: 'SUCCESS' 
+        setToast({
+          visible: true,
+          message: 'Diárias geradas com sucesso!',
+          status: 'SUCCESS'
         });
         fetchPayments();
       }
-      
+
       if (handleAuthError(response, setToast, navigate)) return;
 
     } catch (error: any) {
       console.error('Erro ao gerar diárias:', error);
-      setToast({ 
-        visible: true, 
-        message: error?.message || 'Erro inesperado. Tente novamente mais tarde.', 
-        status: 'ERROR' 
+      setToast({
+        visible: true,
+        message: error?.message || 'Erro inesperado. Tente novamente mais tarde.',
+        status: 'ERROR'
       });
     } finally {
       setLoadingDiarias(false);
     }
   };
 
-  // Função para determinar status real
   const getPaymentStatus = (payment: PaymentsEmployeesProps) => {
     const rawStatus = payment.pag_status.toUpperCase();
     const paymentDate = parseISO(payment.pag_data);
-    // Se PENDENTE e data antes de hoje, marca como CANCELADO
     if (rawStatus === 'PENDENTE' && isBefore(startOfDay(paymentDate), startOfToday())) {
       return 'CANCELADO';
     }
     return rawStatus;
   };
 
-  // Filtragem
   const filteredPayments = useMemo(() => {
     return payments.filter(payment => {
       const status = getPaymentStatus(payment);
 
-      const matchesSearch = 
+      const matchesSearch =
         payment.pag_codigo.toString().includes(searchTerm) ||
         payment.fun_nome.toLowerCase().includes(searchTerm.toLowerCase());
 
@@ -208,6 +206,12 @@ export default function PaymentsEmployees() {
     }
   };
 
+  if (loading) {
+    return (
+      <Loading text='Carregando pagamentos...' />
+    )
+  }
+
   return (
     <div className="grid auto-rows-max items-start gap-4 md:gap-8">
       {toast.visible && (
@@ -225,7 +229,7 @@ export default function PaymentsEmployees() {
             Visualize e gerencie os pagamentos de diárias dos funcionários
           </p>
         </div>
-        
+
         <Button onClick={handlePayments} disabled={loadingDiarias}>
           <Plus className="mr-2 h-4 w-4" />
           {loadingDiarias ? 'Gerando...' : 'Gerar Diárias'}
@@ -237,7 +241,7 @@ export default function PaymentsEmployees() {
           <TabsTrigger value="overview">Visão Geral</TabsTrigger>
           <TabsTrigger value="payments">Pagamentos</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="overview">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Card>
@@ -249,7 +253,7 @@ export default function PaymentsEmployees() {
                 <div className="text-2xl font-bold">{paymentStats.total}</div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Pagamentos Realizados</CardTitle>
@@ -259,7 +263,7 @@ export default function PaymentsEmployees() {
                 <div className="text-2xl font-bold">{paymentStats.paid}</div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Pagamentos Pendentes</CardTitle>
@@ -269,7 +273,7 @@ export default function PaymentsEmployees() {
                 <div className="text-2xl font-bold">{paymentStats.pending}</div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Pagamentos Cancelados</CardTitle>
@@ -282,13 +286,13 @@ export default function PaymentsEmployees() {
           </div>
           <h1>Para confirmar e autorizar o pagamento, vá para a seção "Funcionários"</h1>
         </TabsContent>
-        
+
         <TabsContent value="payments">
           <Card>
             <CardHeader>
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <CardTitle>Lista de Pagamentos</CardTitle>
-                
+
                 <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto">
                   <Input
                     placeholder="Pesquisar funcionário ou ID..."
@@ -296,9 +300,9 @@ export default function PaymentsEmployees() {
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full md:w-[300px]"
                   />
-                  
+
                   <div className="flex gap-2">
-                    <Select 
+                    <Select
                       value={statusFilter}
                       onValueChange={(value) => setStatusFilter(value as PaymentStatus)}
                     >
@@ -312,8 +316,8 @@ export default function PaymentsEmployees() {
                         <SelectItem value="CANCELADO">Cancelado</SelectItem>
                       </SelectContent>
                     </Select>
-                    
-                    <Select 
+
+                    <Select
                       value={methodFilter}
                       onValueChange={(value) => setMethodFilter(value as PaymentMethod)}
                     >
@@ -327,7 +331,7 @@ export default function PaymentsEmployees() {
                         <SelectItem value="TED">TED</SelectItem>
                       </SelectContent>
                     </Select>
-                    
+
                     <Input
                       type="date"
                       value={dateFilter || ''}
@@ -335,7 +339,7 @@ export default function PaymentsEmployees() {
                       className="w-[140px]"
                     />
                   </div>
-                  
+
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="outline" className="ml-auto">
@@ -364,10 +368,20 @@ export default function PaymentsEmployees() {
                       ))}
                     </DropdownMenuContent>
                   </DropdownMenu>
+                  <Input
+                    type="reset"
+                    value="Limpar Filtros"
+                    onClick={() => {
+                      setSearchTerm('');
+                      setStatusFilter('TODOS');
+                      setMethodFilter('TODOS');
+                      setDateFilter(null);
+                    }}
+                  />
                 </div>
               </div>
             </CardHeader>
-            
+
             <CardContent>
               <Table>
                 <TableHeader>
@@ -380,7 +394,7 @@ export default function PaymentsEmployees() {
                     {columnFilters.status && <TableHead>Status</TableHead>}
                   </TableRow>
                 </TableHeader>
-                
+
                 <TableBody>
                   {loading ? (
                     Array.from({ length: 5 }).map((_, idx) => (

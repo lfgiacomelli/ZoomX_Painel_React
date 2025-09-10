@@ -183,7 +183,11 @@ const Employees: React.FC = () => {
   );
 
   const handleAtivarDesativar = async (employeeId: number, currentStatus: boolean) => {
-    setLoading(true);
+    setEmployees(prev =>
+      prev.map(emp =>
+        emp.fun_codigo === employeeId ? { ...emp, fun_ativo: !currentStatus } : emp
+      )
+    );
     try {
       await ApiService.patch(`/api/admin/funcionarios/ativar-desativar/${employeeId}`);
 
@@ -199,14 +203,16 @@ const Employees: React.FC = () => {
         status: 'SUCCESS',
       });
     } catch (error: any) {
-      console.error('Erro ao ativar/desativar funcionário:', error);
+      setEmployees(prev =>
+        prev.map(emp =>
+          emp.fun_codigo === employeeId ? { ...emp, fun_ativo: currentStatus } : emp
+        )
+      );
       setToast({
         visible: true,
         message: error.message || 'Erro ao ativar/desativar funcionário.',
         status: 'ERROR',
       });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -442,11 +448,11 @@ const Employees: React.FC = () => {
                 Cancelar
               </Button>
               {confirmLoading ? (
-                <Button variant="destructive" onClick={handleConfirmDelete}>
+                <Button variant="destructive" disabled onClick={handleConfirmDelete}>
                   <ThreeDot color="white" size='small' />
                 </Button>
               ) : (
-                <Button variant="destructive" onClick={handleConfirmDelete}>
+                <Button className="bg-red-600 hover:bg-red-700 text-white" onClick={handleConfirmDelete}>
                   Confirmar Demissão
                 </Button>
               )}
@@ -604,7 +610,7 @@ const Employees: React.FC = () => {
                   Cancelar
                 </Button>
                 {confirmLoading ? (
-                  <Button type="submit" className="zoomx-button">
+                  <Button type="submit" className="zoomx-button" disabled>
                     <ThreeDot color="#fff" size="small" />
                   </Button>
                 ) : (

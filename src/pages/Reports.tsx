@@ -49,6 +49,8 @@ const API_URL = '/api/admin/relatorios';
 
 const useRelatorioData = (period: string, reportType: string) => {
   const [data, setData] = useState<RelatorioData | null>(null);
+
+  const [countEntregas, setCountEntregas] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<ToastProps>({ visible: false, message: '', status: 'INFO' });
@@ -139,7 +141,7 @@ const useRelatorioData = (period: string, reportType: string) => {
 
   async function fetchRecusadas() {
     try {
-      const response = await fetch(`https://backend-turma-a-2025.onrender.com/api/admin/relatorios/recusadas`, {
+      const response = await fetch(`${BASE_URL}/api/admin/relatorios/recusadas`, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
@@ -160,13 +162,31 @@ const useRelatorioData = (period: string, reportType: string) => {
     }
   }
 
+  async function fetchCountDeliveries() {
+    try {
+      const response = await fetch(`${BASE_URL}/api/admin/relatorios/entregas`, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+        },
+      });
+
+      if (!response.ok) throw new Error('Erro ao buscar total de entregas');
+      const result = await response.json();
+      setCountEntregas(result.total_entregas || 0);
+    } catch (error) {
+      setCountEntregas(0);
+    }
+  }
+
   useEffect(() => {
+    fetchCountDeliveries();
     fetchRecusadas();
   }, []);
 
 
 
-  return { data, loading, error, toast, setToast };
+  return { data, loading, error, toast, setToast, countEntregas };
 };
 
 const ExportButtons = ({
@@ -265,13 +285,13 @@ const Reports: React.FC = () => {
   const [period, setPeriod] = useState('month');
   const [reportType, setReportType] = useState('general');
 
-  const { data, loading, error, toast, setToast } = useRelatorioData(period, reportType);
+  const { data, loading, error, toast, setToast, countEntregas } = useRelatorioData(period, reportType);
   const [recusadas, setRecusadas] = useState<{ total: number }>({ total: 0 });
 
   useEffect(() => {
     async function fetchRecusadas() {
       try {
-        const response = await fetch(`https://backend-turma-a-2025.onrender.com/api/admin/relatorios/recusadas`, {
+        const response = await fetch(`${BASE_URL}/api/admin/relatorios/recusadas`, {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
@@ -290,6 +310,8 @@ const Reports: React.FC = () => {
     }
 
     fetchRecusadas();
+
+
   }, []);
 
   if (loading)
@@ -324,7 +346,7 @@ const Reports: React.FC = () => {
     color: data.statusCorridas.cores[label.toLowerCase()] || '#ccc',
   }));
 
-  const topEmployees = data.usuariosAtivos.map((u) => ({
+  const topUsers = data.usuariosAtivos.map((u) => ({
     name: u.usu_nome,
     corridas: u.total_corridas,
     entregas: 0,
@@ -362,8 +384,8 @@ const Reports: React.FC = () => {
 
         <SummaryCard
           title="Total de Entregas"
-          value="--"
-          description="Sem dados disponíveis"
+          value={countEntregas}
+          description="Total de entregas realizadas"
           descriptionColor="text-gray-600"
         />
 
@@ -463,7 +485,7 @@ const Reports: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {topEmployees.map((employee, index) => (
+              {topUsers.map((user, index) => (
                 <div
                   key={index}
                   className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
@@ -473,15 +495,15 @@ const Reports: React.FC = () => {
                       {index + 1}
                     </div>
                     <div>
-                      <p className="font-medium">{employee.name}</p>
+                      <p className="font-medium">{user.name}</p>
                       <p className="text-sm text-gray-600">
-                        {employee.corridas} corridas • {employee.entregas} entregas
+                        Possui {user.corridas} atividades dentro do app
                       </p>
                     </div>
                   </div>
                   <div className="text-right">
                     <p className="font-bold text-black">
-                      R$ {employee.faturamento.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                      R$ {user.faturamento.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                     </p>
                     <p className="text-sm text-gray-600">faturamento</p>
                   </div>
@@ -504,7 +526,6 @@ const Reports: React.FC = () => {
                 <tr className="border-b border-gray-200">
                   <th className="text-left py-3 px-4 font-righteous">Métrica</th>
                   <th className="text-left py-3 px-4 font-righteous">Valor Atual</th>
-                  <th className="text-left py-3 px-4 font-righteous">Período Anterior</th>
                   <th className="text-left py-3 px-4 font-righteous">Variação</th>
                 </tr>
               </thead>
@@ -512,33 +533,28 @@ const Reports: React.FC = () => {
                 <tr className="border-b border-gray-100">
                   <td className="py-3 px-4 font-medium">Total de Corridas</td>
                   <td className="py-3 px-4">{data.corridas.total}</td>
-                  <td className="py-3 px-4">--</td>
                   <td className="py-3 px-4 text-green-600">--</td>
                 </tr>
                 <tr className="border-b border-gray-100">
                   <td className="py-3 px-4 font-medium">Total de Entregas</td>
-                  <td className="py-3 px-4">--</td>
-                  <td className="py-3 px-4">--</td>
+                  <td className="py-3 px-4">{countEntregas}</td>
                   <td className="py-3 px-4 text-gray-600">Sem dados</td>
                 </tr>
 
                 <tr className="border-b border-gray-100">
                   <td className="py-3 px-4 font-medium">Faturamento Total</td>
                   <td className="py-3 px-4">R$ {data.corridas.faturamento_total.toFixed(2)}</td>
-                  <td className="py-3 px-4">--</td>
                   <td className="py-3 px-4 text-green-600">--</td>
                 </tr>
                 <tr className="border-b border-gray-100">
                   <td className="py-3 px-4 font-medium">Ticket Médio</td>
                   <td className="py-3 px-4">R$ {data.corridas.valor_medio.toFixed(2)}</td>
-                  <td className="py-3 px-4">--</td>
                   <td className="py-3 px-4 text-gray-600">--</td>
                 </tr>
                 <tr className="border-b border-gray-100">
                   <td className="py-3 px-4 font-medium">Usuários Ativos</td>
                   <td className="py-3 px-4">{data.usuarios.ativos}</td>
                   <td className="py-3 px-4">{data.usuarios.total}</td>
-                  <td className="py-3 px-4 text-green-600">--</td>
                 </tr>
               </tbody>
             </table>

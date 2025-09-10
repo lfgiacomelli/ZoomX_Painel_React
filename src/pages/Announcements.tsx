@@ -14,7 +14,7 @@ import { handleAuthError } from '@/utils/handleAuthError';
 
 import noDataAnimation from '@/assets/animations/no_data.json';
 
-import { ToastProps } from  "@/types/toast";
+import { ToastProps } from "@/types/toast";
 import Lottie from 'lottie-react';
 
 
@@ -268,6 +268,11 @@ const Announcements: React.FC = () => {
       </div>
     );
   }
+  if (isLoading) {
+    return (
+      <Loading text='Carregando anúncios...' />
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -279,7 +284,7 @@ const Announcements: React.FC = () => {
         />
       )}
       {isLoading ? (
-          <Loading text='Carregando anúncios...' />
+        null
       ) : (
         <>
           <div className="flex items-center justify-between">
@@ -288,7 +293,7 @@ const Announcements: React.FC = () => {
               <Plus className="w-4 h-4 mr-2" />
               Novo anúncio
             </Button>
-          </div>
+          </div >
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {paginatedAnnouncements.map((announcement) => (
@@ -407,7 +412,7 @@ const Announcements: React.FC = () => {
           </form>
         </DialogContent>
       </Dialog>
-    </div>
+    </div >
   );
 
 };

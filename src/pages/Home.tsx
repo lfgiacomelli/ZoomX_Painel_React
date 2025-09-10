@@ -13,7 +13,7 @@ import {
 import { Button } from '@/components/ui/button';
 import mockup from '../assets/mockup_app.png';
 import HomeHeader from '@/components/layout/HomeHeader';
-import WorkWithUs  from '@/components/layout/WorkWithUs';
+import WorkWithUs from '@/components/layout/WorkWithUs';
 import Footer from '@/components/layout/AppFooter';
 
 export default function Home() {
@@ -69,17 +69,6 @@ export default function Home() {
               } : {}}
               className="space-y-6 md:space-y-8 text-center lg:text-left order-2 lg:order-1"
             >
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={heroInView ? {
-                  opacity: 1, y: 0,
-                  transition: { delay: 0.1, duration: 0.8, ease: [0.16, 1, 0.3, 1] }
-                } : {}}
-                className="inline-flex items-center px-4 py-2 rounded-full bg-blue-100 text-blue-800 text-sm font-medium mb-4"
-              >
-                <Zap className="w-4 h-4 mr-2" /> Sistema exclusivo de PV
-              </motion.div>
-
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={heroInView ? {
@@ -100,7 +89,7 @@ export default function Home() {
                 } : {}}
                 className="text-lg md:text-xl lg:text-2xl text-gray-600 leading-relaxed max-w-2xl mx-auto lg:mx-0"
               >
-                O ZoomX é um sistema exclusivo para uma única empresa de mototáxi e entregas urbanas de Presidente Venceslau, trazendo mais eficiência, controle e agilidade.
+                Solução completa em gestão de corridas e entregas urbanas, com tecnologia moderna e adaptada às necessidades da sua empresa.
               </motion.p>
 
               <motion.div
@@ -137,10 +126,10 @@ export default function Home() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={heroInView ? {
                 opacity: 1,
-                scale: 1,
-                transition: { delay: 0.3, duration: 0.8, ease: [0.16, 1, 0.3, 1] }
+                scale: 1.9,
+                transition: { delay: 0.1, duration: 0.8, ease: [0.16, 1, 0.3, 1] }
               } : {}}
-              className="relative order-1 lg:order-2"
+              className="relative order-1 lg:order-2 mt-40 m-10"
             >
               <div className="relative w-full h-auto max-w-4xl mx-auto lg:mx-0">
                 <motion.img
@@ -151,7 +140,7 @@ export default function Home() {
                   initial={{ y: 20 }}
                   animate={heroInView ? {
                     y: 0,
-                    transition: { delay: 0.5, duration: 0.8, ease: [0.16, 1, 0.3, 1] }
+                    transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] }
                   } : {}}
                 />
               </div>
@@ -189,7 +178,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-      <WorkWithUs />
       <section className="py-20 bg-gradient-to-r from-blue-600 to-blue-500 text-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">

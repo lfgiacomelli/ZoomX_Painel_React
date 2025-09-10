@@ -50,7 +50,7 @@ const LoginPage: React.FC = () => {
     setLoading(true);
 
     try {
-      const res = await fetch('https://backend-turma-a-2025.onrender.com/api/admin/login/', {
+      const res = await fetch('https://backend-turma-a-2025.onrender.com/api/admin/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ fun_email: email, fun_senha: senha }),
@@ -82,24 +82,25 @@ const LoginPage: React.FC = () => {
 
           navigate('/');
         } else {
-          setError('E-mail ou senha incorretos.');
+
+          setError('Erro ao tentar fazer login. Tente novamente mais tarde.');
           setToast({
             visible: true,
-            message: 'E-mail ou senha incorretos.',
+            message: 'Erro ao tentar fazer login. Tente novamente mais tarde.',
             status: 'ERROR',
           });
         }
       } else {
-        setError('Erro ao tentar fazer login. Tente novamente mais tarde.');
+        setError('E-mail ou senha incorretos.');
         setToast({
           visible: true,
-          message: 'Erro ao tentar fazer login. Tente novamente mais tarde.',
+          message: 'E-mail ou senha incorretos.',
           status: 'ERROR',
         });
       }
     } catch (err) {
       console.error('Erro de conexão:', err);
-      setError('Não foi possível conectar ao servidor. Verifique sua conexão.');
+      setError('Servidor fora do ar. Tente novamente mais tarde.');
       setToast({
         visible: true,
         message: 'Erro de conexão. Verifique sua internet.',
@@ -140,7 +141,7 @@ const LoginPage: React.FC = () => {
             {error && (
               <Alert variant="destructive" className="animate-fade-in">
                 <XCircle className="h-4 w-4" />
-                <AlertDescription className="text-sm">
+                <AlertDescription className="text-sm text-center">
                   {error}
                 </AlertDescription>
               </Alert>
@@ -202,6 +203,13 @@ const LoginPage: React.FC = () => {
                 'Entrar'
               )}
             </Button>
+            {loading ? (
+              null
+            ) : (
+              <Link to="/home" className="text-sm text-blue-600 hover:underline block text-center">
+                Voltar para a página inicial
+              </Link>
+            )}
           </form>
         </CardContent>
       </Card>

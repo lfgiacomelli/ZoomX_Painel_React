@@ -739,9 +739,9 @@ const Employees: React.FC = () => {
                                 onClick={() => handleAtivarDesativar(employee.fun_codigo, employee.fun_ativo)}
                               >
                                 {employee.fun_ativo ? (
-                                  <ToggleLeft className="w-4 h-4 text-blue-600" />
-                                ) : (
                                   <ToggleRight className="w-4 h-4 text-blue-600" />
+                                ) : (
+                                  <ToggleLeft className="w-4 h-4 text-blue-600" />
                                 )}
                               </Button>
                               <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 

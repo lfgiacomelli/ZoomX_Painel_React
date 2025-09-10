@@ -57,7 +57,7 @@ export default function HomeHeader() {
 
             <button
               type="button"
-              className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-blue-600 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-blue-600 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 border"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               <span className="sr-only">Abrir menu</span>
@@ -81,7 +81,7 @@ export default function HomeHeader() {
           <div className="pt-4 border-t border-gray-200">
             <a
               onClick={() => navigate('/login')}
-              className="block w-full px-4 py-2 text-center rounded-md text-gray-700 hover:text-blue-600 hover:bg-blue-50 font-medium"
+              className="block w-full px-4 py-2 text-center rounded-md text-gray-700 hover:text-blue-600 hover:bg-blue-50 font-medium border"
             >
               Entrar
             </a>

@@ -114,11 +114,9 @@ export default function Documents() {
 
                 className="w-full max-w-[240px] h-auto object-contain rounded border bg-gray-50"
               />
-
               <p className="mt-2 font-medium text-sm text-gray-800 text-center">
                 {doc.fun_nome}
               </p>
-              <p className="text-xs text-gray-400">ID: {doc.fun_codigo}</p>
             </li>
           ))}
         </ul>

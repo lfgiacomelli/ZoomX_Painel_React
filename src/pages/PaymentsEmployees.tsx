@@ -256,8 +256,8 @@ export default function PaymentsEmployees() {
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Pagamentos Realizados</CardTitle>
-                <CheckCircle className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium text-green-600">Pagamentos Realizados</CardTitle>
+                <CheckCircle className="h-4 w-4 text-muted-foreground" style={{color:"#16a34a"}} />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{paymentStats.paid}</div>
@@ -266,8 +266,8 @@ export default function PaymentsEmployees() {
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Pagamentos Pendentes</CardTitle>
-                <Clock className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium text-yellow-600">Pagamentos Pendentes</CardTitle>
+                <Clock className="h-4 w-4 text-muted-foreground text-yellow-600" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{paymentStats.pending}</div>
@@ -276,8 +276,8 @@ export default function PaymentsEmployees() {
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Pagamentos Cancelados</CardTitle>
-                <XCircle className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium text-red-700">Pagamentos Cancelados</CardTitle>
+                <XCircle className="h-4 w-4 text-muted-foreground text-red-700" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{paymentStats.canceled}</div>

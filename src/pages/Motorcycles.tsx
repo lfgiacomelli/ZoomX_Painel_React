@@ -67,7 +67,6 @@ const Motorcycles: React.FC = () => {
       if (handleAuthError(response, setToast, navigate)) return;
 
       if (response.status === 204) {
-        // Nenhum funcionário sem moto
         setFuncionarios([]);
         return;
       }

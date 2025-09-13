@@ -48,8 +48,8 @@ const Reviews: React.FC = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
-    const [toast, setToast] = useState<ToastProps>({ visible: false, message: "", status: "INFO" });
-  
+  const [toast, setToast] = useState<ToastProps>({ visible: false, message: "", status: "INFO" });
+
 
   const itemsPerPage = 10;
 
@@ -142,26 +142,10 @@ const Reviews: React.FC = () => {
       <Card className="zoomx-card mb-6">
         <CardHeader>
           <CardTitle className="font-righteous">Filtros</CardTitle>
-          <CardDescription>Filtre as avaliações por nota mínima ou pesquisa.</CardDescription>
+          <CardDescription>Filtre as avaliações buscando pelo comentário, usuário ou ID do usuário.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            <div>
-              <label className="text-sm font-medium">Nota Mínima</label>
-              <Select value={minRatingFilter} onValueChange={setMinRatingFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Todas as notas" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todas as notas</SelectItem>
-                  <SelectItem value="5">5 Estrelas</SelectItem>
-                  <SelectItem value="4">4 Estrelas ou Mais</SelectItem>
-                  <SelectItem value="3">3 Estrelas ou Mais</SelectItem>
-                  <SelectItem value="2">2 Estrelas ou Mais</SelectItem>
-                  <SelectItem value="1">1 Estrela ou Mais</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
             <div>
               <label className="text-sm font-medium">Pesquisar</label>
               <Input

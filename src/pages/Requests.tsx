@@ -278,13 +278,11 @@ const Requests: React.FC = () => {
   const getStatusBadge = (status: Request['sol_status']) => {
     switch (status) {
       case 'Pendente':
-        return <Badge className="bg-yellow-100 text-yellow-800">Pendente</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-200">Pendente</Badge>;
       case 'aceita':
-        return <Badge className="bg-green-100 text-green-800">Aceita</Badge>;
+        return <Badge className="bg-green-100 text-green-800 hover:bg-green-200">Aceita</Badge>;
       case 'recusada':
-        return <Badge className="bg-red-100 text-red-800">Recusada</Badge>;
-      case 'concluida':
-        return <Badge className="bg-green-100 text-green-800">Concluída</Badge>;
+        return <Badge className="bg-red-100 text-red-800 hover:bg-red-200">Recusada</Badge>;
       default:
         return <Badge>{status}</Badge>;
     }

@@ -526,35 +526,29 @@ const Reports: React.FC = () => {
                 <tr className="border-b border-gray-200">
                   <th className="text-left py-3 px-4 font-righteous">Métrica</th>
                   <th className="text-left py-3 px-4 font-righteous">Valor Atual</th>
-                  <th className="text-left py-3 px-4 font-righteous">Variação</th>
                 </tr>
               </thead>
               <tbody>
                 <tr className="border-b border-gray-100">
                   <td className="py-3 px-4 font-medium">Total de Corridas</td>
                   <td className="py-3 px-4">{data.corridas.total}</td>
-                  <td className="py-3 px-4 text-green-600">--</td>
                 </tr>
                 <tr className="border-b border-gray-100">
                   <td className="py-3 px-4 font-medium">Total de Entregas</td>
                   <td className="py-3 px-4">{countEntregas}</td>
-                  <td className="py-3 px-4 text-gray-600">Sem dados</td>
                 </tr>
 
                 <tr className="border-b border-gray-100">
                   <td className="py-3 px-4 font-medium">Faturamento Total</td>
                   <td className="py-3 px-4">R$ {data.corridas.faturamento_total.toFixed(2)}</td>
-                  <td className="py-3 px-4 text-green-600">--</td>
                 </tr>
                 <tr className="border-b border-gray-100">
                   <td className="py-3 px-4 font-medium">Ticket Médio</td>
                   <td className="py-3 px-4">R$ {data.corridas.valor_medio.toFixed(2)}</td>
-                  <td className="py-3 px-4 text-gray-600">--</td>
                 </tr>
                 <tr className="border-b border-gray-100">
                   <td className="py-3 px-4 font-medium">Usuários Ativos</td>
                   <td className="py-3 px-4">{data.usuarios.ativos}</td>
-                  <td className="py-3 px-4">{data.usuarios.total}</td>
                 </tr>
               </tbody>
             </table>

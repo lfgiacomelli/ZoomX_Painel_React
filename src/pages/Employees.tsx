@@ -330,8 +330,8 @@ const Employees: React.FC = () => {
 
   const getStatusBadge = (ativo: boolean) => {
     return ativo
-      ? <Badge className="bg-green-100 text-green-800">Ativo</Badge>
-      : <Badge className="bg-red-100 text-red-800">Indisponível</Badge>;
+      ? <Badge className="bg-green-100 text-green-800 hover:bg-green-200">Ativo</Badge>
+      : <Badge className="bg-red-100 text-red-800 hover:bg-red-200">Indisponível</Badge>;
   };
 
   const openPaymentModal = (pag_codigo: number, statusAtual: string) => {
@@ -714,7 +714,7 @@ const Employees: React.FC = () => {
                   </thead>
                   <tbody>
                     {paginatedEmployees.map((employee) => (
-                      <tr key={employee.fun_codigo} className="border-b border-gray-100 hover:bg-gray-50">
+                      <tr key={employee.fun_codigo} className="border-b border-gray-100">
                         <td className="py-3 px-4 font-medium text-center">{employee.fun_codigo}</td>
                         <td className="py-3 px-4 font-medium">{employee.fun_nome}</td>
                         <td className="py-3 px-4 text-gray-600">{employee.fun_email}</td>
@@ -784,9 +784,9 @@ const Employees: React.FC = () => {
                         ) : (
                           <td className="py-3 px-4 text-center">
                             {employee.pag_status === 'pago' ? (
-                              <Badge className="bg-green-100 text-green-800">Pago</Badge>
+                              <Badge className="bg-green-100 text-green-800 hover:bg-green-200">Pago</Badge>
                             ) : (
-                              <Badge className="bg-yellow-100 text-yellow-800">Pendente</Badge>
+                              <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-200">Pendente</Badge>
                             )}
                           </td>
                         )

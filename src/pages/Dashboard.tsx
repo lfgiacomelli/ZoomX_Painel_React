@@ -414,12 +414,12 @@ const Dashboard: React.FC = () => {
                         <strong>Usuário:</strong> {sol.usu_nome}
                       </p>
                     </div>
-                    {goToSolicitacoes()}
                   </li>
                 ))}
               </ul>
             </>
           )}
+          {solicitacoesPendentes.length > 0 ? goToSolicitacoes() : null}
         </CardContent>
       </Card>
 

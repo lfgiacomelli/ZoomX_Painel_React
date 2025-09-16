@@ -4,6 +4,8 @@ import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 
+import { SummaryCard } from '@/components/ui/summary-card';
+
 import {
   Card,
   CardContent,
@@ -12,13 +14,6 @@ import {
   CardTitle,
 } from '../components/ui/card';
 import { Button } from '../components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../components/ui/select';
 
 import {
   BarChart,
@@ -56,6 +51,7 @@ const useRelatorioData = (period: string, reportType: string) => {
   const [toast, setToast] = useState<ToastProps>({ visible: false, message: '', status: 'INFO' });
   const navigate = useNavigate();
   const [recusadas, setRecusadas] = useState<{ total: number }>({ total: 0 });
+  const [pixPayments, setPixPayments] = useState(0);
 
 
   useEffect(() => {
@@ -179,14 +175,33 @@ const useRelatorioData = (period: string, reportType: string) => {
     }
   }
 
+  async function fetchPixPayments(){
+    try {
+      const response = await fetch(`http://192.168.1.106:3000/api/admin/relatorios/pagamentos-pix`, {
+      // const response = await fetch(`${BASE_URL}/api/admin/relatorios/pagamentos-pix`, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+        },
+      });
+      if (!response.ok) throw new Error('Erro ao buscar total de pagamentos via Pix');
+      const result = await response.json();
+      console.log('Total de pagamentos via Pix:', result.total_pago_pix);
+      setPixPayments(result.total_pago_pix || 0);
+    } catch (error) {
+      setPixPayments(0);
+    }
+  }
+
   useEffect(() => {
+    fetchPixPayments();
     fetchCountDeliveries();
     fetchRecusadas();
   }, []);
 
 
 
-  return { data, loading, error, toast, setToast, countEntregas };
+  return { data, loading, error, toast, setToast, countEntregas, pixPayments  };
 };
 
 const ExportButtons = ({
@@ -259,33 +274,11 @@ const ExportButtons = ({
   );
 };
 
-const SummaryCard = ({
-  title,
-  value,
-  description,
-  descriptionColor = 'text-gray-600',
-}: {
-  title: string;
-  value: React.ReactNode;
-  description?: string;
-  descriptionColor?: string;
-}) => (
-  <Card className="zoomx-card">
-    <CardHeader className="pb-2">
-      <CardTitle className="text-sm font-medium">{title}</CardTitle>
-    </CardHeader>
-    <CardContent>
-      <div className="text-2xl font-bold text-black">{value}</div>
-      {description && <p className={`text-xs ${descriptionColor}`}>{description}</p>}
-    </CardContent>
-  </Card>
-);
-
 const Reports: React.FC = () => {
   const [period, setPeriod] = useState('month');
   const [reportType, setReportType] = useState('general');
 
-  const { data, loading, error, toast, setToast, countEntregas } = useRelatorioData(period, reportType);
+  const { data, loading, error, toast, setToast, countEntregas, pixPayments } = useRelatorioData(period, reportType);
   const [recusadas, setRecusadas] = useState<{ total: number }>({ total: 0 });
 
   useEffect(() => {
@@ -374,23 +367,23 @@ const Reports: React.FC = () => {
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-6 gap-6">
         <SummaryCard
-          title="Total de Corridas"
+          title="Corridas"
           value={data.corridas.total}
           description={`Finalizadas: ${data.corridas.finalizadas} | Canceladas: ${data.corridas.canceladas}`}
           descriptionColor="text-green-600"
         />
 
         <SummaryCard
-          title="Total de Entregas"
+          title="Entregas"
           value={countEntregas}
           description="Total de entregas realizadas"
           descriptionColor="text-gray-600"
         />
 
         <SummaryCard
-          title="Total de Solicitações Recusadas"
+          title="Solicitações Recusadas"
           value={recusadas.total > 0 ? `${recusadas.total}` : "Sem dados disponíveis"}
           description={recusadas.total > 0 ? `Solicitações recusadas: ${recusadas.total}` : "Sem dados disponíveis"}
           descriptionColor="text-red-600"
@@ -408,6 +401,11 @@ const Reports: React.FC = () => {
           title="Usuários Ativos"
           value={data.usuarios.ativos}
           description={`Total usuários: ${data.usuarios.total}`}
+        />
+        <SummaryCard
+          title="Recebido via Pix"
+          value={`R$ ${pixPayments.toFixed(2)}`}
+          description="Total de pagamentos recebidos Pix"
         />
       </div>
 

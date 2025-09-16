@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { format, isSameDay, parseISO } from "date-fns";
+import { format, isSameDay, parseISO, set } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import {
   Card,
@@ -18,7 +18,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, MapPin, Calendar, DollarSign, CreditCard, Bike } from "lucide-react";
+import { Loader2, MapPin, Calendar, DollarSign, CreditCard, Bike, Star } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -48,6 +48,7 @@ export default function EmployeeTrips() {
   const navigate = useNavigate();
   const [toast, setToast] = useState<ToastProps>({ visible: false, message: "", status: "INFO" });
   const [filterDate, setFilterDate] = useState<string>("");
+  const [notaMedia, setNotaMedia] = useState<number | null>(null);
 
   useEffect(() => {
     if (!funCodigo) return;
@@ -80,6 +81,28 @@ export default function EmployeeTrips() {
       }
     };
 
+    async function fetchAverageGrade() {
+      try {
+        const response = await fetch(`
+          https://backend-turma-a-2025.onrender.com/api/admin/funcionarios/nota-media/${funCodigo}
+          `, {
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        if (handleAuthError(response, setToast, navigate)) return;
+
+        const data = await response.json();
+        setNotaMedia(data.nota_media);
+        console.log(notaMedia);
+        console.log("Média de notas:", data);
+      } catch (error) {
+        console.error("Erro ao buscar média de notas:", error);
+      }
+    }
+
+    fetchAverageGrade();
     fetchTrips();
   }, [funCodigo]);
 
@@ -116,6 +139,25 @@ export default function EmployeeTrips() {
 
   const fun_nome = trips[0].fun_nome;
 
+
+  const NotaEstrelas = ({ notaMedia }: { notaMedia: number }) => {
+    const estrelas = Array.from({ length: 5 }, (_, i) => i < Math.round(notaMedia));
+
+    return (
+      <p className="flex flex-col items-start text-lg text-yellow-700">
+        <span>Nota média dos clientes: {notaMedia}</span>
+        <div className="flex mt-1">
+          {estrelas.map((cheia, i) => (
+            <Star
+              key={i}
+              className={`h-5 w-5 ${cheia ? "text-yellow-500" : "text-gray-300"}`}
+            />
+          ))}
+        </div>
+      </p>
+    );
+  };
+
   return (
     <div className="space-y-6">
       {toast.visible && (
@@ -131,6 +173,7 @@ export default function EmployeeTrips() {
         <p className="text-sm text-muted-foreground">
           Todas as viagens realizadas pelo funcionário #{funCodigo}
         </p>
+        <NotaEstrelas notaMedia={notaMedia ?? 0} />
       </div>
 
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">

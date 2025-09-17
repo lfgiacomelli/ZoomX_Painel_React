@@ -113,11 +113,11 @@ const LimitedDashboard: FC = () => {
   const generateMapsLink = (origin: string, destination?: string) => {
     if (destination) {
       return `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(
-        origin
-      )}&destination=${encodeURIComponent(destination)}`;
+        origin + "Presidente Venceslau - SP"
+      )}&destination=${encodeURIComponent(destination + "Presidente Venceslau - SP")}`;
     }
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-      origin
+      origin + "Presidente Venceslau - SP"
     )}`;
   };
   async function fetchPaymentData() {

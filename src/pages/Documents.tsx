@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import ToastMessage from "@/components/layout/ToastMessage";
 import { ToastProps } from "@/types/toast";
 import { Loading } from "@/components/ui/loading";
+import WithoutData from "@/components/ui/without-data";
 
 type DocumentoFuncionario = {
   fun_codigo: number;
@@ -100,7 +101,7 @@ export default function Documents() {
       {loading ? (
         <p className="text-gray-500">Carregando documentos...</p>
       ) : documents.length === 0 ? (
-        <p className="text-gray-500">Nenhum documento encontrado.</p>
+        <WithoutData message="Não há documentos para exibir!" />
       ) : (
         <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
           {documents.map((doc) => (

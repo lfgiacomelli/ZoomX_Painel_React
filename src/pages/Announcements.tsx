@@ -16,6 +16,7 @@ import noDataAnimation from '@/assets/animations/no_data.json';
 
 import { ToastProps } from "@/types/toast";
 import Lottie from 'lottie-react';
+import WithoutData from '@/components/ui/without-data';
 
 
 const Announcements: React.FC = () => {
@@ -192,17 +193,8 @@ const Announcements: React.FC = () => {
   };
   if (anuncios.length === 0 && !isLoading) {
     return (
-      <div className="space-y-6 flex flex-col items-center justify-center">
-        <h1 className="text-3xl font-righteous text-black">Anúncios</h1>
-        <Lottie animationData={noDataAnimation} loop style={{ width: 400, height: 300, justifyContent: 'center', alignItems: 'center' }} />
-        <p className="text-center" style={{ fontSize: '1.25rem' }}>Nenhum anúncio encontrado.</p>
-        <div className="flex justify-center">
-          <Button className="zoomx-button mt-4" onClick={handleNew}>
-            <Plus className="w-4 h-4 mr-2" />
-            Novo anúncio
-          </Button>
-        </div>
-
+      <>
+        <WithoutData message="Nenhum anúncio encontrado" buttonLabel="Criar novo anúncio" onButtonClick={handleNew} />  
         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
           <DialogContent className="sm:max-w-[600px]">
             <DialogHeader>
@@ -265,7 +257,7 @@ const Announcements: React.FC = () => {
             </form>
           </DialogContent>
         </Dialog>
-      </div>
+      </>
     );
   }
   if (isLoading) {

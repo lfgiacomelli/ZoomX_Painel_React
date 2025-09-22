@@ -14,11 +14,8 @@ export default function Footer() {
           <div>
             <h2 className="text-lg font-semibold mb-4 font-righteous">Links úteis</h2>
             <ul className="space-y-2 text-sm">
-              <li><a href="/" className="hover:text-white transition">Início</a></li>
-              <li><a href="/conta" className="hover:text-white transition">Minha Conta</a></li>
-              <li><a href="/suporte" className="hover:text-white transition">Suporte</a></li>
-              <li><a href="/politica-privacidade" className="hover:text-white transition">Privacidade</a></li>
-              <li><a href="/termos" className="hover:text-white transition">Termos de Uso</a></li>
+              <li><a href="#" className="hover:text-white transition">Início</a></li>
+              <li><a href="/login" className="hover:text-white transition">Minha Conta</a></li>
             </ul>
           </div>
 

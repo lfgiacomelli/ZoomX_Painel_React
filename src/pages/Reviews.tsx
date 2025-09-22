@@ -194,7 +194,7 @@ const Reviews: React.FC = () => {
                       <th className="px-4 py-2 font-righteous">Nota</th>
                       <th className="px-4 py-2 font-righteous">Comentário</th>
                       <th className="px-4 py-2 font-righteous">Usuário</th>
-                      <th className="px-4 py-2 font-righteous">Viagem (Código)</th>
+                      <th className="px-4 py-2 font-righteous text-center">Viagem (Código)</th>
                       <th className="px-4 py-2 font-righteous">Data da Avaliação</th>
                     </tr>
                   </thead>
@@ -208,10 +208,8 @@ const Reviews: React.FC = () => {
                         <td className="px-4 py-2">
                           {review.usu_nome ? `${review.usu_nome} (ID: ${review.usu_codigo})` : `Usuário ID: ${review.usu_codigo}`}
                         </td>
-                        <td className="px-4 py-2">
-                          {review.via_origem && review.via_destino
-                            ? `${review.via_origem} para ${review.via_destino} (ID: ${review.via_codigo})`
-                            : `Viagem ID: ${review.via_codigo}`}
+                        <td className="px-4 py-2 text-center">
+                          ID: {review.via_codigo}
                         </td>
                         <td className="px-4 py-2">
                           {new Date(review.ava_data_avaliacao).toLocaleString('pt-BR')}

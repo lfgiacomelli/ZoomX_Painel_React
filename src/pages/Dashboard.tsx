@@ -295,7 +295,7 @@ const Dashboard: React.FC = () => {
 
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="zoomx-card">
+        <Card className="zoomx-card shadow-xl">
           <CardHeader className="flex flex-row items-center justify-center space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total de Corridas Finalizadas</CardTitle>
           </CardHeader>
@@ -315,7 +315,7 @@ const Dashboard: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="zoomx-card">
+        <Card className="zoomx-card shadow-xl">
           <CardHeader className="flex flex-row items-center justify-center space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-center">Total de Avaliações</CardTitle>
           </CardHeader>
@@ -323,7 +323,7 @@ const Dashboard: React.FC = () => {
             {loadingContador ? (
               <div className="text-2xl text-black text-center">Atualizando...</div>
             ) : (
-              <div className="text-2xl text-black text-center">
+              <div className="text-2xl text-black text-center text-yellow-600">
                 {totalAvaliacoes !== null ? totalAvaliacoes : 'N/A'}
               </div>
             )}
@@ -338,7 +338,7 @@ const Dashboard: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="zoomx-card">
+        <Card className="zoomx-card shadow-xl">
           <CardHeader className="flex flex-row items-center justify-center space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-center">Faturamento do dia</CardTitle>
           </CardHeader>
@@ -347,9 +347,8 @@ const Dashboard: React.FC = () => {
               {loadingContador ? (
                 <div className="text-2xl text-black text-center">Atualizando...</div>
               ) : (
-                <div className="text-2xl text-black text-center">
+                <div className="text-2xl text-black text-center text-green-600">
                   {faturamento ? `R$ ${parseFloat(faturamento.faturamento_diario).toFixed(2)}` : 'N/A'}
-
                 </div>
               )}
               <Link to="/relatorios" aria-label="Ver relatório">
@@ -364,7 +363,7 @@ const Dashboard: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="zoomx-card">
+        <Card className="zoomx-card shadow-xl">
           <CardHeader className="flex flex-row items-center justify-center space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Mototáxistas disponíveis</CardTitle>
           </CardHeader>
@@ -385,7 +384,7 @@ const Dashboard: React.FC = () => {
       </div>
       {cargo === "gerente" && <DocumentAlert />}
       {cargo !== "gerente" && cargo !== "atendente" && <MessageNotManager />}
-      <Card className="zoomx-card">
+      <Card className="zoomx-card shadow-md">
         <CardHeader>
           <CardTitle className="font-righteous">Solicitações Pendentes</CardTitle>
           <CardDescription>Solicitações que ainda não foram atendidas</CardDescription>
@@ -425,7 +424,7 @@ const Dashboard: React.FC = () => {
 
       ---
 
-      <Card className="zoomx-card">
+      <Card className="zoomx-card shadow-md">
         <CardHeader>
           <CardTitle className="font-righteous">Viagens em Andamento</CardTitle>
           <CardDescription>Viagens que estão atualmente em andamento</CardDescription>

@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import { Pagination } from '../components/ui/pagination';
 import { Loading } from '../components/ui/loading';
@@ -17,7 +17,6 @@ import { useNavigate } from 'react-router-dom';
 import { ToastProps } from '@/types/toast';
 import { Motorcycle } from '@/types/motorcycle';
 import { ThreeDot } from 'react-loading-indicators';
-
 
 type FuncionarioProps = {
   fun_codigo: number;
@@ -42,12 +41,17 @@ const Motorcycles: React.FC = () => {
   const [color, setColor] = useState('');
   const [employeeCode, setEmployeeCode] = useState<number | ''>('');
   const [refreshEmployees, setRefreshEmployees] = useState(0);
+
+  const [isModalDeleteOpen, setIsModalDeleteOpen] = useState(false);
+  const [motorcycleToDelete, setMotorcycleToDelete] = useState<Partial<Motorcycle> | null>(null);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+
   const navigate = useNavigate();
 
   const [toast, setToast] = useState<ToastProps>({ visible: false, message: "", status: "INFO" });
 
-
   const itemsPerPage = 10;
+
   function validarPlaca(placa: string) {
     const regexAntigo = /^[A-Z]{3}[0-9]{4}$/i;
     const regexMercosul = /^[A-Z]{3}[0-9][A-Z][0-9]{2}$/i;
@@ -78,7 +82,6 @@ const Motorcycles: React.FC = () => {
       }
 
       setFuncionarios(Array.isArray(data) ? data : []);
-
     } catch (error: any) {
       console.error('Erro ao buscar funcionários:', error);
       setToast({
@@ -91,8 +94,6 @@ const Motorcycles: React.FC = () => {
     }
   }
 
-
-
   async function fetchMotorcycles() {
     setLoading(true);
     try {
@@ -102,6 +103,7 @@ const Motorcycles: React.FC = () => {
           'Authorization': `Bearer ${localStorage.getItem('token') || ''}`,
         },
       });
+
       if (handleAuthError(response, setToast, navigate)) return;
 
       if (!response.ok) {
@@ -117,7 +119,6 @@ const Motorcycles: React.FC = () => {
 
       const data: Motorcycle[] = await response.json();
       setMotorcycles(data);
-
     } catch (error: any) {
       console.error('Erro ao buscar motocicletas:', error);
       setToast({
@@ -166,7 +167,6 @@ const Motorcycles: React.FC = () => {
       await fetchMotorcycles();
 
       setRefreshEmployees(prev => prev + 1);
-
     } catch (error: any) {
       console.error('Erro ao adicionar motocicleta:', error);
       setToast({
@@ -214,7 +214,6 @@ const Motorcycles: React.FC = () => {
       });
 
       await fetchMotorcycles();
-
     } catch (error: any) {
       console.error('Erro ao atualizar motocicleta:', error);
       setToast({
@@ -228,11 +227,7 @@ const Motorcycles: React.FC = () => {
   }
 
   async function deleteMotorcycle(motorcycleId: number) {
-    if (!confirm('Tem certeza que deseja excluir esta motocicleta? Esta ação é irreversível.')) {
-      return;
-    }
-
-    setLoading(true);
+    setConfirmLoading(true);
     try {
       const response = await fetch(`${BASE_URL}/api/admin/motocicletas/excluir/${motorcycleId}`, {
         method: 'DELETE',
@@ -255,7 +250,6 @@ const Motorcycles: React.FC = () => {
 
       await response.json();
 
-      await fetchMotorcycles();
       setToast({
         visible: true,
         message: 'Motocicleta excluída com sucesso!',
@@ -263,7 +257,6 @@ const Motorcycles: React.FC = () => {
       });
 
       await fetchMotorcycles();
-
     } catch (error: any) {
       console.error('Erro ao excluir motocicleta:', error);
       setToast({
@@ -272,18 +265,16 @@ const Motorcycles: React.FC = () => {
         status: 'ERROR',
       });
     } finally {
-      setLoading(false);
+      setConfirmLoading(false);
+      setIsModalDeleteOpen(false);
+      setMotorcycleToDelete(null);
     }
   }
-
-
 
   useEffect(() => {
     fetchMotorcycles();
     listarFuncionarios();
   }, []);
-
-
 
   const filteredMotorcycles = motorcycles.filter(motorcycle => {
     const brandMatch = brandFilter === 'all' || motorcycle.mot_modelo.toLowerCase().includes(brandFilter.toLowerCase());
@@ -303,7 +294,6 @@ const Motorcycles: React.FC = () => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-
 
   const handleNewMotorcycleClick = () => {
     setEditingMotorcycle(null);
@@ -343,15 +333,31 @@ const Motorcycles: React.FC = () => {
       fun_codigo: employeeCode === '' || employeeCode === 0 ? null : Number(employeeCode),
     };
 
-    console.log('Dados enviados:', motorcycleData);
-
-    if (editingMotorcycle?.mot_codigo) {
-      await updateMotorcycle(editingMotorcycle.mot_codigo, motorcycleData);
-    } else {
-      await addMotorcycle(motorcycleData);
+    try {
+      if (editingMotorcycle?.mot_codigo) {
+        await updateMotorcycle(editingMotorcycle.mot_codigo, motorcycleData);
+      } else {
+        await addMotorcycle(motorcycleData);
+      }
+      setIsModalOpen(false);
+      setEditingMotorcycle(null);
+    } catch (err) {
+      setToast({
+        visible: true,
+        message: editingMotorcycle.mot_codigo ? "Erro ao atualizar motocicleta!" : "Erro ao cadastrar motocicleta!",
+        status: 'ERROR',
+      });
     }
-    setIsModalOpen(false);
-    setEditingMotorcycle(null);
+  };
+
+  const openDeleteModal = (motorcycle: Motorcycle) => {
+    setMotorcycleToDelete(motorcycle);
+    setIsModalDeleteOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!motorcycleToDelete?.mot_codigo) return;
+    await deleteMotorcycle(motorcycleToDelete.mot_codigo);
   };
 
   return (
@@ -363,8 +369,10 @@ const Motorcycles: React.FC = () => {
           onHide={() => setToast({ ...toast, visible: false })}
         />
       )}
+
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-righteous text-black">Motocicletas</h1>
+
         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
           <DialogTrigger asChild>
             <Button className="zoomx-button" onClick={handleNewMotorcycleClick}>
@@ -372,6 +380,7 @@ const Motorcycles: React.FC = () => {
               Nova Motocicleta
             </Button>
           </DialogTrigger>
+
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
               <DialogTitle className="font-righteous">
@@ -381,6 +390,7 @@ const Motorcycles: React.FC = () => {
                 Preencha os dados da motocicleta abaixo.
               </DialogDescription>
             </DialogHeader>
+
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -403,16 +413,17 @@ const Motorcycles: React.FC = () => {
                   />
                 </div>
               </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium">Ano</label>
                   <Input
                     type="number"
-                    min="2000"
+                    min={2000}
                     max={new Date().getFullYear()}
                     className="zoomx-input"
                     value={year}
-                    onChange={(e) => setYear(Number(e.target.value))}
+                    onChange={(e) => setYear(e.target.value === '' ? '' : Number(e.target.value))}
                     required
                   />
                 </div>
@@ -426,30 +437,34 @@ const Motorcycles: React.FC = () => {
                   />
                 </div>
               </div>
+
               <div>
                 <label className="text-sm font-medium">Proprietário</label>
-                {funcionarios.length === 0 ? <p className="text-sm text-gray-500">Nenhum funcionário disponível sem motocicleta.</p> :
+                {funcionarios.length === 0 ? (
+                  <p className="text-sm text-gray-500">Nenhum funcionário disponível sem motocicleta.</p>
+                ) : (
                   <Select
-                  value={employeeCode === '' ? '' : String(employeeCode)}
-                  onValueChange={(value) => setEmployeeCode(value === '' ? '' : Number(value))}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione um funcionário">
-                      {employeeCode &&
-                        funcionarios.find(f => String(f.fun_codigo) === String(employeeCode))?.fun_nome}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {funcionarios.map((funcionario) => (
-                      <SelectItem
-                        key={funcionario.fun_codigo}
-                        value={String(funcionario.fun_codigo)}
-                      >
-                        {funcionario.fun_nome}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>}
+                    value={employeeCode === '' ? '' : String(employeeCode)}
+                    onValueChange={(value) => setEmployeeCode(value === '' ? '' : Number(value))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione um funcionário">
+                        {employeeCode &&
+                          funcionarios.find(f => String(f.fun_codigo) === String(employeeCode))?.fun_nome}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {funcionarios.map((funcionario) => (
+                        <SelectItem
+                          key={funcionario.fun_codigo}
+                          value={String(funcionario.fun_codigo)}
+                        >
+                          {funcionario.fun_nome}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
               </div>
 
               <div className="flex justify-end space-x-2">
@@ -469,10 +484,46 @@ const Motorcycles: React.FC = () => {
             </form>
           </DialogContent>
         </Dialog>
+
+        <Dialog open={isModalDeleteOpen} onOpenChange={setIsModalDeleteOpen}>
+          <DialogContent className="sm:max-w-[480px]">
+            <DialogHeader>
+              <DialogTitle>Confirmar Exclusão</DialogTitle>
+              <DialogDescription>
+                Tem certeza que deseja excluir esta motocicleta? Essa ação é irreversível.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="mt-4">
+              <p className="text-sm text-gray-700">
+                <strong>Modelo:</strong> {motorcycleToDelete?.mot_modelo || '—'}
+              </p>
+              <p className="text-sm text-gray-700">
+                <strong>Placa:</strong> {motorcycleToDelete?.mot_placa || '—'}
+              </p>
+            </div>
+
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsModalDeleteOpen(false)}>
+                Cancelar
+              </Button>
+
+              {confirmLoading ? (
+                <Button variant="destructive" disabled>
+                  <ThreeDot color="white" size='small' />
+                </Button>
+              ) : (
+                <Button className="bg-red-600 hover:bg-red-700 text-white" onClick={handleConfirmDelete}>
+                  Confirmar exclusão
+                </Button>
+              )}
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
 
-      ---
       <EmployeesWithoutMotorcycles key={refreshEmployees} />
+
       <Card className="zoomx-card">
         <CardHeader>
           <CardTitle className="font-righteous">Filtros</CardTitle>
@@ -517,8 +568,6 @@ const Motorcycles: React.FC = () => {
         </CardContent>
       </Card>
 
-      ---
-
       <Card className="zoomx-card">
         <CardHeader>
           <CardTitle className="font-righteous">Lista de Motocicletas</CardTitle>
@@ -527,68 +576,90 @@ const Motorcycles: React.FC = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-
           {loading ? (
-            <Loading text='Carregando motocicletas...' />
+            <Loading text="Carregando motocicletas..." />
           ) : (
             <>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-gray-200">
-                      <th className="text-left py-3 px-4 font-righteous">Modelo</th>
-                      <th className="text-left py-3 px-4 font-righteous">Placa</th>
-                      <th className="text-left py-3 px-4 font-righteous">Ano</th>
-                      <th className="text-left py-3 px-4 font-righteous">Cor</th>
-                      <th className="text-left py-3 px-4 font-righteous">Dono</th>
-                      <th className="text-center py-3 px-4 font-righteous">Ações</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {paginatedMotorcycles.map((motorcycle) => (
-                      <tr key={motorcycle.mot_codigo} className="border-b border-gray-100 hover:bg-gray-50">
-                        <td className="py-3 px-4 font-medium">{motorcycle.mot_modelo}</td>
-                        <td className="py-3 px-4">{motorcycle.mot_placa}</td>
-                        <td className="py-3 px-4">{motorcycle.mot_ano}</td>
-                        <td className="py-3 px-4">{motorcycle.mot_cor}</td>
-                        <td className="py-3 px-4">{motorcycle.fun_nome}</td>
-                        <td className="py-3 px-4">
-                          <div className="flex justify-center space-x-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleEdit(motorcycle)}
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => deleteMotorcycle(motorcycle.mot_codigo)}
-                              className="text-red-600 hover:text-red-700"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              {filteredMotorcycles.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                  {paginatedMotorcycles.map((motorcycle) => (
+                    <div
+                      key={motorcycle.mot_codigo}
+                      className="bg-white rounded-xl border border-gray-200 p-6 flex flex-col w-full"
+                    >
+                      <div className="flex items-start justify-between mb-4">
+                        <h3 className="text-base font-semibold text-gray-900 truncate">
+                          {motorcycle.mot_modelo}
+                        </h3>
+                        <span
+                          className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${motorcycle.fun_codigo
+                              ? "bg-red-100 text-red-700"
+                              : "bg-green-100 text-green-700"
+                            }`}
+                        >
+                          {motorcycle.fun_codigo ? "Em uso" : "Disponível"}
+                        </span>
+                      </div>
 
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={setCurrentPage}
-              />
+                      <dl className="text-sm text-gray-700 space-y-2 flex-1">
+                        <div className="flex justify-between">
+                          <dt className="font-medium text-gray-500">Placa</dt>
+                          <dd>{motorcycle.mot_placa}</dd>
+                        </div>
+                        <div className="flex justify-between">
+                          <dt className="font-medium text-gray-500">Ano</dt>
+                          <dd>{motorcycle.mot_ano}</dd>
+                        </div>
+                        <div className="flex justify-between">
+                          <dt classkwName="font-medium text-gray-500">Cor</dt>
+                          <dd>{motorcycle.mot_cor}</dd>
+                        </div>
+                        <div className="flex justify-between">
+                          <dt className="font-medium text-gray-500">Dono</dt>
+                          <dd>{motorcycle.fun_nome || "—"}</dd>
+                        </div>
+                      </dl>
+
+                      <div className="flex justify-end gap-2 mt-5">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="rounded-full px-3 py-1 text-gray-600 hover:bg-gray-100"
+                          onClick={() => handleEdit(motorcycle)}
+                          aria-label={`Editar ${motorcycle.mot_modelo}`}
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="rounded-full px-3 py-1 text-gray-600 hover:bg-gray-100"
+                          onClick={() => openDeleteModal(motorcycle)}
+                          aria-label={`Excluir ${motorcycle.mot_modelo}`}
+                        >
+                          <Trash2 className="w-4 h-4 text-red-600" />
+                        </Button>
+                      </div>
+                    </div>
+
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center text-gray-500 py-6 text-sm">
+                  Nenhuma motocicleta encontrada.
+                </div>
+              )}
+
+              <div className="mt-6 flex justify-center">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                />
+              </div>
             </>
           )}
-          {
-            filteredMotorcycles.length === 0 && !loading && (
-              <div className="text-center text-gray-500 py-4">Nenhuma motocicleta encontrada.</div>
-            )
-          }
         </CardContent>
       </Card>
     </div>

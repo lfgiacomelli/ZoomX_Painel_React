@@ -436,29 +436,29 @@ const Employees: React.FC = () => {
       )}
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-righteous text-black">Funcionários</h1>
-        <Dialog open={isModalDeleteOpen} onOpenChange={setIsModalDeleteOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Confirmar Demissão</DialogTitle>
-            </DialogHeader>
-            <p>Tem certeza que deseja demitir este funcionário?</p>
-            <p className="text-sm text-gray-500">Esta ação não pode ser desfeita. Ao confirmar, todos os dados do funcionário serão excluídos de forma permanente.</p>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsModalDeleteOpen(false)}>
-                Cancelar
-              </Button>
-              {confirmLoading ? (
-                <Button variant="destructive" disabled onClick={handleConfirmDelete}>
-                  <ThreeDot color="white" size='small' />
+          <Dialog open={isModalDeleteOpen} onOpenChange={setIsModalDeleteOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Confirmar Demissão</DialogTitle>
+              </DialogHeader>
+              <p>Tem certeza que deseja demitir este funcionário?</p>
+              <p className="text-sm text-gray-500">Esta ação não pode ser desfeita. Ao confirmar, todos os dados do funcionário serão excluídos de forma permanente.</p>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setIsModalDeleteOpen(false)}>
+                  Cancelar
                 </Button>
-              ) : (
-                <Button className="bg-red-600 hover:bg-red-700 text-white" onClick={handleConfirmDelete}>
-                  Confirmar Demissão
-                </Button>
-              )}
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+                {confirmLoading ? (
+                  <Button variant="destructive" disabled onClick={handleConfirmDelete}>
+                    <ThreeDot color="white" size='small' />
+                  </Button>
+                ) : (
+                  <Button className="bg-red-600 hover:bg-red-700 text-white" onClick={handleConfirmDelete}>
+                    Confirmar Demissão
+                  </Button>
+                )}
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
           <DialogTrigger asChild>
             <Button

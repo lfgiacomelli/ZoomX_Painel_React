@@ -10,6 +10,8 @@ import { Loading } from '../components/ui/loading';
 import ToastMessage from '@/components/layout/ToastMessage';
 import EmployeesWithoutMotorcycles from '@/components/layout/EmployeesWithoutBike';
 
+import icon from '@/assets/icon.png';
+
 import { handleAuthError } from '@/utils/handleAuthError';
 
 import { useNavigate } from 'react-router-dom';
@@ -593,8 +595,8 @@ const Motorcycles: React.FC = () => {
                         </h3>
                         <span
                           className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${motorcycle.fun_codigo
-                              ? "bg-red-100 text-red-700"
-                              : "bg-green-100 text-green-700"
+                            ? "bg-red-100 text-red-700"
+                            : "bg-green-100 text-green-700"
                             }`}
                         >
                           {motorcycle.fun_codigo ? "Em uso" : "Disponível"}
@@ -611,7 +613,7 @@ const Motorcycles: React.FC = () => {
                           <dd>{motorcycle.mot_ano}</dd>
                         </div>
                         <div className="flex justify-between">
-                          <dt classkwName="font-medium text-gray-500">Cor</dt>
+                          <dt className="font-medium text-gray-500">Cor</dt>
                           <dd>{motorcycle.mot_cor}</dd>
                         </div>
                         <div className="flex justify-between">

@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { EllipsisVertical, Upload, Image, Loader2, Route } from "lucide-react";
+import { EllipsisVertical, Upload, Image, Loader2, Route, AlertCircleIcon, Check, CheckCheckIcon } from "lucide-react";
 import example from '@/assets/example_cnh.png';
 import ToastMessage from "./ToastMessage";
 
@@ -204,9 +204,12 @@ export function ActionMenu({ funCodigo, funDocumento, onFotoAtualizada, disabled
             size="sm"
             variant="outline"
             className="hover:bg-gray-100"
-            disabled={disabled} 
+            disabled={disabled}
           >
             <EllipsisVertical className="w-4 h-4" />
+            {funDocumento == null && !disabled &&(
+                <AlertCircleIcon className="h-2 w-2 text-yellow-500" />
+            )}
             <span className="sr-only">Ações</span>
           </Button>
         </DropdownMenuTrigger>
@@ -218,10 +221,11 @@ export function ActionMenu({ funCodigo, funDocumento, onFotoAtualizada, disabled
               if (!funDocumento && !disabled) setIsDialogOpen(true);
             }}
           >
-            {!funDocumento ? (
+            {funDocumento == null  ? (
               <>
                 <Upload className="mr-2 h-4 w-4" />
                 <span>Enviar CNH</span>
+                <AlertCircleIcon className="ml-auto h-4 w-4 text-red-500" />
               </>
             ) : (
               <>

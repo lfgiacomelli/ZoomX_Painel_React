@@ -428,6 +428,14 @@ const Dashboard: React.FC = () => {
         <CardHeader>
           <CardTitle className="font-righteous">Viagens em Andamento</CardTitle>
           <CardDescription>Viagens que estão atualmente em andamento</CardDescription>
+          {/* Botão principal */}
+            <Button
+              onClick={handleFinalizarTodas}
+              className="bg-yellow-500 text-white px-6 py-2 rounded-xl hover:bg-yellow-600 shadow-md hover:shadow-lg transition-all duration-300"
+              aria-label="Finalizar todas as viagens"
+            >
+              Finalizar todas
+            </Button>
         </CardHeader>
         <CardContent>
 
@@ -437,36 +445,57 @@ const Dashboard: React.FC = () => {
           ) : viagensPendentes.length === 0 ? (
             <p>Nenhuma viagem em andamento.</p>
           ) : (
-            <><Box sx={{ width: '100%' }}>
-              <LinearProgress color='warning' />
-            </Box>
-              <ul className="space-y-3 max-h-64 overflow-y-auto">
+            <>
+              <Box sx={{ width: '100%' }}>
+                <LinearProgress color='warning' />
+              </Box>
+              <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-h-[28rem] overflow-y-auto p-3">
                 {viagensPendentes.map((via) => (
                   <li
                     key={via.via_codigo}
-                    className="border border-gray-200 rounded p-3 hover:shadow"
+                    className="bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 p-5 flex flex-col justify-between"
                   >
-                    <p>
-                      <strong>Origem:</strong> {via.via_origem} | <strong>Destino:</strong> {via.via_destino} | <strong>Valor:</strong> R$ {parseFloat(via.via_valor).toFixed(2)} | <strong>Mototáxista:</strong> {via.funcionario_nome} | <strong>Usuário:</strong> {via.usuario_nome}
-                    </p>
+                    {/* Cabeçalho */}
+                    <div className="flex items-center justify-between border-b border-gray-100 pb-2 mb-3">
+                      <h3 className="text-gray-800 font-semibold text-lg">
+                        {via.via_origem} → {via.via_destino}
+                      </h3>
+                      <span className="text-sm font-medium text-yellow-600 bg-yellow-50 px-2 py-1 rounded-md">
+                        R$ {parseFloat(via.via_valor).toFixed(2)}
+                      </span>
+                    </div>
 
-                    {via.via_observacoes && (
+                    {/* Conteúdo */}
+                    <div className="space-y-1 text-sm text-gray-700">
                       <p>
-                        <strong>Observações:</strong> {via.via_observacoes}
+                        <strong>Mototáxista:</strong> {via.funcionario_nome}
                       </p>
-                    )}
+                      <p>
+                        <strong>Usuário:</strong> {via.usuario_nome}
+                      </p>
+
+                      {via.via_observacoes && (
+                        <p className="mt-2 text-gray-600 bg-gray-50 border border-gray-100 p-2 rounded-md text-xs">
+                          <strong>Observações:</strong> {via.via_observacoes}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Rodapé */}
+                    <div className="mt-4 flex justify-end">
+                      <button
+                        className="text-sm font-medium text-yellow-700 hover:text-yellow-800 hover:underline transition"
+                        onClick={() => console.log('Visualizar detalhes')}
+                      >
+                        Ver detalhes
+                      </button>
+                    </div>
                   </li>
                 ))}
-                <div className="mt-4">
-                  <Button
-                    onClick={handleFinalizarTodas}
-                    className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition"
-                    aria-label="Ver lista de solicitações"
-                  >
-                    Finalizar todas
-                  </Button>
-                </div>
+
+
               </ul>
+
             </>
           )}
         </CardContent>

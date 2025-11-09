@@ -342,7 +342,7 @@ const Travels: React.FC = () => {
                                                 <td className="px-4 py-2">
                                                     {travel.via_status === 'em andamento' ? (
                                                         <Button
-                                                            variant="outline"
+                                                            variant="alert"
                                                             onClick={() => handleFinalizar(travel.via_codigo)}
                                                         >
                                                             Finalizar

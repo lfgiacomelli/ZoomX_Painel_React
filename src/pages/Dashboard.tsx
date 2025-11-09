@@ -274,8 +274,21 @@ const Dashboard: React.FC = () => {
     }
   }
 
-
-
+  function renderButton() {
+    const todas = viagensPendentes.length;
+    if (todas === 0) {
+      return null;
+    }
+    return (
+      <Button
+        onClick={handleFinalizarTodas}
+        className="bg-yellow-500 text-white px-6 py-2 rounded-xl hover:bg-yellow-600 shadow-md hover:shadow-lg transition-all duration-300"
+        aria-label="Finalizar todas as viagens"
+      >
+        {loadingViagens ? 'Finalizando...' : `Finalizar ${viagensPendentes.length > 1 ? 'todas' : 'viagem'}`}
+      </Button>
+    );
+  }
   return (
     <div className="space-y-6">
       {toast.visible && (
@@ -421,21 +434,11 @@ const Dashboard: React.FC = () => {
           {solicitacoesPendentes.length > 0 ? goToSolicitacoes() : null}
         </CardContent>
       </Card>
-
-      ---
-
       <Card className="zoomx-card shadow-md">
         <CardHeader>
           <CardTitle className="font-righteous">Viagens em Andamento</CardTitle>
           <CardDescription>Viagens que estão atualmente em andamento</CardDescription>
-          {/* Botão principal */}
-            <Button
-              onClick={handleFinalizarTodas}
-              className="bg-yellow-500 text-white px-6 py-2 rounded-xl hover:bg-yellow-600 shadow-md hover:shadow-lg transition-all duration-300"
-              aria-label="Finalizar todas as viagens"
-            >
-              Finalizar todas
-            </Button>
+          {renderButton()}
         </CardHeader>
         <CardContent>
 
@@ -479,16 +482,6 @@ const Dashboard: React.FC = () => {
                           <strong>Observações:</strong> {via.via_observacoes}
                         </p>
                       )}
-                    </div>
-
-                    {/* Rodapé */}
-                    <div className="mt-4 flex justify-end">
-                      <button
-                        className="text-sm font-medium text-yellow-700 hover:text-yellow-800 hover:underline transition"
-                        onClick={() => console.log('Visualizar detalhes')}
-                      >
-                        Ver detalhes
-                      </button>
                     </div>
                   </li>
                 ))}

@@ -39,7 +39,7 @@ const baseMenuItems = [
   { title: 'Diárias', url: '/diarias', icon: BarChart2Icon },
   { title: 'Avaliações', url: '/avaliacoes', icon: Star },
   { title: 'Usuários', url: '/usuarios', icon: UserCog },
-  { title: 'Notificações', url: '/notificacoes', icon: Bell },
+  // { title: 'Notificações', url: '/notificacoes', icon: Bell },
   { title: 'Anúncios', url: '/anuncios', icon: Edit },
   { title: 'Relatórios', url: '/relatorios', icon: BarChart2Icon },
   { title: 'Conta', url: '/conta', icon: User },

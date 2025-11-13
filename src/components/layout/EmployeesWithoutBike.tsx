@@ -8,7 +8,6 @@ import {
 } from "../ui/card";
 import { LinearProgress } from "@mui/material";
 import ToastMessage from "./ToastMessage";
-
 import { TriangleAlert } from "lucide-react";
 import { handleAuthError } from "@/utils/handleAuthError";
 import { useNavigate } from "react-router-dom";
@@ -87,14 +86,20 @@ export default function EmployeesWithoutMotorcycles() {
         />
       )}
 
-      <Card className="border border-gray-200 shadow-none">
+      <Card className="border border-gray-200 shadow-none relative">
+        <div className="absolute top-3 right-3 animate-pulse">
+          <TriangleAlert className="w-6 h-6 text-red-600" />
+        </div>
+
         <CardHeader className="pb-3 border-b border-gray-100">
           <CardTitle className="text-xl font-medium text-gray-900">
             Mototaxistas sem Motocicleta
           </CardTitle>
           <CardDescription className="text-base text-gray-500">
-            Lista de mototaxistas sem motocicletas cadastradas
-            <span className="text-yellow-600 inline-flex items-center ml-1">
+            <span className="font-medium border-r border-gray-300 pr-2 mr-2">
+              Lista de mototaxistas sem motocicletas cadastradas
+            </span>
+            <span className="text-yellow-600 inline-flex items-center">
               <TriangleAlert className="w-4 h-4 mr-1" />
               Funcionários sem motocicleta cadastrada ficarão indisponíveis para
               novas solicitações até regularizarem essa pendência no sistema.
@@ -105,21 +110,18 @@ export default function EmployeesWithoutMotorcycles() {
         <CardContent className="pt-4">
           {loading ? (
             <div className="w-full">
-              <LinearProgress
-                color="inherit"
-                className="text-gray-200"
-              />
+              <LinearProgress color="inherit" className="text-gray-200" />
             </div>
           ) : (
             <ul className="divide-y divide-gray-100">
               {employeesWithoutMotorcycles.map((employee) => (
                 <li
                   key={employee.fun_codigo}
-                  className="py-3 first:pt-0 last:pb-0"
+                  className="py-3 first:pt-0 last:pb-0 border-b-2 border-gray-300 last:border-0"
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-base font-medium text-gray-900">
+                      <p className="text-base text-xl text-gray-900">
                         {employee.fun_nome}
                       </p>
                       <p className="text-xs text-gray-500 mt-1">

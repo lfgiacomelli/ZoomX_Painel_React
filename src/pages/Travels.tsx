@@ -190,9 +190,9 @@ const Travels: React.FC = () => {
     const getStatusBadge = (status: Travel['via_status']) => {
         switch (status) {
             case 'em andamento':
-                return <Badge className="bg-yellow-100 text-yellow-800">Andamento</Badge>;
+                return <Badge className="bg-yellow-100 text-yellow-800" >Andamento</Badge>;
             case 'finalizada':
-                return <Badge className="bg-green-100 text-green-800">Finalizada</Badge>;
+                return <Badge className="bg-green-100 text-green-800" variant='success'>Finalizada</Badge>;
             default:
                 return <Badge>{status}</Badge>;
         }

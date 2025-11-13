@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import {User2Icon} from 'lucide-react';
 
 export default function HomeHeader() {
   const navigate = useNavigate();
@@ -35,21 +36,15 @@ export default function HomeHeader() {
 
           <div className="flex items-center">
             <div className="hidden md:flex items-center space-x-4">
-              <a
-                onClick={() => navigate('/login')}
-                className="text-gray-700 hover:text-blue-600 text-sm font-medium transition-colors"
-              >
-                Entrar
-              </a>
-
-              <a onClick={() => navigate('/e-mail')}>
+              <a onClick={() => navigate('/login')}>
                 <button
                   type="button"
                   className="relative inline-flex items-center rounded-md bg-gradient-to-r from-blue-600 to-blue-500 px-4 py-2 text-sm font-medium text-white shadow-md
                              transition-all duration-300 hover:from-blue-700 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
                              active:scale-95 group"
                 >
-                  <span className="relative z-10">Contratar serviço</span>
+                  <User2Icon className="w-4 h-4 mr-2" />
+                  <span className="relative z-10">Entrar</span>
                   <span className="absolute inset-0 rounded-md bg-gradient-to-r from-blue-700 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
                 </button>
               </a>

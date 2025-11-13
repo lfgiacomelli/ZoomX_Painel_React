@@ -89,10 +89,10 @@ export default function DocumentAlert() {
                 <FileWarning className="h-5 w-5 text-yellow-600 mt-0.5" />
                 <div className="flex-1">
                     <AlertTitle className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
-                        Atenção: {count} {count === 1 ? 'funcionário' : 'funcionários'} {count === 1 ? 'está' : 'estão'} com pendências
+                        Atenção: {count} {count === 1 ? 'funcionário' : 'funcionários'} {count === 1 ? 'está' : 'estão'} com pendências na documentação
                     </AlertTitle>
                     <AlertDescription className="text-sm text-yellow-700 dark:text-yellow-300">
-                        Para finalizar o cadastro, envie a foto do funcionário segurando a CNH. Acesse a opção <strong>"Outros"</strong> na lista de funcionários para realizar o envio.
+                        Para finalizar o cadastro e regularizar a situação, envie a foto do funcionário segurando a CNH. Acesse a opção <strong>"Outros"</strong> na lista de funcionários para realizar o envio.
                     </AlertDescription>
 
                 </div>

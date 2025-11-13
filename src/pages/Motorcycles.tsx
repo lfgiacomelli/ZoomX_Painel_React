@@ -136,6 +136,8 @@ const Motorcycles: React.FC = () => {
 
   async function addMotorcycle(newMotorcycle: Omit<Motorcycle, 'mot_codigo' | 'fun_nome'>) {
     setLoading(true);
+    console.log("ativou")
+
     try {
       const response = await fetch(`${BASE_URL}/api/admin/motocicletas/adicionar`, {
         method: 'POST',
@@ -145,20 +147,27 @@ const Motorcycles: React.FC = () => {
         },
         body: JSON.stringify(newMotorcycle),
       });
+      console.log(newMotorcycle)
 
       if (!response.ok) {
-        let errorMessage = 'Erro ao adicionar motocicleta';
+        let message = 'Erro ao adicionar motocicleta';
+        console.error(message); 
         try {
-          const errorData = await response.json();
-          errorMessage = errorData.message || errorMessage;
+          const errData = await response.json();
+          message = errData.message || message;
         } catch { }
-
-        const error: any = new Error(errorMessage);
-        error.status = response.status;
-        throw error;
+        throw new Error(message);
       }
 
-      await response.json();
+      if (response.status !== 204) {
+        try {
+
+          
+          await response.json();
+          console.log("deu bom")
+        } catch {
+        }
+      }
 
       setToast({
         visible: true,
@@ -167,7 +176,6 @@ const Motorcycles: React.FC = () => {
       });
 
       await fetchMotorcycles();
-
       setRefreshEmployees(prev => prev + 1);
     } catch (error: any) {
       console.error('Erro ao adicionar motocicleta:', error);
@@ -178,8 +186,10 @@ const Motorcycles: React.FC = () => {
       });
     } finally {
       setLoading(false);
+      console.log("desativou")
     }
   }
+
 
   async function updateMotorcycle(
     motorcycleId: number,
@@ -604,20 +614,20 @@ const Motorcycles: React.FC = () => {
                       </div>
 
                       <dl className="text-sm text-gray-700 space-y-2 flex-1">
-                        <div className="flex justify-between">
+                        <div className="flex justify-between border-b pb-2">
                           <dt className="font-medium text-gray-500">Placa</dt>
                           <dd>{motorcycle.mot_placa}</dd>
                         </div>
-                        <div className="flex justify-between">
+                        <div className="flex justify-between border-b pb-2">
                           <dt className="font-medium text-gray-500">Ano</dt>
                           <dd>{motorcycle.mot_ano}</dd>
                         </div>
-                        <div className="flex justify-between">
+                        <div className="flex justify-between border-b pb-2">
                           <dt className="font-medium text-gray-500">Cor</dt>
                           <dd>{motorcycle.mot_cor}</dd>
                         </div>
-                        <div className="flex justify-between">
-                          <dt className="font-medium text-gray-500">Dono</dt>
+                        <div className="flex justify-between border-b pb-2">
+                          <dt className="font-medium text-gray-500">Proprietário</dt>
                           <dd>{motorcycle.fun_nome || "—"}</dd>
                         </div>
                       </dl>

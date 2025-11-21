@@ -9,10 +9,9 @@ import {
   Clock,
   Zap,
   Globe,
-  Loader2
+  Loader2,
+  Smartphone
 } from 'lucide-react';
-
-
 import { Button } from '@/components/ui/button';
 import mockup from '../assets/mockup_app.png';
 import HomeHeader from '@/components/layout/HomeHeader';
@@ -22,11 +21,12 @@ import { useState } from 'react';
 
 export default function Home() {
   const isAndroid = /Android/i.test(navigator.userAgent);
+
   const [isDownloading, setIsDownloading] = useState(false);
 
   const handleInstallApp = async () => {
     try {
-      setIsDownloading(true); // Inicia animação
+      setIsDownloading(true);
 
       const response = await fetch("https://backend-turma-a-2025.onrender.com/api/downloads/app");
 
@@ -46,10 +46,9 @@ export default function Home() {
       console.error(error);
       alert("Não foi possível realizar o download.");
     } finally {
-      setIsDownloading(false); // Finaliza animação
+      setIsDownloading(false);
     }
   };
-
 
   const navigate = useNavigate();
   const [heroRef, heroInView] = useInView({ triggerOnce: true, threshold: 0.1 });
@@ -128,42 +127,59 @@ export default function Home() {
 
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
-                animate={heroInView ? {
-                  opacity: 1, y: 0,
-                  transition: { delay: 0.6, duration: 0.8, ease: [0.16, 1, 0.3, 1] }
-                } : {}}
-                className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4 pt-4"
+                animate={
+                  heroInView
+                    ? {
+                      opacity: 1,
+                      y: 0,
+                      transition: { delay: 0.6, duration: 0.8, ease: [0.16, 1, 0.3, 1] },
+                    }
+                    : {}
+                }
+                className="flex flex-col items-center lg:items-start gap-4 pt-4"
               >
-                <Button onClick={handleAccessPanel} className="px-8 py-5 text-lg font-medium rounded-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white transition-all duration-300 shadow-lg hover:shadow-xl group">
-                  <span className="mr-3">ACESSAR PAINEL</span>
-                  <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-                </Button>
-                <Button
-                  onClick={handleInstallApp}
-                  disabled={isDownloading}
-                  className={`px-8 py-5 text-lg font-medium rounded-full transition-all duration-300 shadow-lg hover:shadow-xl group 
-    ${isDownloading ? "bg-gray-400 cursor-not-allowed" : "bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white"}
-  `}
-                >
-                  {isDownloading ? (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 0.3 }}
-                      className="flex items-center gap-2"
-                    >
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      BAIXANDO...
-                    </motion.div>
-                  ) : (
-                    <>
-                      <span className="mr-3">INSTALAR APP</span>
-                      <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-                    </>
-                  )}
-                </Button>
+                <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
+                  <Button
+                    onClick={handleAccessPanel}
+                    className="px-8 py-5 text-lg font-medium rounded-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white transition-all duration-300 shadow-lg hover:shadow-xl group"
+                  >
+                    <span className="mr-3">ACESSAR PAINEL</span>
+                    <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                  </Button>
+                  <Button
+                    onClick={handleInstallApp}
+                    disabled={isDownloading}
+                    className={`px-8 py-5 text-lg font-medium rounded-full transition-all duration-300 shadow-lg hover:shadow-xl group 
+        ${isDownloading
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white"
+                      }
+      `}
+                  >
+                    {isDownloading ? (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.3 }}
+                        className="flex items-center gap-2"
+                      >
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        BAIXANDO...
+                      </motion.div>
+                    ) : (
+                      <>
+                        <span className="mr-3">INSTALAR APP</span>
+                        <Smartphone className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                      </>
+                    )}
+                  </Button>
+                </div>
 
+                <p className="text-sm text-gray-500 -mt-2 opacity-80 hover:opacity-100 transition-opacity text-right">
+                  Aplicativo disponível para Android
+                </p>
               </motion.div>
+
 
               <motion.div
                 initial={{ opacity: 0 }}

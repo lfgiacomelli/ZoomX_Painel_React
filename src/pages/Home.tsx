@@ -8,15 +8,49 @@ import {
   MapPin,
   Clock,
   Zap,
-  Globe
+  Globe,
+  Loader2
 } from 'lucide-react';
+
+
 import { Button } from '@/components/ui/button';
 import mockup from '../assets/mockup_app.png';
 import HomeHeader from '@/components/layout/HomeHeader';
 import WorkWithUs from '@/components/layout/WorkWithUs';
 import Footer from '@/components/layout/AppFooter';
+import { useState } from 'react';
 
 export default function Home() {
+  const isAndroid = /Android/i.test(navigator.userAgent);
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const handleInstallApp = async () => {
+    try {
+      setIsDownloading(true); // Inicia animação
+
+      const response = await fetch("https://backend-turma-a-2025.onrender.com/api/downloads/app");
+
+      if (!response.ok) {
+        throw new Error("Erro ao baixar arquivo");
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "ZoomX.apk";
+      link.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error(error);
+      alert("Não foi possível realizar o download.");
+    } finally {
+      setIsDownloading(false); // Finaliza animação
+    }
+  };
+
+
   const navigate = useNavigate();
   const [heroRef, heroInView] = useInView({ triggerOnce: true, threshold: 0.1 });
 
@@ -104,6 +138,31 @@ export default function Home() {
                   <span className="mr-3">ACESSAR PAINEL</span>
                   <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
                 </Button>
+                <Button
+                  onClick={handleInstallApp}
+                  disabled={isDownloading}
+                  className={`px-8 py-5 text-lg font-medium rounded-full transition-all duration-300 shadow-lg hover:shadow-xl group 
+    ${isDownloading ? "bg-gray-400 cursor-not-allowed" : "bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white"}
+  `}
+                >
+                  {isDownloading ? (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.3 }}
+                      className="flex items-center gap-2"
+                    >
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      BAIXANDO...
+                    </motion.div>
+                  ) : (
+                    <>
+                      <span className="mr-3">INSTALAR APP</span>
+                      <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                    </>
+                  )}
+                </Button>
+
               </motion.div>
 
               <motion.div

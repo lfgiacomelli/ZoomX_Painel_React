@@ -42,6 +42,7 @@ const statusVariantMap: Record<string, string> = {
 
 export default function EmployeeTrips() {
   const { funCodigo } = useParams<{ funCodigo: string }>();
+  const [nomeFuncionario, setNomeFuncionario] = useState(null);
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -95,6 +96,7 @@ export default function EmployeeTrips() {
 
         const data = await response.json();
         setNotaMedia(data.nota_media);
+        setNomeFuncionario(data.fun_nome);
         console.log(notaMedia);
         console.log("Média de notas:", data);
       } catch (error) {
@@ -137,14 +139,16 @@ export default function EmployeeTrips() {
     );
   }
 
-  const fun_nome = trips[0].fun_nome;
 
+  const NotaEstrelas = ({ notaMedia }: { notaMedia: number | null }) => {
+    if (notaMedia === null) {
+      return <p className="text-lg text-muted-foreground">Sem avaliações</p>;
+    }
 
-  const NotaEstrelas = ({ notaMedia }: { notaMedia: number }) => {
     const estrelas = Array.from({ length: 5 }, (_, i) => i < Math.round(notaMedia));
 
     return (
-      <p className="flex flex-col items-start text-lg text-yellow-700">
+      <div className="flex flex-col items-start text-lg text-yellow-700">
         <span>Nota média dos clientes: {notaMedia}</span>
         <div className="flex mt-1">
           {estrelas.map((cheia, i) => (
@@ -154,9 +158,10 @@ export default function EmployeeTrips() {
             />
           ))}
         </div>
-      </p>
+      </div>
     );
   };
+
 
   return (
     <div className="space-y-6">
@@ -169,11 +174,12 @@ export default function EmployeeTrips() {
       )}
 
       <div className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Histórico de viagens de {fun_nome}</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Histórico de viagens de {nomeFuncionario}</h1>
         <p className="text-sm text-muted-foreground">
           Todas as viagens realizadas pelo funcionário #{funCodigo}
         </p>
-        <NotaEstrelas notaMedia={notaMedia ?? 0} />
+        <NotaEstrelas notaMedia={typeof notaMedia === "number" ? notaMedia : null} />
+
       </div>
 
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">

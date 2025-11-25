@@ -136,7 +136,6 @@ const Motorcycles: React.FC = () => {
 
   async function addMotorcycle(newMotorcycle: Omit<Motorcycle, 'mot_codigo' | 'fun_nome'>) {
     setLoading(true);
-    console.log("ativou")
 
     try {
       const response = await fetch(`${BASE_URL}/api/admin/motocicletas/adicionar`, {
@@ -147,7 +146,6 @@ const Motorcycles: React.FC = () => {
         },
         body: JSON.stringify(newMotorcycle),
       });
-      console.log(newMotorcycle)
 
       if (!response.ok) {
         let message = 'Erro ao adicionar motocicleta';
@@ -164,7 +162,6 @@ const Motorcycles: React.FC = () => {
 
           
           await response.json();
-          console.log("deu bom")
         } catch {
         }
       }
@@ -186,7 +183,6 @@ const Motorcycles: React.FC = () => {
       });
     } finally {
       setLoading(false);
-      console.log("desativou")
     }
   }
 
